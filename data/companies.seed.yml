@@ -37,3 +37,17 @@
 - {name: Linear, ats: ashby, slug: linear, domain: linear.app, hot: true}
 - {name: Cohere, ats: ashby, slug: cohere, domain: cohere.com, hot: true}
 - {name: Supabase, ats: ashby, slug: supabase, domain: supabase.com, hot: true}
+
+# Workday / SmartRecruiters / Workable. slug for workday is "tenant/site".
+- {name: NVIDIA, ats: workday, slug: nvidia/NVIDIAExternalCareerSite, workday_host: nvidia.wd5.myworkdayjobs.com, workday_site: NVIDIAExternalCareerSite, domain: nvidia.com, hot: true}
+- {name: Salesforce, ats: workday, slug: salesforce/External_Career_Site, workday_host: salesforce.wd12.myworkdayjobs.com, workday_site: External_Career_Site, domain: salesforce.com, hot: true}
+- {name: Adobe, ats: workday, slug: adobe/external_experienced, workday_host: adobe.wd5.myworkdayjobs.com, workday_site: external_experienced, domain: adobe.com, hot: true}
+- {name: Workday, ats: workday, slug: workday/Workday, workday_host: workday.wd5.myworkdayjobs.com, workday_site: Workday, domain: workday.com, hot: true}
+- {name: Mastercard, ats: workday, slug: mastercard/CorporateCareers, workday_host: mastercard.wd1.myworkdayjobs.com, workday_site: CorporateCareers, domain: mastercard.com, hot: true}
+- {name: Thomson Reuters, ats: workday, slug: thomsonreuters/External_Career_Site, workday_host: thomsonreuters.wd5.myworkdayjobs.com, workday_site: External_Career_Site, domain: thomsonreuters.com, hot: true}
+- {name: ServiceNow, ats: smartrecruiters, slug: ServiceNow, domain: servicenow.com, hot: true}
+- {name: Hugging Face, ats: workable, slug: huggingface, domain: huggingface.co, hot: true}
+- {name: RBC, ats: workday, slug: rbc/RBCEARLYTALENT1, workday_host: rbc.wd3.myworkdayjobs.com, workday_site: RBCEARLYTALENT1, domain: rbc.com, hot: true}
+- {name: RBC, ats: workday, slug: rbc/ExternalPrivatePostingStudents, workday_host: rbc.wd3.myworkdayjobs.com, workday_site: ExternalPrivatePostingStudents, domain: rbc.com, hot: true}
+- {name: BMO, ats: workday, slug: bmo/Campus, workday_host: bmo.wd3.myworkdayjobs.com, workday_site: Campus, domain: bmo.com, hot: true}
+- {name: TD, ats: workday, slug: td/TD_Bank_Careers, workday_host: td.wd3.myworkdayjobs.com, workday_site: TD_Bank_Careers, domain: td.com, hot: true}

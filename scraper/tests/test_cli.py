@@ -10,7 +10,14 @@ ROOT = Path(__file__).resolve().parents[2]
 def test_seed_file_is_valid():
     seeds = load_seeds(ROOT / "data" / "companies.seed.yml")
     assert len(seeds) >= 20
-    assert {s["ats"] for s in seeds} <= {"greenhouse", "lever", "ashby"}
+    assert {s["ats"] for s in seeds} <= {
+        "greenhouse",
+        "lever",
+        "ashby",
+        "workday",
+        "smartrecruiters",
+        "workable",
+    }
     keys = [(s["ats"], s["slug"]) for s in seeds]
     assert len(keys) == len(set(keys))
 
@@ -50,3 +57,21 @@ def test_workday_seed_needs_host_and_site(tmp_path):
     bad.write_text("- {name: X, ats: workday, slug: x/y}\n")
     with pytest.raises(ValueError, match="workday"):
         load_seeds(bad)
+
+
+def test_seed_verify_passes_workday_host_and_site(monkeypatch, tmp_path):
+    from scraper import __main__ as cli
+
+    seed = tmp_path / "seed.yml"
+    seed.write_text(
+        "- {name: A, ats: workday, slug: a/S, workday_host: a.wd5.myworkdayjobs.com, workday_site: S}\n"
+    )
+    seen = []
+
+    async def fake_poll_all(companies):
+        seen.extend(companies)
+        return []
+
+    monkeypatch.setattr(cli, "_poll_all", fake_poll_all)
+    cli.main(["seed", str(seed), "--verify"])
+    assert (seen[0].workday_host, seen[0].workday_site) == ("a.wd5.myworkdayjobs.com", "S")

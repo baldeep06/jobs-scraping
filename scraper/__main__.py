@@ -75,7 +75,17 @@ def cmd_migrate(_: argparse.Namespace) -> int:
 def cmd_seed(args: argparse.Namespace) -> int:
     seeds = load_seeds(args.path)
     if args.verify:
-        companies = [Company(id=0, name=s["name"], ats=s["ats"], slug=s["slug"]) for s in seeds]
+        companies = [
+            Company(
+                id=0,
+                name=s["name"],
+                ats=s["ats"],
+                slug=s["slug"],
+                workday_host=s.get("workday_host"),
+                workday_site=s.get("workday_site"),
+            )
+            for s in seeds
+        ]
         outcomes = asyncio.run(_poll_all(companies))
         _print_outcomes(outcomes)
         failed = [o.company.slug for o in outcomes if not o.ok]
