@@ -1,0 +1,17 @@
+{
+  "total": 3,
+  "results": [
+    {"id": 1, "shortcode": "AAA111", "title": "Software Engineer Intern", "remote": false,
+     "location": {"country": "Canada", "countryCode": "CA", "city": "Toronto", "region": "Ontario"},
+     "state": "published", "published": "2026-09-30T00:00:00.000Z", "type": "intern",
+     "workplace": "hybrid"},
+    {"id": 2, "shortcode": "BBB222", "title": "International Sales Manager", "remote": false,
+     "location": {"country": "United States", "countryCode": "US", "city": "Austin", "region": "Texas"},
+     "state": "published", "published": "2026-09-01T00:00:00.000Z", "type": "full",
+     "workplace": "on_site"},
+    {"id": 3, "shortcode": "CCC333", "title": "Data Science Intern", "remote": true,
+     "location": {"country": "United States", "countryCode": "US", "city": "", "region": null},
+     "state": "published", "published": "2026-10-01T00:00:00.000Z", "type": "intern",
+     "workplace": "remote"}
+  ]
+}

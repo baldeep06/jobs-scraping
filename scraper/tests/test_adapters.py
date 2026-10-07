@@ -97,4 +97,4 @@ def test_ashby_unexpected_payload():
 
 
 def test_registry_has_all_phase1_adapters():
-    assert set(ADAPTERS) == {"greenhouse", "lever", "ashby"}
+    assert {"greenhouse", "lever", "ashby"} <= set(ADAPTERS)
