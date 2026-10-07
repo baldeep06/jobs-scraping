@@ -8,3 +8,5 @@ visa sponsorship, pay, and reposts, and serves everything in a filterable table.
 
 - Stack (planned): Next.js on Vercel · Supabase (Postgres) · GitHub Actions cron scrapers
 - Design reference: [`design/DESIGN.md`](design/DESIGN.md)
+
+WIP 
