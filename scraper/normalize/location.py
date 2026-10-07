@@ -8,6 +8,7 @@ _CITY_CODE = re.compile(r"^\s*(?P<city>[^,()]+?)\s*,\s*(?P<code>[A-Z]{2})\b")
 _MODE_PREFIX = re.compile(r"^(?:remote|hybrid|on-?site)\s*[-–:]\s*", re.I)
 _REMOTE = re.compile(r"\bremote\b|\bwork from home\b|\bwfh\b", re.I)
 _HYBRID = re.compile(r"\bhybrid\b", re.I)
+_MODE_WORDS = re.compile(r"\b(?:remote|hybrid|on-?site|work from home|wfh|anywhere)\b", re.I)
 _CANADA = re.compile(r"\bcanada\b", re.I)
 _USA = re.compile(r"\bunited states\b|\busa\b|(?<!\w)u\.s\.(?:a\.)?|(?-i:\bUS\b)", re.I)
 
@@ -90,9 +91,12 @@ def parse_location(
     segments = [s for s in _SPLIT.split(raw or "") if s.strip()]
     found: dict[str, Location] = {}
     foreign: list[bool] = []
+    named_unresolved = False  # a place name we couldn't place in CA/US or abroad
     for seg in segments:
         locs, is_foreign = _parse_segment(seg)
         foreign.append(is_foreign)
+        if not locs and not is_foreign and _MODE_WORDS.sub("", seg).strip(" ,-–()/"):
+            named_unresolved = True
         for loc in locs:
             found.setdefault(loc.key(), loc)
     locations = list(found.values())
@@ -104,7 +108,7 @@ def parse_location(
             locations = [Location(country=hint)]
         elif hint or (foreign and all(foreign)):
             return ParsedLocation(country="UNKNOWN", work_mode=mode, foreign_only=True)
-        elif default_country in ("CA", "US"):
+        elif default_country in ("CA", "US") and not named_unresolved:
             locations = [Location(country=default_country)]
         else:
             return ParsedLocation(country="UNKNOWN", work_mode=mode, location_unclear=True)

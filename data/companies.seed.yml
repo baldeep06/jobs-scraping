@@ -1,0 +1,39 @@
+# Curated tech companies polled every 5 minutes (tier: hot).
+# ats: greenhouse | lever | ashby. slug: the board token in the ATS URL.
+- {name: Stripe, ats: greenhouse, slug: stripe, domain: stripe.com, hot: true}
+- {name: Airbnb, ats: greenhouse, slug: airbnb, domain: airbnb.com, hot: true}
+- {name: Databricks, ats: greenhouse, slug: databricks, domain: databricks.com, hot: true}
+- {name: Robinhood, ats: greenhouse, slug: robinhood, domain: robinhood.com, hot: true}
+- {name: Coinbase, ats: greenhouse, slug: coinbase, domain: coinbase.com, hot: true}
+- {name: Figma, ats: greenhouse, slug: figma, domain: figma.com, hot: true}
+- {name: Discord, ats: greenhouse, slug: discord, domain: discord.com, hot: true}
+- {name: Reddit, ats: greenhouse, slug: reddit, domain: reddit.com, hot: true}
+- {name: Pinterest, ats: greenhouse, slug: pinterest, domain: pinterest.com, hot: true}
+- {name: Lyft, ats: greenhouse, slug: lyft, domain: lyft.com, hot: true}
+- {name: Instacart, ats: greenhouse, slug: instacart, domain: instacart.com, hot: true}
+- {name: Dropbox, ats: greenhouse, slug: dropbox, domain: dropbox.com, hot: true}
+- {name: Cloudflare, ats: greenhouse, slug: cloudflare, domain: cloudflare.com, hot: true}
+- {name: Datadog, ats: greenhouse, slug: datadog, domain: datadoghq.com, hot: true}
+- {name: MongoDB, ats: greenhouse, slug: mongodb, domain: mongodb.com, hot: true}
+- {name: GitLab, ats: greenhouse, slug: gitlab, domain: gitlab.com, hot: true}
+- {name: Affirm, ats: greenhouse, slug: affirm, domain: affirm.com, hot: true}
+- {name: Brex, ats: greenhouse, slug: brex, domain: brex.com, hot: true}
+- {name: Samsara, ats: greenhouse, slug: samsara, domain: samsara.com, hot: true}
+- {name: Scale AI, ats: greenhouse, slug: scaleai, domain: scale.com, hot: true}
+- {name: Anthropic, ats: greenhouse, slug: anthropic, domain: anthropic.com, hot: true}
+- {name: Faire, ats: greenhouse, slug: faire, domain: faire.com, hot: true}
+- {name: Roblox, ats: greenhouse, slug: roblox, domain: roblox.com, hot: true}
+- {name: Twitch, ats: greenhouse, slug: twitch, domain: twitch.tv, hot: true}
+- {name: Duolingo, ats: greenhouse, slug: duolingo, domain: duolingo.com, hot: true}
+- {name: Asana, ats: greenhouse, slug: asana, domain: asana.com, hot: true}
+- {name: Okta, ats: greenhouse, slug: okta, domain: okta.com, hot: true}
+- {name: Elastic, ats: greenhouse, slug: elastic, domain: elastic.co, hot: true}
+- {name: Vercel, ats: greenhouse, slug: vercel, domain: vercel.com, hot: true}
+- {name: Palantir, ats: lever, slug: palantir, domain: palantir.com, hot: true}
+- {name: Spotify, ats: lever, slug: spotify, domain: spotify.com, hot: true}
+- {name: OpenAI, ats: ashby, slug: openai, domain: openai.com, hot: true}
+- {name: Ramp, ats: ashby, slug: ramp, domain: ramp.com, hot: true}
+- {name: Notion, ats: ashby, slug: notion, domain: notion.so, hot: true}
+- {name: Linear, ats: ashby, slug: linear, domain: linear.app, hot: true}
+- {name: Cohere, ats: ashby, slug: cohere, domain: cohere.com, hot: true}
+- {name: Supabase, ats: ashby, slug: supabase, domain: supabase.com, hot: true}

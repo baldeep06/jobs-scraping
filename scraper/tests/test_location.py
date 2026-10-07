@@ -67,3 +67,13 @@ def test_work_modes():
     assert parse_location("Remote - US").work_mode == "remote"
     assert parse_location("Toronto, ON", work_mode_hint="remote").work_mode == "remote"
     assert parse_location("").work_mode == "unknown"
+
+
+def test_unrecognised_city_is_not_given_the_company_default_country():
+    parsed = parse_location("Gotham", default_country="US")
+    assert parsed.country == "UNKNOWN" and parsed.location_unclear is True
+
+
+@pytest.mark.parametrize("raw", ["Bucharest, Romania", "Prague", "Krakow, Poland", "Chennai"])
+def test_more_foreign_cities(raw):
+    assert parse_location(raw).foreign_only is True

@@ -15,6 +15,12 @@ from scraper.normalize.term import parse_term
         ("PEY Co-op Student", "", ("PEY", 12)),
         ("Software Intern", "Requires 6 months of experience with Python.", (None, None)),
         ("Software Intern", "", (None, None)),
+        (
+            "Data Analyst, Intern",
+            "with the expectation of graduating in December 2027 or spring/summer 2028",
+            (None, None),
+        ),
+        ("Data Intern (Summer 2027)", "Graduating in spring 2028.", ("Summer 2027", None)),
     ],
 )
 def test_parse_term(title, text, expected):

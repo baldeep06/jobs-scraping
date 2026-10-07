@@ -12,9 +12,20 @@ _MONTHS_DESC = re.compile(
 _PEY = re.compile(r"(?-i:\bPEY\b)|professional experience year", re.I)
 
 
+_GRADUATION = re.compile(r"graduat", re.I)
+
+
+def _description_season(text: str) -> re.Match[str] | None:
+    """First season+year in the description that isn't a graduation date."""
+    for m in _SEASON.finditer(text):
+        if not _GRADUATION.search(text[max(0, m.start() - 80) : m.start()]):
+            return m
+    return None
+
+
 def parse_term(title: str, text: str) -> tuple[str | None, int | None]:
     term: str | None = None
-    if season := (_SEASON.search(title) or _SEASON.search(text)):
+    if season := (_SEASON.search(title) or _description_season(text)):
         name = season.group(1).lower()
         term = f"{'Fall' if name == 'autumn' else name.title()} {season.group(2)}"
 

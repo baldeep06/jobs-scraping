@@ -50,6 +50,15 @@ FOREIGN_RE = re.compile(
     r"tokyo|china|beijing|shanghai|shenzhen|hong kong|taiwan|taipei|korea|seoul|australia|"
     r"sydney|melbourne|new zealand|israel|tel aviv|brazil|são paulo|sao paulo|mexico|"
     r"argentina|buenos aires|colombia|bogota|philippines|manila|vietnam|indonesia|uae|dubai|"
+    r"romania|bucharest|cluj|czech|prague|brno|hungary|budapest|austria|vienna|belgium|"
+    r"brussels|greece|athens|turkey|istanbul|ukraine|kyiv|krakow|wroclaw|serbia|belgrade|"
+    r"bulgaria|sofia|croatia|zagreb|estonia|tallinn|latvia|riga|lithuania|vilnius|"
+    r"luxembourg|iceland|oslo|helsinki|hamburg|frankfurt|cologne|stuttgart|lyon|rotterdam|"
+    r"eindhoven|utrecht|edinburgh|manchester|belfast|chennai|noida|kolkata|ahmedabad|osaka|"
+    r"kuala lumpur|malaysia|bangkok|thailand|jakarta|hanoi|ho chi minh|egypt|cairo|kenya|"
+    r"nairobi|nigeria|lagos|south africa|johannesburg|cape town|saudi|riyadh|qatar|doha|"
+    r"abu dhabi|pakistan|karachi|lahore|bangladesh|dhaka|sri lanka|colombo|peru|lima|chile|"
+    r"santiago|uruguay|montevideo|costa rica|"
     r"emea|apac|latam|europe)\b",
     re.I,
 )
