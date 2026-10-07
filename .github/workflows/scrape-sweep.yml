@@ -1,0 +1,32 @@
+name: scrape-sweep
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: scrape-sweep
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --no-dev
+      - name: Discover new boards from Simplify
+        run: uv run python -m scraper discover
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Sweep warm and cold companies
+        run: uv run python -m scraper run --sweep
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

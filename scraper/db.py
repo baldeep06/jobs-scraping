@@ -471,3 +471,37 @@ def get_sweep_companies(
         {"ats": ats, "now": now, "repoll": COLD_REPOLL, "limit": limit},
     ).fetchall()
     return [Company(**r) for r in rows]
+
+
+RUN_RETENTION = "30 days"
+
+
+def prune(conn: psycopg.Connection, now: datetime) -> int:
+    cur = conn.execute(
+        "delete from scrape_runs where finished_at < %s - %s::interval", (now, RUN_RETENTION)
+    )
+    return cur.rowcount
+
+
+def _counts(conn: psycopg.Connection, sql: str) -> dict[str, int]:
+    return {r["k"]: r["n"] for r in conn.execute(sql).fetchall()}
+
+
+def stats(conn: psycopg.Connection, now: datetime) -> dict[str, Any]:
+    last = conn.execute(
+        "select workflow, finished_at from scrape_runs order by finished_at desc limit 1"
+    ).fetchone()
+    return {
+        "companies_by_tier": _counts(
+            conn, "select tier as k, count(*) as n from companies group by 1 order by 1"
+        ),
+        "companies_by_ats": _counts(
+            conn, "select ats as k, count(*) as n from companies group by 1 order by 1"
+        ),
+        "open_jobs_by_country": _counts(
+            conn,
+            "select country as k, count(*) as n from jobs where status = 'open' "
+            "group by 1 order by 1",
+        ),
+        "last_run": last,
+    }

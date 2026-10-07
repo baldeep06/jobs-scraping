@@ -1,0 +1,33 @@
+name: maintenance
+on:
+  schedule:
+    - cron: "0 8 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: maintenance
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --no-dev
+      - run: uv run python -m scraper maintenance
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Commit STATS.md (keeps scheduled workflows enabled)
+        run: |
+          git config user.name "baldeep06"
+          git config user.email "92562237+baldeep06@users.noreply.github.com"
+          git add STATS.md
+          git commit -m "chore: weekly stats" || echo "nothing to commit"
+          git push

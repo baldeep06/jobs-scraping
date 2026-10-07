@@ -10,6 +10,7 @@ import psycopg
 import yaml
 
 from scraper import db
+from scraper import stats as stats_report
 from scraper.adapters import ADAPTERS
 from scraper.discovery import discover
 from scraper.http import Fetcher
@@ -93,6 +94,16 @@ def cmd_discover(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_maintenance(args: argparse.Namespace) -> int:
+    conn = _connect()
+    now = datetime.now(UTC)
+    db.retier(conn, now)
+    pruned = db.prune(conn, now)
+    args.stats_path.write_text(stats_report.render(db.stats(conn, now), now))
+    print(f"retiered, pruned {pruned} old runs, wrote {args.stats_path}")
+    return 0
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     started = datetime.now(UTC)
     if args.dry_run and args.company and args.ats:
@@ -155,6 +166,9 @@ def main(argv: list[str] | None = None) -> int:
     seed.add_argument("path", nargs="?", type=Path, default=DEFAULT_SEED)
     seed.add_argument("--verify", action="store_true", help="only check each board responds")
 
+    maint = sub.add_parser("maintenance", help="re-tier, prune, write STATS.md")
+    maint.add_argument("--stats-path", type=Path, default=Path("STATS.md"))
+
     sub.add_parser("discover", help="add companies found in the Simplify lists")
 
     run = sub.add_parser("run", help="poll companies and write jobs")
@@ -172,7 +186,13 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     args = parser.parse_args(argv)
-    handlers = {"migrate": cmd_migrate, "seed": cmd_seed, "run": cmd_run, "discover": cmd_discover}
+    handlers = {
+        "migrate": cmd_migrate,
+        "seed": cmd_seed,
+        "run": cmd_run,
+        "discover": cmd_discover,
+        "maintenance": cmd_maintenance,
+    }
     return handlers[args.cmd](args)
 
 
