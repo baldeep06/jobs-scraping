@@ -398,3 +398,41 @@ def record_run(
             Jsonb(error_samples[:20]),
         ),  # fmt: skip
     )
+
+
+def discover_companies(conn: psycopg.Connection, seeds: list[dict[str, Any]]) -> int:
+    """Insert boards we don't know yet as warm companies. Never touches existing rows."""
+    added = 0
+    with conn.transaction():
+        for s in seeds:
+            cur = conn.execute(
+                """insert into companies (name, ats, slug, workday_host, workday_site,
+                                          tier, discovered_from)
+                   values (%(name)s, %(ats)s, %(slug)s, %(workday_host)s, %(workday_site)s,
+                           'warm', 'simplify')
+                   on conflict (ats, slug) do nothing""",
+                {
+                    "name": s["name"],
+                    "ats": s["ats"],
+                    "slug": s["slug"],
+                    "workday_host": s.get("workday_host"),
+                    "workday_site": s.get("workday_site"),
+                },
+            )
+            added += cur.rowcount
+    return added
+
+
+def get_state_sha(conn: psycopg.Connection, source: str) -> str | None:
+    row = conn.execute(
+        "select last_commit_sha from source_state where source = %s", (source,)
+    ).fetchone()
+    return row["last_commit_sha"] if row else None
+
+
+def set_state_sha(conn: psycopg.Connection, source: str, sha: str) -> None:
+    conn.execute(
+        """insert into source_state (source, last_commit_sha) values (%s, %s)
+           on conflict (source) do update set last_commit_sha = excluded.last_commit_sha""",
+        (source, sha),
+    )

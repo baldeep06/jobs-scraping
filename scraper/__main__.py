@@ -11,6 +11,7 @@ import yaml
 
 from scraper import db
 from scraper.adapters import ADAPTERS
+from scraper.discovery import discover
 from scraper.http import Fetcher
 from scraper.models import Company, CompanyOutcome
 from scraper.pipeline import poll
@@ -83,6 +84,15 @@ def cmd_seed(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_discover(_: argparse.Namespace) -> int:
+    async def go(conn: psycopg.Connection) -> int:
+        async with Fetcher() as fetcher:
+            return await discover(fetcher, conn)
+
+    print(f"discovered {asyncio.run(go(_connect()))} new companies")
+    return 0
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     started = datetime.now(UTC)
     if args.dry_run and args.company and args.ats:
@@ -145,6 +155,8 @@ def main(argv: list[str] | None = None) -> int:
     seed.add_argument("path", nargs="?", type=Path, default=DEFAULT_SEED)
     seed.add_argument("--verify", action="store_true", help="only check each board responds")
 
+    sub.add_parser("discover", help="add companies found in the Simplify lists")
+
     run = sub.add_parser("run", help="poll companies and write jobs")
     run.add_argument("--tier", choices=["hot", "warm", "cold"])
     run.add_argument("--company", help="only this slug")
@@ -157,7 +169,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     args = parser.parse_args(argv)
-    handlers = {"migrate": cmd_migrate, "seed": cmd_seed, "run": cmd_run}
+    handlers = {"migrate": cmd_migrate, "seed": cmd_seed, "run": cmd_run, "discover": cmd_discover}
     return handlers[args.cmd](args)
 
 
