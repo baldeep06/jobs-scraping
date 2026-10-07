@@ -16,6 +16,8 @@ class Company(BaseModel):
     ats: str
     slug: str
     job_ids_hash: str | None = None
+    workday_host: str | None = None
+    workday_site: str | None = None
 
 
 class PayRange(BaseModel):
@@ -106,6 +108,8 @@ class EnrichedJob(BaseModel):
 class FetchResult:
     jobs: list[RawJob]
     invalid: int = 0
+    # A search-based ATS answered successfully with zero hits (so the last job may be gone).
+    confirmed_empty: bool = False
 
 
 @dataclass
@@ -119,5 +123,6 @@ class CompanyOutcome:
     ids_hash: str | None = None
     unchanged: bool = False
     invalid: int = 0
+    confirmed_empty: bool = False
     error: str | None = None
     status: int | None = None

@@ -43,3 +43,10 @@ def test_connection_errors_never_print_the_password(monkeypatch, capsys, dsn):
     shown = f"{exc.value} {out.out} {out.err}"
     assert "Sup3r" not in shown and "Secret" not in shown
     assert "DATABASE_URL" in str(exc.value)
+
+
+def test_workday_seed_needs_host_and_site(tmp_path):
+    bad = tmp_path / "seed.yml"
+    bad.write_text("- {name: X, ats: workday, slug: x/y}\n")
+    with pytest.raises(ValueError, match="workday"):
+        load_seeds(bad)

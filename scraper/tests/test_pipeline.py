@@ -90,3 +90,12 @@ def test_few_invalid_records_still_ingests():
     jobs = [raw(str(i)) for i in range(10)]
     out = process(ACME, FetchResult(jobs=jobs, invalid=1))
     assert out.ok and out.invalid == 1
+
+
+def test_process_carries_confirmed_empty():
+    from scraper.models import Company, FetchResult
+    from scraper.pipeline import process
+
+    c = Company(id=1, name="A", ats="workday", slug="a/b")
+    out = process(c, FetchResult(jobs=[], confirmed_empty=True))
+    assert out.ok and out.confirmed_empty

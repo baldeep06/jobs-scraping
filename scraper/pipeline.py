@@ -40,7 +40,12 @@ def process(company: Company, result: FetchResult) -> CompanyOutcome:
         )
     seen = {r.source_job_id for r in result.jobs}
     outcome = CompanyOutcome(
-        company=company, ok=True, seen_ids=seen, ids_hash=board_hash(seen), invalid=result.invalid
+        company=company,
+        ok=True,
+        seen_ids=seen,
+        ids_hash=board_hash(seen),
+        invalid=result.invalid,
+        confirmed_empty=result.confirmed_empty,
     )
     if outcome.ids_hash == company.job_ids_hash:
         outcome.unchanged = True

@@ -213,3 +213,37 @@ def test_job_that_stops_passing_the_filter_is_closed(conn):
     db.ingest(conn, outcome(c, [raw("1")]), T0)
     db.ingest(conn, outcome(c, [raw("1", location="London, UK")]), T0 + timedelta(minutes=5))
     assert jobs(conn)[0]["status"] == "closed"
+
+
+def test_workday_fields_round_trip(conn):
+    db.upsert_companies(
+        conn,
+        [{"name": "Nvidia", "ats": "workday", "slug": "nvidia/Site", "hot": True,
+          "workday_host": "nvidia.wd5.myworkdayjobs.com", "workday_site": "Site"}],
+    )  # fmt: skip
+    c = db.get_companies(conn, ats=["workday"])[0]
+    assert (c.workday_host, c.workday_site) == ("nvidia.wd5.myworkdayjobs.com", "Site")
+
+
+def _empty_outcome(c, confirmed):
+    return CompanyOutcome(
+        company=c, ok=True, seen_ids=set(), ids_hash=ids_hash(set()), confirmed_empty=confirmed
+    )
+
+
+def test_confirmed_empty_board_closes_after_two_polls(conn):
+    c = company(conn)
+    db.ingest(conn, outcome(c, [raw("1")] + other()), T0)
+    for i in (1, 2):
+        c = db.get_companies(conn, ats=["greenhouse"], slug="acme")[0]
+        db.ingest(conn, _empty_outcome(c, True), T0 + timedelta(minutes=5 * i))
+    assert jobs(conn)[0]["status"] == "closed"
+
+
+def test_unconfirmed_empty_board_never_closes(conn):
+    c = company(conn)
+    db.ingest(conn, outcome(c, [raw("1")] + other()), T0)
+    for i in (1, 2, 3):
+        c = db.get_companies(conn, ats=["greenhouse"], slug="acme")[0]
+        db.ingest(conn, _empty_outcome(c, False), T0 + timedelta(minutes=5 * i))
+    assert jobs(conn)[0]["status"] == "open"

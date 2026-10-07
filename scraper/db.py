@@ -51,11 +51,15 @@ def upsert_companies(conn: psycopg.Connection, seeds: list[dict[str, Any]]) -> i
     with conn.transaction():
         for s in seeds:
             conn.execute(
-                """insert into companies (name, ats, slug, domain, curated_hot, tier)
-                   values (%(name)s, %(ats)s, %(slug)s, %(domain)s, %(hot)s,
+                """insert into companies (name, ats, slug, domain, workday_host, workday_site,
+                                          curated_hot, tier)
+                   values (%(name)s, %(ats)s, %(slug)s, %(domain)s, %(workday_host)s,
+                           %(workday_site)s, %(hot)s,
                            case when %(hot)s then 'hot' else 'warm' end)
                    on conflict (ats, slug) do update set
                      name = excluded.name, domain = excluded.domain,
+                     workday_host = excluded.workday_host,
+                     workday_site = excluded.workday_site,
                      curated_hot = excluded.curated_hot,
                      -- re-seeding a curated company reactivates it
                      tier = case when excluded.curated_hot then 'hot' else companies.tier end,
@@ -68,6 +72,8 @@ def upsert_companies(conn: psycopg.Connection, seeds: list[dict[str, Any]]) -> i
                     "ats": s["ats"],
                     "slug": s["slug"],
                     "domain": s.get("domain"),
+                    "workday_host": s.get("workday_host"),
+                    "workday_site": s.get("workday_site"),
                     "hot": bool(s.get("hot", False)),
                 },
             )
@@ -83,7 +89,7 @@ def get_companies(
     limit: int = 1000,
 ) -> list[Company]:
     rows = conn.execute(
-        """select id, name, ats, slug, job_ids_hash from companies
+        """select id, name, ats, slug, job_ids_hash, workday_host, workday_site from companies
            where ats = any(%(ats)s) and tier <> 'inactive'
              and (%(tier)s::text is null or tier = %(tier)s)
              and (%(slug)s::text is null or slug = %(slug)s)
@@ -343,7 +349,7 @@ def ingest(conn: psycopg.Connection, outcome: CompanyOutcome, now: datetime) -> 
 
         # An empty board or records that failed validation look like an upstream glitch or an
         # API change, not like every job being taken down: count no misses for this poll.
-        if outcome.seen_ids and not outcome.invalid:
+        if (outcome.seen_ids or outcome.confirmed_empty) and not outcome.invalid:
             enriched = None if outcome.unchanged else {j.raw.source_job_id for j in outcome.jobs}
             plan = plan_closures(_open_jobs(conn, company.id, source), outcome.seen_ids, enriched)
             _apply_closures(conn, plan, now)
