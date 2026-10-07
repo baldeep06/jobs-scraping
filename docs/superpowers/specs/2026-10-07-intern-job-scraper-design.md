@@ -103,10 +103,13 @@ digest.config.yml
   (if new) with `discovered_from` set; it is then polled directly.
 
 ### Intern & tech filter
-- Include if title matches
-  `\b(intern|internship|co-?op|student|placement|apprentice|PEY)\b` (case-insensitive).
-- Exclude if title matches `\b(internal|international|senior|sr\.?|staff|principal|manager|director|lead)\b`.
-  The filter applies to titles only, never descriptions.
+- Reject if title has a seniority word: `\b(senior|sr|staff|principal|director|head|vp)\b`.
+- Accept if title has a strong intern word: `\b(interns?|internships?|co-?ops?|apprentices?|apprenticeships?)\b`
+  or `PEY` (word boundaries mean "Internal"/"International" never match).
+- Accept if the ATS employment type says intern/co-op (Lever `commitment`, Ashby `employmentType`).
+- Accept a weak word (`student|placement`) only if the title has no
+  `manager|coordinator|advisor|recruiter|success|services|officer|counsellor` word.
+- Titles only, never descriptions.
 - Category by title keywords: `SWE`, `Data/ML`, `Hardware/Embedded`, `PM`,
   `Design`, `Quant`, `IT/Security`, `Other-tech`. Titles that match no tech
   keyword are dropped.
@@ -145,7 +148,7 @@ jobs_new, jobs_closed, errors int, error_samples jsonb`.
 `source pk, cooldown_until, backoff_seconds, last_commit_sha, notes`.
 
 **`user_job_state`**
-`user_id, job_id, state (saved|applied|hidden), updated_at`. PK `(user_id, job_id)`.
+`user_id, job_id, state (saved|applied|hidden), updated_at`. PK `(user_id, job_id)`. Created in the phase 4 migration.
 
 **View `jobs_feed`**: open jobs joined with company name/domain/h1b fields,
 ordered by `first_seen_at desc`.
@@ -269,8 +272,10 @@ Regex: `(summer|fall|autumn|winter|spring)\s*20\d\d`, `(\d{1,2})[- ]month`,
 - **Keepalive:** `maintenance` commits `STATS.md` weekly so GitHub doesn't
   disable schedules after 60 days of inactivity. Scraper writes keep Supabase
   from pausing.
-- **Secrets:** `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`,
-  `DIGEST_TO` in GitHub Secrets; never logged (logs are public).
+- **Secrets:** `DATABASE_URL` (Supabase **session pooler** URI — GitHub runners
+  have no IPv6, so the direct connection won't work), `RESEND_API_KEY`, `DIGEST_TO`
+  in GitHub Secrets; never logged (logs are public). The scraper talks to Postgres
+  directly via `psycopg`; the website uses `SUPABASE_URL` + anon key.
 - **Health:** a source is `degraded` if no successful run in 60 min; shown on
   `/status` and in the digest. GitHub's default failure emails cover crashes.
 
