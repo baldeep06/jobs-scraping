@@ -1,10 +1,10 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { FilterBar } from "@/components/FilterBar";
 import { Hero } from "@/components/Hero";
 import { JobList } from "@/components/JobList";
 import { Pagination } from "@/components/Pagination";
 import { RegionTabs } from "@/components/RegionTabs";
-import { parseFilters, type SearchParams } from "@/lib/filters";
+import { lastPageRedirect, parseFilters, type SearchParams } from "@/lib/filters";
 import { fetchCounts, fetchJobs, fetchSources, fetchTermOptions } from "@/lib/jobs";
 import { supabase } from "@/lib/supabase";
 import type { Region } from "@/lib/types";
@@ -28,6 +28,8 @@ export default async function RegionPage({
     fetchCounts(client, filters.region, now),
     fetchTermOptions(client, filters.region),
   ]);
+  const goTo = lastPageRedirect(filters, rows.length, total);
+  if (goTo) redirect(goTo);
   const sources = await fetchSources(
     client,
     rows.map((r) => r.id),

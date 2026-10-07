@@ -1,6 +1,13 @@
 "use client";
 
-export default function RegionError({ reset }: { error: Error; reset: () => void }) {
+// retry() re-fetches the server payload; reset() would re-render the same failed result.
+export default function RegionError({
+  retry,
+}: {
+  error: Error & { digest?: string };
+  retry: () => void;
+  reset: () => void;
+}) {
   return (
     <main className="mx-auto max-w-[1280px] px-4 py-16 md:px-8">
       <div className="rounded-card bg-surface px-6 py-16 text-center shadow-subtle">
@@ -10,7 +17,7 @@ export default function RegionError({ reset }: { error: Error; reset: () => void
         </p>
         <button
           type="button"
-          onClick={reset}
+          onClick={() => retry()}
           className="mt-4 rounded-control bg-signal px-3.5 pb-[9px] pt-[7px] text-sm font-medium text-white"
         >
           Retry

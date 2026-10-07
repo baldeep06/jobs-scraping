@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { type Filters, PAGE_SIZE } from "@/lib/filters";
+import { defaultVisa, type Filters, PAGE_SIZE } from "@/lib/filters";
 import type { Country, JobRow, JobSource, Region } from "@/lib/types";
 
 export const REGION_COUNTRIES: Record<Region, Country[]> = {
@@ -20,7 +20,8 @@ export interface FilterableQuery {
   range(from: number, to: number): this;
 }
 
-export function applyFilters<Q extends FilterableQuery>(query: Q, f: Filters, now: Date): Q {
+/** The WHERE part of the job list query (shared by the list and its count). */
+function applyWhere<Q extends FilterableQuery>(query: Q, f: Filters, now: Date): Q {
   let q = query.in("country", REGION_COUNTRIES[f.region]).in("visa_status", f.visa);
   if (f.category) q = q.eq("category", f.category);
   if (f.term) q = q.ilike("term", `%${f.term}%`);
@@ -34,6 +35,11 @@ export function applyFilters<Q extends FilterableQuery>(query: Q, f: Filters, no
     // f.q is sanitized by parseFilters (no quotes, commas, parens or %), so quoting is safe.
     q = q.or(`title.ilike."%${f.q}%",company_name.ilike."%${f.q}%"`);
   }
+  return q;
+}
+
+export function applyFilters<Q extends FilterableQuery>(query: Q, f: Filters, now: Date): Q {
+  let q = applyWhere(query, f, now);
   if (f.sort === "pay") q = q.order("pay_hourly_max", { ascending: false, nullsFirst: false });
   q = q.order("first_seen_at", { ascending: false });
   const from = (f.page - 1) * PAGE_SIZE;
@@ -53,6 +59,14 @@ export async function fetchJobs(
   const base = client.from("jobs_feed").select(COLUMNS, { count: "exact" });
   const filtered = applyFilters(base as unknown as FilterableQuery, f, now);
   const { data, count, error } = await (filtered as unknown as typeof base);
+  if (error?.code === "PGRST103") {
+    // Offset past the end (e.g. a bookmarked last page after jobs closed): report the real
+    // total so the page can redirect to the last page instead of erroring.
+    const head = client.from("jobs_feed").select("id", { count: "exact", head: true });
+    const counted = await (applyWhere(head as unknown as FilterableQuery, f, now) as unknown as typeof head);
+    if (counted.error) throw new Error(`jobs count failed: ${counted.error.message}`);
+    return { rows: [], total: counted.count ?? 0 };
+  }
   if (error) throw new Error(`jobs query failed: ${error.message}`);
   return { rows: (data ?? []) as unknown as JobRow[], total: count ?? 0 };
 }
@@ -81,14 +95,22 @@ export async function fetchCounts(
   region: Region,
   now: Date,
 ): Promise<{ open: number; today: number }> {
+  // Count what the region shows by default (the US tab hides visa-blocked jobs), so the hero
+  // agrees with the unfiltered list.
   const countries = REGION_COUNTRIES[region];
+  const visa = defaultVisa(region);
   const since = new Date(now.getTime() - WITHIN_MS["24h"]).toISOString();
   const [open, today] = await Promise.all([
-    client.from("jobs_feed").select("id", { count: "exact", head: true }).in("country", countries),
     client
       .from("jobs_feed")
       .select("id", { count: "exact", head: true })
       .in("country", countries)
+      .in("visa_status", visa),
+    client
+      .from("jobs_feed")
+      .select("id", { count: "exact", head: true })
+      .in("country", countries)
+      .in("visa_status", visa)
       .gte("first_seen_at", since),
   ]);
   if (open.error || today.error) throw new Error("count query failed");

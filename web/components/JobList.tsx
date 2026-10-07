@@ -109,6 +109,7 @@ function Row({ job, sources, now }: { job: JobRow; sources: JobSource[]; now: Da
               First seen {new Date(job.first_seen_at).toUTCString().slice(5, 16)} · location as
               posted: {job.location_raw || "—"}
             </p>
+            {job.pay_raw && <p>Pay as posted: {job.pay_raw}</p>}
             {job.repost_count > 0 && (
               <p>Posted before: this role has been reposted {job.repost_count}×.</p>
             )}

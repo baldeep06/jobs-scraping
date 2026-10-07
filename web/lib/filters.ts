@@ -73,6 +73,12 @@ export function parseFilters(region: Region, params: SearchParams): Filters {
   };
 }
 
+/** Where to send a request for a page past the end (results shrink as jobs close), or null. */
+export function lastPageRedirect(f: Filters, rowCount: number, total: number): string | null {
+  if (rowCount > 0 || total === 0 || f.page === 1) return null;
+  return `/${f.region}${toQuery({ ...f, page: Math.ceil(total / PAGE_SIZE) })}`;
+}
+
 export function toQuery(f: Filters): string {
   const p = new URLSearchParams();
   if (f.q) p.set("q", f.q);

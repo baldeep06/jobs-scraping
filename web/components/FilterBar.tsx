@@ -31,6 +31,12 @@ function Check({ name, label, checked }: { name: string; label: string; checked:
 
 export function FilterBar({ filters, terms }: { filters: Filters; terms: string[] }) {
   const visa = filters.visa.join(",");
+  // A URL can hold values the dropdowns don't offer (visa=blocked, a term from the other
+  // tab); list them so the select shows the truth and the next Apply keeps them.
+  const visaOptions = VISA_OPTIONS.some(([v]) => v === visa)
+    ? VISA_OPTIONS
+    : [...VISA_OPTIONS, [visa, `Custom: ${filters.visa.join(", ")}`] as [string, string]];
+  const termOptions = filters.term && !terms.includes(filters.term) ? [filters.term, ...terms] : terms;
   return (
     <form id="filters" method="get" className="flex flex-wrap items-center gap-3 py-4">
       <select
@@ -48,14 +54,14 @@ export function FilterBar({ filters, terms }: { filters: Filters; terms: string[
       </select>
       <select name="term" defaultValue={filters.term ?? ""} aria-label="Term" className={select}>
         <option value="">Any term</option>
-        {terms.map((t) => (
+        {termOptions.map((t) => (
           <option key={t} value={t}>
             {t}
           </option>
         ))}
       </select>
       <select name="visa" defaultValue={visa} aria-label="Visa" className={select}>
-        {VISA_OPTIONS.map(([value, label]) => (
+        {visaOptions.map(([value, label]) => (
           <option key={value} value={value}>
             {label}
           </option>
