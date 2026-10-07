@@ -20,6 +20,7 @@ from scraper.models import Company, CompanyOutcome, EnrichedJob
 
 MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "supabase" / "migrations"
 INACTIVE_AFTER_404S = 5
+INACTIVE_AFTER = "24 hours"  # and the 404 streak must span at least this long
 
 
 def connect(dsn: str) -> psycopg.Connection:
@@ -56,9 +57,12 @@ def upsert_companies(conn: psycopg.Connection, seeds: list[dict[str, Any]]) -> i
                    on conflict (ats, slug) do update set
                      name = excluded.name, domain = excluded.domain,
                      curated_hot = excluded.curated_hot,
-                     tier = case when companies.tier = 'inactive' then 'inactive'
-                                 when excluded.curated_hot then 'hot'
-                                 else companies.tier end""",
+                     -- re-seeding a curated company reactivates it
+                     tier = case when excluded.curated_hot then 'hot' else companies.tier end,
+                     consecutive_404s = case when excluded.curated_hot then 0
+                                             else companies.consecutive_404s end,
+                     first_404_at = case when excluded.curated_hot then null
+                                         else companies.first_404_at end""",
                 {
                     "name": s["name"],
                     "ats": s["ats"],
@@ -222,16 +226,17 @@ def _ingest_job(
     match = None
     if existing is None:
         fp = conn.execute(
-            """select id, status, last_seen_at, repost_count from jobs
-               where fingerprint = %s order by last_seen_at desc limit 1""",
-            (job.fingerprint,),
+            """select id, status, last_seen_at, repost_count, term from jobs
+               where fingerprint = %s
+               order by (term is not distinct from %s) desc, last_seen_at desc limit 1""",
+            (job.fingerprint, job.term),
         ).fetchone()
         if fp:
             match = FingerprintMatch(
-                str(fp["id"]), fp["status"], fp["last_seen_at"], fp["repost_count"]
+                str(fp["id"]), fp["status"], fp["last_seen_at"], fp["repost_count"], fp["term"]
             )
 
-    d = classify(existing, raw.source_posted_at, match, now)
+    d = classify(existing, raw.source_posted_at, match, now, incoming_term=job.term)
     if d.action == "insert":
         job_id = _insert_job(conn, job, d, now)
         _upsert_source(conn, job_id, company.id, job, now)
@@ -299,15 +304,35 @@ def ingest(conn: psycopg.Connection, outcome: CompanyOutcome, now: datetime) -> 
     with conn.transaction():
         if not outcome.ok:
             is_404 = outcome.status == 404
-            conn.execute(
+            row = conn.execute(
                 """update companies set last_polled_at = %(now)s, fail_count = fail_count + 1,
                      consecutive_404s = case when %(is_404)s then consecutive_404s + 1 else 0 end,
+                     first_404_at = case when %(is_404)s then coalesce(first_404_at, %(now)s)
+                                         end,
                      tier = case when %(is_404)s and consecutive_404s + 1 >= %(limit)s
+                                      and %(now)s - coalesce(first_404_at, %(now)s)
+                                          >= %(window)s::interval
                                  then 'inactive' else tier end
-                   where id = %(id)s""",
-                {"now": now, "is_404": is_404, "limit": INACTIVE_AFTER_404S, "id": company.id},
-            )
-            return IngestStats()
+                   where id = %(id)s
+                   returning tier""",
+                {
+                    "now": now,
+                    "is_404": is_404,
+                    "limit": INACTIVE_AFTER_404S,
+                    "window": INACTIVE_AFTER,
+                    "id": company.id,
+                },
+            ).fetchone()
+            stats = IngestStats()
+            if row and row["tier"] == "inactive":
+                # The board is gone: its jobs will never be polled again, so close them.
+                closed = conn.execute(
+                    """update jobs set status = 'closed', closed_at = %s, updated_at = %s
+                       where company_id = %s and status = 'open'""",
+                    (now, now, company.id),
+                )
+                stats.closed = closed.rowcount
+            return stats
 
         source = company.ats
         stats = IngestStats(seen=len(outcome.seen_ids))
@@ -316,13 +341,18 @@ def ingest(conn: psycopg.Connection, outcome: CompanyOutcome, now: datetime) -> 
         else:
             stats.new = sum(_ingest_job(conn, company, job, now) for job in outcome.jobs)
 
-        plan = plan_closures(_open_jobs(conn, company.id, source), outcome.seen_ids)
-        _apply_closures(conn, plan, now)
-        stats.closed = len(plan.close)
+        # An empty board or records that failed validation look like an upstream glitch or an
+        # API change, not like every job being taken down: count no misses for this poll.
+        if outcome.seen_ids and not outcome.invalid:
+            enriched = None if outcome.unchanged else {j.raw.source_job_id for j in outcome.jobs}
+            plan = plan_closures(_open_jobs(conn, company.id, source), outcome.seen_ids, enriched)
+            _apply_closures(conn, plan, now)
+            stats.closed = len(plan.close)
 
         conn.execute(
             """update companies set last_polled_at = %(now)s, last_success_at = %(now)s,
-                 fail_count = 0, consecutive_404s = 0, job_ids_hash = %(hash)s,
+                 fail_count = 0, consecutive_404s = 0, first_404_at = null,
+                 job_ids_hash = %(hash)s,
                  last_intern_seen_at = case when %(interns)s then %(now)s
                                             else last_intern_seen_at end
                where id = %(id)s""",

@@ -26,3 +26,20 @@ def test_run_requires_database_url_unless_offline_dry_run(monkeypatch):
     monkeypatch.delenv("DATABASE_URL", raising=False)
     with pytest.raises(SystemExit, match="DATABASE_URL"):
         main(["run", "--tier", "hot"])
+
+
+@pytest.mark.parametrize(
+    "dsn",
+    [
+        "postgresql://user:Sup3r%Secret@localhost:1/db",  # bad percent-encoding
+        "postgresql://user:Sup3rSecret@127.0.0.1:1/db",  # unreachable
+    ],
+)
+def test_connection_errors_never_print_the_password(monkeypatch, capsys, dsn):
+    monkeypatch.setenv("DATABASE_URL", dsn)
+    with pytest.raises(SystemExit) as exc:
+        main(["run", "--tier", "hot"])
+    out = capsys.readouterr()
+    shown = f"{exc.value} {out.out} {out.err}"
+    assert "Sup3r" not in shown and "Secret" not in shown
+    assert "DATABASE_URL" in str(exc.value)

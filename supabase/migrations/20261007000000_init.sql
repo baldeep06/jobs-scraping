@@ -14,6 +14,7 @@ create table companies (
   last_success_at timestamptz,
   fail_count int not null default 0,
   consecutive_404s int not null default 0,
+  first_404_at timestamptz,
   job_ids_hash text,
   last_intern_seen_at timestamptz,
   discovered_from text,

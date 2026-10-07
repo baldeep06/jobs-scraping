@@ -14,6 +14,8 @@ from scraper.enrich.visa import detect_visa_signals, visa_status
             "no_sponsorship",
         ),
         ("Sponsorship is not available for this position.", "no_sponsorship"),
+        ("We won't sponsor visas for this role.", "no_sponsorship"),
+        ("We can't sponsor work visas.", "no_sponsorship"),
         ("Applicants must be a U.S. citizen.", "us_citizen_only"),
         ("U.S. citizenship is required.", "us_citizen_only"),
         ("Open to US citizens or green card holders only.", "us_citizen_only"),

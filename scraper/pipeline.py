@@ -8,6 +8,11 @@ from scraper.http import Fetcher, FetchError
 from scraper.models import Company, CompanyOutcome, FetchResult, RawJob
 from scraper.normalize.location import parse_location
 
+# Bump when enrichment rules change so existing rows get re-enriched on the next poll.
+ENRICH_VERSION = 2
+# More invalid records than this share means the ATS changed its format: don't trust the poll.
+MAX_INVALID_SHARE = 0.2
+
 
 def dominant_country(raws: list[RawJob]) -> str | None:
     """Most common of CA/US across a company's whole board (used for bare "Remote" roles)."""
@@ -19,10 +24,23 @@ def dominant_country(raws: list[RawJob]) -> str | None:
     return counts.most_common(1)[0][0] if counts else None
 
 
+def board_hash(seen: set[str]) -> str:
+    """Change-detection hash. Includes ENRICH_VERSION so a rules change reprocesses every board."""
+    return ids_hash([f"__enrich_v{ENRICH_VERSION}", *seen])
+
+
 def process(company: Company, result: FetchResult) -> CompanyOutcome:
+    total = len(result.jobs) + result.invalid
+    if result.invalid and (not result.jobs or result.invalid / total > MAX_INVALID_SHARE):
+        return CompanyOutcome(
+            company=company,
+            ok=False,
+            invalid=result.invalid,
+            error=f"{result.invalid} of {total} records failed validation (API change?)",
+        )
     seen = {r.source_job_id for r in result.jobs}
     outcome = CompanyOutcome(
-        company=company, ok=True, seen_ids=seen, ids_hash=ids_hash(seen), invalid=result.invalid
+        company=company, ok=True, seen_ids=seen, ids_hash=board_hash(seen), invalid=result.invalid
     )
     if outcome.ids_hash == company.job_ids_hash:
         outcome.unchanged = True

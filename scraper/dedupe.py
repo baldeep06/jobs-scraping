@@ -41,6 +41,7 @@ class FingerprintMatch:
     status: str
     last_seen_at: datetime
     repost_count: int
+    term: str | None = None
 
 
 @dataclass(frozen=True)
@@ -57,8 +58,14 @@ def classify(
     incoming_posted_at: datetime | None,
     fp_match: FingerprintMatch | None,
     now: datetime,
+    incoming_term: str | None = None,
 ) -> Decision:
-    """Spec §4 freshness rules, evaluated in order."""
+    """Spec §4 freshness rules, evaluated in order.
+
+    The fingerprint ignores term, so "Intern (Fall 2026)" and "Intern (Winter 2027)" match.
+    An open match only absorbs the incoming posting when the terms agree (or one is
+    unknown); two terms posted at the same time are separate opportunities.
+    """
     if existing is not None:
         if existing.job_status == "closed":
             return Decision("reopen", job_id=existing.job_id, freshness="reopened")
@@ -72,6 +79,8 @@ def classify(
         return Decision("touch", job_id=existing.job_id)
     if fp_match is not None:
         if fp_match.status == "open":
+            if fp_match.term and incoming_term and fp_match.term != incoming_term:
+                return Decision("insert", freshness="fresh")
             return Decision("attach", job_id=fp_match.job_id)
         if now - fp_match.last_seen_at <= REPOST_WINDOW:
             return Decision(
@@ -98,10 +107,20 @@ class ClosurePlan:
     close: list[str] = field(default_factory=list)
 
 
-def plan_closures(open_jobs: list[OpenJob], seen_ids: set[str]) -> ClosurePlan:
-    """A job is missing only if none of its source IDs (for this company+source) were seen."""
+def plan_closures(
+    open_jobs: list[OpenJob], seen_ids: set[str], enriched_ids: set[str] | None = None
+) -> ClosurePlan:
+    """A job is missing only if none of its source IDs (for this company+source) were seen.
+
+    With `enriched_ids` (a full re-enrichment happened), a job whose IDs are still listed but
+    none passed the filter any more (retitled, moved abroad) is closed right away.
+    """
     plan = ClosurePlan()
     for job in open_jobs:
+        if enriched_ids is not None and job.source_job_ids & seen_ids:
+            if not job.source_job_ids & enriched_ids:
+                plan.close.append(job.job_id)
+                continue
         if job.source_job_ids & seen_ids:
             if job.miss_count:
                 plan.reset.append(job.job_id)

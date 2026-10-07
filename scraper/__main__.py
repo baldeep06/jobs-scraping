@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import psycopg
 import yaml
 
 from scraper import db
@@ -25,11 +26,18 @@ def load_seeds(path: Path) -> list[dict[str, Any]]:
     return seeds
 
 
-def _dsn() -> str:
+def _connect() -> psycopg.Connection:
     dsn = os.environ.get("DATABASE_URL")
     if not dsn:
         raise SystemExit("DATABASE_URL is not set (see .env.example)")
-    return dsn
+    try:
+        return db.connect(dsn)
+    except (psycopg.Error, ValueError) as e:
+        # Never echo the message: psycopg can quote parts of the URL, including the password,
+        # and Actions logs are public. GitHub only masks the exact secret, not fragments.
+        raise SystemExit(
+            f"could not connect to the database ({type(e).__name__}); check DATABASE_URL"
+        ) from None
 
 
 async def _poll_all(companies: list[Company]) -> list[CompanyOutcome]:
@@ -55,7 +63,7 @@ def _print_outcomes(outcomes: list[CompanyOutcome]) -> None:
 
 
 def cmd_migrate(_: argparse.Namespace) -> int:
-    applied = db.migrate(db.connect(_dsn()))
+    applied = db.migrate(_connect())
     print(f"applied: {applied or 'nothing (up to date)'}")
     return 0
 
@@ -69,7 +77,7 @@ def cmd_seed(args: argparse.Namespace) -> int:
         failed = [o.company.slug for o in outcomes if not o.ok]
         print(f"\n{len(seeds) - len(failed)}/{len(seeds)} boards OK. Failed: {failed or 'none'}")
         return 1 if failed else 0
-    print(f"upserted {db.upsert_companies(db.connect(_dsn()), seeds)} companies")
+    print(f"upserted {db.upsert_companies(_connect(), seeds)} companies")
     return 0
 
 
@@ -80,7 +88,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         _print_outcomes(asyncio.run(_poll_all([company])))
         return 0
 
-    conn = db.connect(_dsn())
+    conn = _connect()
     companies = db.get_companies(
         conn,
         ats=[args.ats] if args.ats else list(ADAPTERS),

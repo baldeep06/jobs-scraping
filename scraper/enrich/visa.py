@@ -12,6 +12,8 @@ VISA_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
         re.compile(
             r"\b(?:will|do|does|can|are|is)\s*(?:not|n['’]t)\s+(?:be\s+)?(?:able\s+to\s+)?"
             r"(?:offer\s+|provide\s+)?(?:visa\s+|immigration\s+)?sponsor"
+            r"|\b(?:won['’]t|can['’]t)\s+(?:be\s+able\s+to\s+)?(?:offer\s+|provide\s+)?"
+            r"(?:visa\s+|immigration\s+)?sponsor"
             r"|\bunable\s+to\s+(?:offer\s+|provide\s+|support\s+)?(?:visa\s+|immigration\s+)?sponsor"
             r"|\bnot\s+(?:able|eligible)\s+to\s+(?:provide|offer|receive)\s+"
             r"(?:visa\s+|immigration\s+)?sponsorship"

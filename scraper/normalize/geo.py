@@ -42,23 +42,49 @@ KNOWN_CITIES = {
     "portland": ("OR", "US"), "raleigh": ("NC", "US"), "washington dc": ("DC", "US"),
 }  # fmt: skip
 
+# Foreign city -> ISO country code. "City, XX" is foreign when XX is that code, so
+# "Berlin, DE" is Germany but "Dublin, OH" / "Paris, TX" stay in the US.
+FOREIGN_CITIES = {
+    "london": "GB", "manchester": "GB", "edinburgh": "GB", "belfast": "GB", "dublin": "IE",
+    "berlin": "DE", "munich": "DE", "hamburg": "DE", "frankfurt": "DE", "cologne": "DE",
+    "stuttgart": "DE", "paris": "FR", "lyon": "FR", "amsterdam": "NL", "rotterdam": "NL",
+    "eindhoven": "NL", "utrecht": "NL", "madrid": "ES", "barcelona": "ES", "lisbon": "PT",
+    "milan": "IT", "warsaw": "PL", "krakow": "PL", "wroclaw": "PL", "zurich": "CH",
+    "stockholm": "SE", "copenhagen": "DK", "oslo": "NO", "helsinki": "FI", "bucharest": "RO",
+    "cluj": "RO", "prague": "CZ", "brno": "CZ", "budapest": "HU", "vienna": "AT",
+    "brussels": "BE", "athens": "GR", "istanbul": "TR", "kyiv": "UA", "belgrade": "RS",
+    "sofia": "BG", "zagreb": "HR", "tallinn": "EE", "riga": "LV", "vilnius": "LT",
+    "bratislava": "SK", "bangalore": "IN", "bengaluru": "IN", "hyderabad": "IN", "pune": "IN",
+    "mumbai": "IN", "delhi": "IN", "new delhi": "IN", "gurgaon": "IN", "gurugram": "IN",
+    "chennai": "IN", "noida": "IN", "kolkata": "IN", "ahmedabad": "IN", "kochi": "IN",
+    "singapore": "SG", "tokyo": "JP", "osaka": "JP", "beijing": "CN", "shanghai": "CN",
+    "shenzhen": "CN", "hong kong": "HK", "taipei": "TW", "seoul": "KR", "sydney": "AU",
+    "melbourne": "AU", "tel aviv": "IL", "haifa": "IL", "herzliya": "IL", "sao paulo": "BR",
+    "buenos aires": "AR", "bogota": "CO", "medellin": "CO", "manila": "PH",
+    "kuala lumpur": "MY", "bangkok": "TH", "jakarta": "ID", "hanoi": "VN",
+    "ho chi minh": "VN", "cairo": "EG", "nairobi": "KE", "lagos": "NG",
+    "johannesburg": "ZA", "cape town": "ZA", "riyadh": "SA", "doha": "QA", "dubai": "AE",
+    "abu dhabi": "AE", "karachi": "PK", "lahore": "PK", "dhaka": "BD", "colombo": "LK",
+    "lima": "PE", "santiago": "CL", "montevideo": "UY", "mexico city": "MX",
+    "guadalajara": "MX", "monterrey": "MX",
+}  # fmt: skip
+
+FOREIGN_PLACES = [
+    "uk", "united kingdom", "england", "scotland", "wales", "ireland", "germany", "france",
+    "netherlands", "spain", "portugal", "italy", "poland", "switzerland", "sweden", "denmark",
+    "norway", "finland", "romania", "czech republic", "czechia", "hungary", "austria",
+    "belgium", "greece", "turkey", "ukraine", "serbia", "bulgaria", "croatia", "estonia",
+    "latvia", "lithuania", "slovakia", "luxembourg", "iceland", "india", "japan", "china",
+    "taiwan", "korea", "south korea", "australia", "new zealand", "israel", "brazil",
+    "mexico", "argentina", "colombia", "philippines", "vietnam", "indonesia", "malaysia",
+    "thailand", "egypt", "kenya", "nigeria", "south africa", "saudi arabia", "qatar", "uae",
+    "united arab emirates", "pakistan", "bangladesh", "sri lanka", "peru", "chile",
+    "uruguay", "costa rica", "emea", "apac", "latam", "europe",
+]  # fmt: skip
+
 FOREIGN_RE = re.compile(
-    r"\b(?:uk|united kingdom|england|scotland|london|dublin|ireland|germany|berlin|munich|"
-    r"france|paris|netherlands|amsterdam|spain|madrid|barcelona|portugal|lisbon|italy|milan|"
-    r"poland|warsaw|switzerland|zurich|sweden|stockholm|denmark|copenhagen|norway|finland|"
-    r"india|bangalore|bengaluru|hyderabad|pune|mumbai|delhi|gurgaon|gurugram|singapore|japan|"
-    r"tokyo|china|beijing|shanghai|shenzhen|hong kong|taiwan|taipei|korea|seoul|australia|"
-    r"sydney|melbourne|new zealand|israel|tel aviv|brazil|são paulo|sao paulo|mexico|"
-    r"argentina|buenos aires|colombia|bogota|philippines|manila|vietnam|indonesia|uae|dubai|"
-    r"romania|bucharest|cluj|czech|prague|brno|hungary|budapest|austria|vienna|belgium|"
-    r"brussels|greece|athens|turkey|istanbul|ukraine|kyiv|krakow|wroclaw|serbia|belgrade|"
-    r"bulgaria|sofia|croatia|zagreb|estonia|tallinn|latvia|riga|lithuania|vilnius|"
-    r"luxembourg|iceland|oslo|helsinki|hamburg|frankfurt|cologne|stuttgart|lyon|rotterdam|"
-    r"eindhoven|utrecht|edinburgh|manchester|belfast|chennai|noida|kolkata|ahmedabad|osaka|"
-    r"kuala lumpur|malaysia|bangkok|thailand|jakarta|hanoi|ho chi minh|egypt|cairo|kenya|"
-    r"nairobi|nigeria|lagos|south africa|johannesburg|cape town|saudi|riyadh|qatar|doha|"
-    r"abu dhabi|pakistan|karachi|lahore|bangladesh|dhaka|sri lanka|colombo|peru|lima|chile|"
-    r"santiago|uruguay|montevideo|costa rica|"
-    r"emea|apac|latam|europe)\b",
+    r"\b(?:"
+    + "|".join(sorted(map(re.escape, [*FOREIGN_CITIES, *FOREIGN_PLACES]), key=len, reverse=True))
+    + r")\b",
     re.I,
 )

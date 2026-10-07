@@ -26,6 +26,11 @@ _PERIODS = [
     ("month", re.compile(r"/\s*mo(?:nth)?\b|per\s+month|monthly|a\s+month", re.I)),
     ("week", re.compile(r"/\s*w(?:ee)?k\b|per\s+week|weekly|a\s+week", re.I)),
 ]
+# Words that make an adjacent amount something other than pay. Checked only up to the
+# neighbouring "$" or line break, so "$40/hr plus a $1,500 housing stipend" keeps $40/hr.
+_NOT_PAY_WORDS = re.compile(
+    r"stipend|allowance|bonus|relocation|housing|reimburs|benefit|perk|budget", re.I
+)
 _PAY_WORD = re.compile(r"\b(?:pay|salary|compensation|wages?|rate|range)\b", re.I)
 
 
@@ -72,6 +77,11 @@ def parse_pay(text: str, structured: PayRange | None, country: str) -> Pay | Non
     for m in _PAY_RE.finditer(text):
         tail = text[m.end() : m.end() + 40]
         if _NOT_PAY_SUFFIX.match(tail):
+            continue
+        before = re.split(r"[$\n]", text[max(0, m.start() - 30) : m.start()])[-1]
+        after = re.split(r"[$\n]", text[m.end() : m.end() + 30])[0]
+        near = before + after
+        if _NOT_PAY_WORDS.search(near):
             continue
         lo = _num(m.group("a"), m.group("ak"))
         hi = _num(m.group("b"), m.group("bk") or m.group("ak")) if m.group("b") else lo

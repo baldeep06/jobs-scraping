@@ -77,3 +77,43 @@ def test_unrecognised_city_is_not_given_the_company_default_country():
 @pytest.mark.parametrize("raw", ["Bucharest, Romania", "Prague", "Krakow, Poland", "Chennai"])
 def test_more_foreign_cities(raw):
     assert parse_location(raw).foreign_only is True
+
+
+@pytest.mark.parametrize(
+    ("raw", "hint", "region"),
+    [("Toronto, CA", None, "ON"), ("Vancouver, CA", None, "BC"), ("Kanata, CA", "CA", None)],
+)
+def test_city_with_ca_code_can_be_canada(raw, hint, region):
+    parsed = parse_location(raw, country_hint=hint)
+    assert parsed.country == "CA" and parsed.locations[0].region == region
+
+
+def test_ca_code_without_canadian_evidence_is_california():
+    assert parse_location("San Diego, CA").country == "US"
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "Amsterdam, NL", "Rotterdam, NL", "Lima, PE", "Bratislava, SK", "Haifa, IL",
+        "Herzliya, IL", "Bogotá, CO", "Kochi, IN", "Guadalajara, MX",
+    ],
+)  # fmt: skip
+def test_foreign_country_codes_that_clash_with_states_or_provinces(raw):
+    assert parse_location(raw).foreign_only is True
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "Melbourne, FL", "Vienna, VA", "Dublin, CA", "Dublin, OH", "Athens, GA",
+        "Manchester, NH", "Warsaw, IN", "Paris, TX",
+    ],
+)  # fmt: skip
+def test_us_cities_sharing_foreign_names_stay_us(raw):
+    parsed = parse_location(raw)
+    assert parsed.country == "US" and not parsed.foreign_only
+
+
+def test_foreign_country_hint_matching_code_wins():
+    assert parse_location("Some Town, NL", country_hint="NL").foreign_only is True

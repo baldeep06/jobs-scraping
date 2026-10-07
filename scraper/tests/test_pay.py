@@ -71,3 +71,25 @@ def test_structured_missing_currency_uses_country_default():
     s = PayRange(min=80000, max=None, currency=None, period="year")
     pay = p("", country="CA", structured=s)
     assert (pay.min, pay.max, pay.currency) == (80000, 80000, "CAD")
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Interns receive a $1,500/month housing stipend.",
+        "Up to $300 per week in commuter benefits.",
+        "A $10,000 signing bonus plus salary.",
+    ],
+)
+def test_stipends_and_bonuses_are_not_pay(text):
+    assert p(text) is None
+
+
+def test_pay_next_to_a_stipend_is_still_pay():
+    pay = p("Pay: $40/hr plus a $1,500 housing stipend.")
+    assert (pay.min, pay.period) == (40, "hour")
+
+
+def test_benefits_heading_on_next_line_does_not_hide_pay():
+    pay = p("Hourly Range for this internship is:\n$54—$56 USD\nBenefits: Take a peek at our perks")
+    assert (pay.min, pay.max, pay.period) == (54, 56, "hour")

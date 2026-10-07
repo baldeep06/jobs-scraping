@@ -94,3 +94,23 @@ def test_plan_closures():
     assert plan.reset == ["seen"]
     assert plan.increment == ["first-miss"]
     assert plan.close == ["second-miss"]
+
+
+def test_open_match_with_a_different_term_is_a_separate_posting():
+    fp = FingerprintMatch("job-9", "open", NOW, 0, term="Fall 2026")
+    assert classify(None, None, fp, NOW, incoming_term="Winter 2027") == Decision(
+        "insert", freshness="fresh"
+    )
+
+
+def test_open_match_with_same_or_unknown_term_attaches():
+    fp = FingerprintMatch("job-9", "open", NOW, 0, term="Fall 2026")
+    assert classify(None, None, fp, NOW, incoming_term="Fall 2026").action == "attach"
+    assert classify(None, None, fp, NOW, incoming_term=None).action == "attach"
+
+
+def test_plan_closures_closes_jobs_that_no_longer_pass_the_filter():
+    jobs = [OpenJob("filtered", 0, frozenset({"f"})), OpenJob("kept", 0, frozenset({"k"}))]
+    plan = plan_closures(jobs, {"f", "k"}, enriched_ids={"k"})
+    assert plan.close == ["filtered"] and plan.increment == []
+    assert plan_closures(jobs, {"f", "k"}).close == []
