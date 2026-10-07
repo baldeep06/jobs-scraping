@@ -5,7 +5,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from scraper.adapters import ADAPTERS, greenhouse, lever
+from scraper.adapters import ADAPTERS, ashby, greenhouse, lever
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company
 
@@ -71,3 +71,30 @@ def test_lever_parse():
 def test_lever_unexpected_payload():
     with pytest.raises(FetchError, match="unexpected"):
         lever.parse({"ok": False})
+
+
+def test_ashby_parse():
+    result = ashby.parse(load("ashby.json"))
+    assert [j.source_job_id[-1] for j in result.jobs] == ["1", "3"]  # unlisted job skipped
+    job = result.jobs[0]
+    assert job.source == "ashby"
+    assert job.location_raw == "San Francisco, CA | New York, NY"
+    assert job.source_posted_at == datetime(2026, 10, 1, 15, 30, tzinfo=UTC)
+    assert (
+        job.description_text == "Visa sponsorship is available for this role.\n$50 – $60 per hour"
+    )
+    assert (job.pay_structured.min, job.pay_structured.max) == (50, 60)
+    assert (job.pay_structured.currency, job.pay_structured.period) == ("USD", "hour")
+    hints = (job.country_hint, job.work_mode_hint, job.employment_type_hint)
+    assert hints == ("US", "onsite", "Intern")
+    london = result.jobs[1]
+    assert (london.country_hint, london.work_mode_hint) == ("OTHER", "hybrid")
+
+
+def test_ashby_unexpected_payload():
+    with pytest.raises(FetchError, match="unexpected"):
+        ashby.parse({"apiVersion": "1"})
+
+
+def test_registry_has_all_phase1_adapters():
+    assert set(ADAPTERS) == {"greenhouse", "lever", "ashby"}
