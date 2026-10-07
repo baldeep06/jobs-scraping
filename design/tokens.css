@@ -1,0 +1,60 @@
+/* Design tokens — see DESIGN.md */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600&display=swap");
+
+:root {
+  /* Brand */
+  --signal: #1b55f5;
+
+  /* Accents */
+  --apricot: #fad8ac;
+  --orchid-edge: #eeaafd;
+  --sky-edge: #8ec0ff;
+  --tangerine-edge: #ffae70;
+  --horizon: linear-gradient(120deg, #f7bfa3 10%, #e6b3e6 40%, #a3d8f7 75%, #7be7e7);
+
+  /* Neutrals */
+  --ink: #000000;
+  --charcoal: #2b2d32;
+  --graphite: #454554;
+  --slate: #67677e;
+  --input-steel: #d8d8df;
+  --divider: #e6e6ea;
+  --peach-paper: #f4e5d9;
+  --lilac-wash: #f9e8ff;
+  --blue-mist: #eaf0ff;
+  --canvas: #f4f4f6;
+  --surface: #ffffff;
+
+  /* Type */
+  --font-display: "Poppins", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  /* Spacing (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-11: 44px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --gap-element: var(--space-3);
+  --gap-section: var(--space-16);
+  --max-width: 1280px;
+
+  /* Radius */
+  --radius-card: 24px;
+  --radius-image: 12px;
+  --radius-control: 8px;
+  --radius-nav: 4px;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-subtle: oklab(0 0 0 / 0.05) 0 0 0 1px, rgba(0, 0, 0, 0.1) 0 1px 3px 0;
+  --shadow-subtle-2: rgba(0, 0, 0, 0.1) 0 1px 3px 0;
+  --shadow-subtle-3: rgba(0, 0, 0, 0.05) 0 1px 2px 0;
+}
