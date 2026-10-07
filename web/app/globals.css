@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* Tokens from design/DESIGN.md */
+@theme {
+  --color-signal: #1b55f5;
+  --color-apricot: #fad8ac;
+  --color-orchid-edge: #eeaafd;
+  --color-sky-edge: #8ec0ff;
+  --color-tangerine-edge: #ffae70;
+  --color-ink: #000000;
+  --color-charcoal: #2b2d32;
+  --color-graphite: #454554;
+  --color-slate: #67677e;
+  --color-input-steel: #d8d8df;
+  --color-divider: #e6e6ea;
+  --color-peach-paper: #f4e5d9;
+  --color-lilac-wash: #f9e8ff;
+  --color-blue-mist: #eaf0ff;
+  --color-canvas: #f4f4f6;
+  --color-surface: #ffffff;
+
+  --font-display: var(--font-poppins), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  --radius-card: 24px;
+  --radius-control: 8px;
+  --radius-nav: 4px;
+
+  --shadow-subtle: 0 0 0 1px rgb(0 0 0 / 0.05), 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+@utility bg-horizon {
+  background-image: linear-gradient(120deg, #f7bfa3 10%, #e6b3e6 40%, #a3d8f7 75%, #7be7e7);
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* <details> rows: hide the default disclosure triangle */
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
