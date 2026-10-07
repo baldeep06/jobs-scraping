@@ -1,0 +1,44 @@
+from collections import Counter
+
+from scraper.adapters import ADAPTERS
+from scraper.adapters.base import Adapter
+from scraper.dedupe import ids_hash
+from scraper.enrich import enrich
+from scraper.http import Fetcher, FetchError
+from scraper.models import Company, CompanyOutcome, FetchResult, RawJob
+from scraper.normalize.location import parse_location
+
+
+def dominant_country(raws: list[RawJob]) -> str | None:
+    """Most common of CA/US across a company's whole board (used for bare "Remote" roles)."""
+    counts: Counter[str] = Counter()
+    for r in raws:
+        country = parse_location(r.location_raw, r.country_hint, r.work_mode_hint).country
+        if country in ("CA", "US"):
+            counts[country] += 1
+    return counts.most_common(1)[0][0] if counts else None
+
+
+def process(company: Company, result: FetchResult) -> CompanyOutcome:
+    seen = {r.source_job_id for r in result.jobs}
+    outcome = CompanyOutcome(
+        company=company, ok=True, seen_ids=seen, ids_hash=ids_hash(seen), invalid=result.invalid
+    )
+    if outcome.ids_hash == company.job_ids_hash:
+        outcome.unchanged = True
+        return outcome
+    default = dominant_country(result.jobs)
+    outcome.jobs = [e for r in result.jobs if (e := enrich(r, company.id, default)) is not None]
+    return outcome
+
+
+async def poll(
+    fetcher: Fetcher, company: Company, adapters: dict[str, Adapter] = ADAPTERS
+) -> CompanyOutcome:
+    """Fetch + process one company. Never raises: failures become ok=False outcomes."""
+    try:
+        return process(company, await adapters[company.ats](fetcher, company))
+    except FetchError as e:
+        return CompanyOutcome(company=company, ok=False, error=str(e), status=e.status)
+    except Exception as e:  # adapter bug or surprise payload shape — isolate to this company
+        return CompanyOutcome(company=company, ok=False, error=f"{type(e).__name__}: {e}")
