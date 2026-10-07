@@ -1,0 +1,36 @@
+{
+  "jobs": [
+    {
+      "id": 7001,
+      "title": "Software Engineer Intern (Summer 2027)",
+      "absolute_url": "https://boards.greenhouse.io/acme/jobs/7001",
+      "updated_at": "2026-09-30T10:00:00-04:00",
+      "first_published": "2026-09-28T09:00:00-04:00",
+      "location": {"name": "Toronto, ON"},
+      "content": "&lt;p&gt;Join our team.&lt;/p&gt;&lt;p&gt;The hourly rate is CA$30 - CA$38 per hour.&lt;/p&gt;"
+    },
+    {
+      "id": 7002,
+      "title": "Data Science Intern",
+      "absolute_url": "https://boards.greenhouse.io/acme/jobs/7002",
+      "updated_at": "2026-09-30T10:00:00-04:00",
+      "location": {"name": "New York, NY"},
+      "content": "&lt;p&gt;We will not sponsor visas for this role.&lt;/p&gt;"
+    },
+    {
+      "id": 7003,
+      "title": "Senior Account Executive",
+      "absolute_url": "https://boards.greenhouse.io/acme/jobs/7003",
+      "updated_at": "2026-09-30T10:00:00-04:00",
+      "location": {"name": "Remote"},
+      "content": ""
+    },
+    {
+      "title": "Broken record with no id",
+      "absolute_url": "https://boards.greenhouse.io/acme/jobs/x",
+      "location": {"name": "Remote"},
+      "content": ""
+    }
+  ],
+  "meta": {"total": 4}
+}

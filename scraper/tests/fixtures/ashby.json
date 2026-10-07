@@ -1,0 +1,45 @@
+{
+  "apiVersion": "1",
+  "jobs": [
+    {
+      "id": "b0000000-0000-4000-8000-000000000001",
+      "title": "Machine Learning Intern",
+      "location": "San Francisco, CA",
+      "secondaryLocations": [{"location": "New York, NY"}],
+      "isListed": true,
+      "isRemote": false,
+      "workplaceType": "OnSite",
+      "employmentType": "Intern",
+      "publishedAt": "2026-10-01T15:30:00.000+00:00",
+      "jobUrl": "https://jobs.ashbyhq.com/acme/b0000000-0000-4000-8000-000000000001",
+      "descriptionPlain": "Visa sponsorship is available for this role.",
+      "address": {"postalAddress": {"addressCountry": "United States", "addressRegion": "California"}},
+      "compensation": {
+        "compensationTierSummary": "$50 – $60 per hour",
+        "summaryComponents": [
+          {"compensationType": "EquityPercentage", "interval": "NONE", "minValue": 0.1, "maxValue": 0.2},
+          {"compensationType": "Salary", "interval": "1 HOUR", "currencyCode": "USD", "minValue": 50, "maxValue": 60}
+        ]
+      }
+    },
+    {
+      "id": "b0000000-0000-4000-8000-000000000002",
+      "title": "Hidden Intern Role",
+      "location": "Remote",
+      "isListed": false,
+      "jobUrl": "https://jobs.ashbyhq.com/acme/b0000000-0000-4000-8000-000000000002",
+      "descriptionPlain": ""
+    },
+    {
+      "id": "b0000000-0000-4000-8000-000000000003",
+      "title": "Software Engineering Intern",
+      "location": "London",
+      "isListed": true,
+      "isRemote": false,
+      "workplaceType": "Hybrid",
+      "jobUrl": "https://jobs.ashbyhq.com/acme/b0000000-0000-4000-8000-000000000003",
+      "descriptionPlain": "Join us in London.",
+      "address": {"postalAddress": {"addressCountry": "United Kingdom"}}
+    }
+  ]
+}
