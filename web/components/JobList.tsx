@@ -63,19 +63,25 @@ function Row({ job, sources, now }: { job: JobRow; sources: JobSource[]; now: Da
             {formatLocation(job)}
             {mode && <span className="ml-2 text-xs capitalize text-slate">{mode}</span>}
           </div>
-          <div className="text-sm text-graphite">{job.term ?? "—"}</div>
-          <div className="text-sm text-ink" title={job.pay_raw ?? undefined}>
+          {/* On phones, empty term/pay are hidden and the badges share one wrapped line. */}
+          <div className={`text-sm text-graphite ${job.term ? "" : "hidden md:block"}`}>
+            {job.term ?? "—"}
+          </div>
+          <div
+            className={`text-sm text-ink ${pay ? "" : "hidden md:block"}`}
+            title={job.pay_raw ?? undefined}
+          >
             {pay ?? <span className="text-slate">—</span>}
           </div>
-          <div className="mt-2 md:mt-0">
+          <div className="mr-2 mt-2 inline-flex md:mr-0 md:mt-0 md:flex">
             <Badge spec={visaBadge(job)} />
           </div>
-          <div className="mt-2 flex flex-wrap gap-1 md:mt-0">
+          <div className="mr-2 mt-2 inline-flex flex-wrap gap-1 md:mr-0 md:mt-0 md:flex">
             {flags.map((b) => (
               <Badge key={b.label} spec={b} />
             ))}
           </div>
-          <div className="mt-2 flex flex-wrap items-center gap-2 md:mt-0 md:flex-col md:items-start md:gap-1">
+          <div className="mt-2 inline-flex flex-wrap items-center gap-2 md:mt-0 md:flex md:flex-col md:items-start md:gap-1">
             <Badge spec={freshnessBadge(job, now)} />
             <span className="text-xs text-slate">{relativeTime(job.first_seen_at, now)}</span>
           </div>
