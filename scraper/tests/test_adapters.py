@@ -5,7 +5,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from scraper.adapters import ADAPTERS, greenhouse
+from scraper.adapters import ADAPTERS, greenhouse, lever
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company
 
@@ -47,3 +47,27 @@ async def test_greenhouse_fetch_uses_board_url():
         result = await ADAPTERS["greenhouse"](f, company)
     assert seen == ["https://boards-api.greenhouse.io/v1/boards/acme/jobs?content=true"]
     assert len(result.jobs) == 3
+
+
+def test_lever_parse():
+    result = lever.parse(load("lever.json"))
+    assert result.invalid == 0 and len(result.jobs) == 2
+    job = result.jobs[0]
+    assert job.source == "lever"
+    assert job.title == "Software Engineer Co-op (4 months)"
+    assert job.location_raw == "Waterloo, ON | Toronto, ON"
+    assert job.source_posted_at == datetime.fromtimestamp(1790000000, UTC)
+    assert job.description_text == (
+        "Build things.\nRequirements\nEnrolled in a co-op program at a Canadian university"
+    )
+    assert (job.pay_structured.min, job.pay_structured.max) == (32, 40)
+    assert (job.pay_structured.currency, job.pay_structured.period) == ("CAD", "hour")
+    hints = (job.country_hint, job.work_mode_hint, job.employment_type_hint)
+    assert hints == ("CA", "hybrid", "Internship")
+    assert result.jobs[1].work_mode_hint is None
+    assert result.jobs[1].location_raw == "Austin, TX"
+
+
+def test_lever_unexpected_payload():
+    with pytest.raises(FetchError, match="unexpected"):
+        lever.parse({"ok": False})

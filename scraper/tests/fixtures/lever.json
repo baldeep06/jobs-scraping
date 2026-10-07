@@ -1,0 +1,32 @@
+[
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000001",
+    "text": "Software Engineer Co-op (4 months)",
+    "hostedUrl": "https://jobs.lever.co/acme/a1b2c3d4-0000-4000-8000-000000000001",
+    "createdAt": 1790000000000,
+    "country": "CA",
+    "workplaceType": "hybrid",
+    "categories": {
+      "commitment": "Internship",
+      "location": "Waterloo, ON",
+      "allLocations": ["Waterloo, ON", "Toronto, ON"],
+      "team": "Engineering"
+    },
+    "descriptionPlain": "Build things.",
+    "lists": [
+      {"text": "Requirements", "content": "<li>Enrolled in a co-op program at a Canadian university</li>"}
+    ],
+    "additionalPlain": "",
+    "salaryRange": {"currency": "CAD", "interval": "per-hour-wage", "min": 32, "max": 40}
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000002",
+    "text": "Account Manager",
+    "hostedUrl": "https://jobs.lever.co/acme/a1b2c3d4-0000-4000-8000-000000000002",
+    "createdAt": 1790000000000,
+    "country": "US",
+    "workplaceType": "unspecified",
+    "categories": {"commitment": "Full-time", "location": "Austin, TX"},
+    "descriptionPlain": "Sell things."
+  }
+]
