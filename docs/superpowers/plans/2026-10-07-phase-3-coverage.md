@@ -1794,3 +1794,28 @@ git add README.md && git commit -m "docs: phase 3 sources, tiers and workflows"
 - **Placeholders:** none; Task 9 Step 3 is a live-verification loop with the exact command, not a deferred decision.
 - **Type consistency:** `confirmed_empty` is defined on `FetchResult` and `CompanyOutcome` (Task 1) and set by Tasks 3–5; `wanted`/`get_details` (Task 2) are used by Tasks 3–5; `Company.workday_*` (Task 1) feed Task 5 and `get_sweep_companies` (Task 7) selects them; `db.discover_companies/get_state_sha/set_state_sha` (Task 6) are used by `discovery.discover`.
 - **Review Focus coverage:** confirmed-empty closing (Task 1 tests), multi-location + California-vs-Canada (Task 5 tests), search-noise detail fetches (Tasks 3–5 tests assert the non-intern GET never happens), URL junk and dedupe (Task 6 tests), SHA unchanged/failure (Task 6 tests).
+
+---
+
+## Addendum (requested after plan approval): reposts must not be labelled fresh
+
+**Evidence (live DB, 2026-10-07):** all 124 jobs were `fresh`; 95 had a source posted date >14 days before we first saw them and 23 were >350 days old. Two causes: (1) the first poll of any board imports its existing backlog, which the classifier calls `fresh`; (2) a repost with a new ATS id is only caught when title *and* the exact location set match a job we already stored. Discovery (Task 6) would multiply cause (1) across thousands of boards, so this runs **before** Task 9's live import.
+
+**Design (rulings, see ledger):**
+- New freshness value `existing` = open posting we are seeing for the first time but that was posted more than `FRESH_MAX_AGE = 3 days` ago, or that has no posted date and arrived on a company's first successful poll (baseline). It is never "new", never in the `fresh only` filter.
+- Fuzzy repost matching against **closed** jobs of the same company, compatible country, within the 120-day window: first `desc_hash` (normalised description body, digits/seasons stripped, ≥300 chars), then `title_key` (sorted token set of the normalised title minus intern/co-op/stop words, ≥2 tokens). Open fuzzy matches are ignored — two openings with the same title in different cities are different postings; only an exact fingerprint attaches to an open job (unchanged).
+- Terms both known and different (e.g. Summer 2026 vs Summer 2027) are a new cycle → `fresh`, even when a closed match exists.
+- Web: `existing` shows an "Open since <date>" badge, never "New"; the freshness filter keeps excluding it.
+
+### Task R1: Repost signals (migration, `title_key`, `desc_hash`)
+**Files:** create `supabase/migrations/20261007120000_repost_signals.sql`, `scraper/signals.py`, `scraper/tests/test_signals.py`; modify `scraper/models.py` (`EnrichedJob.title_key/desc_hash: str | None = None`), `scraper/enrich/__init__.py`, `scraper/db.py` (`_job_fields`, `_FIELD_NAMES`), `scraper/pipeline.py` (`ENRICH_VERSION = 3`), `scraper/tests/test_db_schema.py`.
+**Produces:** `signals.title_key(normalized_title) -> str | None`, `signals.desc_hash(text) -> str | None`; columns `jobs.title_key`, `jobs.desc_hash`; freshness check allows `existing`; existing `fresh` rows posted >3 days before first seen become `existing`.
+Tests: title_key ignores intern/co-op words and order, needs ≥2 tokens; desc_hash ignores years/seasons/digits/punctuation, None under 300 chars; migration accepts `existing` and backfills.
+
+### Task R2: Classifier and matcher
+**Files:** modify `scraper/dedupe.py` (`FRESH_MAX_AGE`, `classify(..., baseline=False)`), `scraper/db.py` (`_ingest_job` match query, `ingest` computes `baseline`), tests in `scraper/tests/test_dedupe.py`, `scraper/tests/test_db_ingest.py`.
+Tests: old posted date → `existing`; undated + baseline → `existing`; undated, not baseline → `fresh`; recent date → `fresh`; terms differ with a closed match → `fresh`; closed job + new id with changed title word order / changed location (same country) → `repost`; same title in another city while the first is open → separate `fresh`/`existing`, never attached; closed match in another country → not a repost; description-identical retitled posting → `repost`.
+
+### Task R3: Website
+**Files:** modify `web/lib/types.ts` (`Freshness` + `"existing"`), `web/lib/badges.ts` (`existing` → neutral "Open since …"), web tests.
+Tests: badge for `existing` is not "New" even when first seen <24h ago; `?fresh` filter query excludes `existing`.
