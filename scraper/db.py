@@ -8,6 +8,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from scraper.dedupe import (
+    REPOST_WINDOW,
     ClosurePlan,
     Decision,
     ExistingSource,
@@ -217,27 +218,40 @@ def _upsert_source(
 
 
 def _find_match(
-    conn: psycopg.Connection, company_id: int, job: EnrichedJob
+    conn: psycopg.Connection, company_id: int, job: EnrichedJob, seen: list[str], now: datetime
 ) -> FingerprintMatch | None:
     """The stored job this posting most likely duplicates or reposts.
 
-    An exact fingerprint (title + locations) matches open or closed jobs. The fuzzy signals
-    (same description body, or same title words) only match *closed* jobs of the same company
-    in a compatible country: two open postings with one title in different cities are
-    different openings, but a closed posting that comes back reworded or relocated is a repost.
+    An exact fingerprint (title + locations) matches open or closed jobs. A fuzzy match needs
+    the same title words (title_key) *and* either the same description body or an overlapping
+    location, in a compatible country; either signal alone is too generic (many teams share a
+    title, many roles share a template). It may hit a closed job, or an open one whose every
+    source id is missing from this poll (the old posting is on its way out and the new id
+    continues it). Two open postings that are both still listed are different openings.
     """
+    keys = [loc.key() for loc in job.location.locations]
     row = conn.execute(
         """select id, status, last_seen_at, repost_count, term from jobs
            where company_id = %(cid)s and (
              fingerprint = %(fp)s
-             or (status = 'closed' and (country = %(country)s
-                                        or 'BOTH' in (country, %(country)s)
-                                        or 'UNKNOWN' in (country, %(country)s))
-                 and ((%(dh)s::text is not null and desc_hash = %(dh)s)
-                      or (%(tk)s::text is not null and title_key = %(tk)s))))
-           order by (term is not distinct from %(term)s) desc,
+             or (
+               %(tk)s::text is not null and title_key = %(tk)s
+               and (country = %(country)s or 'BOTH' in (country, %(country)s)
+                    or 'UNKNOWN' in (country, %(country)s))
+               and (status = 'closed'
+                    or (status = 'open' and not exists (
+                          select 1 from job_sources js
+                          where js.job_id = jobs.id and js.source_job_id = any(%(seen)s))))
+               and ((%(dh)s::text is not null and desc_hash = %(dh)s)
+                    or exists (select 1 from jsonb_array_elements(jobs.locations) l
+                               where lower(coalesce(l->>'city', '')) || '|'
+                                     || coalesce(l->>'region', '') || '|' || (l->>'country')
+                                     = any(%(keys)s))
+                    or (jsonb_array_length(jobs.locations) = 0 and %(nokeys)s))))
+           order by (fingerprint = %(fp)s and status = 'open') desc,
+                    (last_seen_at >= %(cutoff)s) desc,
+                    (term is not distinct from %(term)s) desc,
                     (fingerprint = %(fp)s) desc,
-                    (desc_hash is not distinct from %(dh)s) desc,
                     last_seen_at desc
            limit 1""",
         {
@@ -247,6 +261,10 @@ def _find_match(
             "dh": job.desc_hash,
             "tk": job.title_key,
             "term": job.term,
+            "seen": seen,
+            "keys": keys,
+            "nokeys": not keys,
+            "cutoff": now - REPOST_WINDOW,
         },
     ).fetchone()
     if not row:
@@ -262,6 +280,7 @@ def _ingest_job(
     job: EnrichedJob,
     now: datetime,
     baseline: bool = False,
+    seen: list[str] | None = None,
 ) -> bool:
     """Returns True if a new jobs row was created."""
     raw = job.raw
@@ -278,7 +297,7 @@ def _ingest_job(
         )
     match = None
     if existing is None:
-        match = _find_match(conn, company.id, job)
+        match = _find_match(conn, company.id, job, seen or [], now)
 
     d = classify(
         existing, raw.source_posted_at, match, now, incoming_term=job.term, baseline=baseline
@@ -401,6 +420,11 @@ def ingest(conn: psycopg.Connection, outcome: CompanyOutcome, now: datetime) -> 
             _apply_closures(conn, plan, now)
             stats.closed = len(plan.close)
 
+        # "Has internships" is about what is open now, not only what changed in this poll.
+        has_open = conn.execute(
+            "select exists (select 1 from jobs where company_id = %s and status = 'open') as e",
+            (company.id,),
+        ).fetchone()["e"]
         conn.execute(
             """update companies set last_polled_at = %(now)s, last_success_at = %(now)s,
                  fail_count = 0, consecutive_404s = 0, first_404_at = null,
@@ -410,7 +434,12 @@ def ingest(conn: psycopg.Connection, outcome: CompanyOutcome, now: datetime) -> 
                  tier = case when %(interns)s and tier in ('warm', 'cold') then 'hot'
                              else tier end
                where id = %(id)s""",
-            {"now": now, "hash": outcome.ids_hash, "interns": bool(outcome.jobs), "id": company.id},
+            {
+                "now": now,
+                "hash": outcome.ids_hash,
+                "interns": bool(outcome.jobs) or has_open,
+                "id": company.id,
+            },
         )
     return stats
 
