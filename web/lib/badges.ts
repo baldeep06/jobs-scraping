@@ -74,6 +74,12 @@ export function freshnessBadge(job: JobRow, now: Date): BadgeSpec {
       return { label: "Date bumped", tone: "neutral" };
     case "recurring":
       return { label: "Returning role", tone: "neutral" };
+    case "existing":
+      return {
+        label: "Already open",
+        tone: "neutral",
+        title: "Posted before we started tracking this company, so it is not new",
+      };
     default:
       return { label: "Fresh", tone: "neutral" };
   }

@@ -61,9 +61,15 @@ describe("freshnessBadge", () => {
     [{ freshness: "refreshed" as const }, "Date bumped"],
     [{ freshness: "recurring" as const }, "Returning role"],
     [{ freshness: "fresh" as const }, "Fresh"],
+    [{ freshness: "existing" as const }, "Already open"],
   ])("labels older %o as %s", (overrides, label) => {
     const job = makeJob({ first_seen_at: "2026-10-01T00:00:00Z", ...overrides });
     expect(freshnessBadge(job, NOW).label).toBe(label);
+  });
+
+  it("never calls a posting that was already open when we found it New", () => {
+    const job = makeJob({ first_seen_at: "2026-10-07T01:00:00Z", freshness: "existing" });
+    expect(freshnessBadge(job, NOW)).toMatchObject({ label: "Already open", tone: "neutral" });
   });
 
   it("does not call a recent repost New", () => {

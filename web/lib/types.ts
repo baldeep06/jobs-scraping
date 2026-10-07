@@ -1,7 +1,7 @@
 export type Region = "us" | "ca";
 export type Country = "CA" | "US" | "BOTH" | "UNKNOWN";
 export type VisaStatus = "open" | "blocked" | "unknown";
-export type Freshness = "fresh" | "repost" | "reopened" | "refreshed" | "recurring";
+export type Freshness = "fresh" | "repost" | "reopened" | "refreshed" | "recurring" | "existing";
 export type WorkMode = "onsite" | "hybrid" | "remote" | "unknown";
 
 export interface Loc {
