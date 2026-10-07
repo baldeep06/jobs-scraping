@@ -1,0 +1,49 @@
+import json
+from datetime import UTC, datetime
+from pathlib import Path
+
+import httpx
+import pytest
+
+from scraper.adapters import ADAPTERS, greenhouse
+from scraper.http import Fetcher, FetchError
+from scraper.models import Company
+
+FIXTURES = Path(__file__).parent / "fixtures"
+
+
+def load(name):
+    return json.loads((FIXTURES / name).read_text())
+
+
+def test_greenhouse_parse():
+    result = greenhouse.parse(load("greenhouse.json"))
+    assert result.invalid == 1
+    assert [j.source_job_id for j in result.jobs] == ["7001", "7002", "7003"]
+    first = result.jobs[0]
+    assert first.source == "greenhouse"
+    assert first.url == "https://boards.greenhouse.io/acme/jobs/7001"
+    assert first.location_raw == "Toronto, ON"
+    assert first.source_posted_at == datetime(2026, 9, 28, 13, 0, tzinfo=UTC)
+    assert first.description_text == "Join our team.\nThe hourly rate is CA$30 - CA$38 per hour."
+    assert result.jobs[1].source_posted_at == datetime(2026, 9, 30, 14, 0, tzinfo=UTC)
+
+
+def test_greenhouse_unexpected_payload():
+    with pytest.raises(FetchError, match="unexpected"):
+        greenhouse.parse(["not", "a", "dict"])
+
+
+async def test_greenhouse_fetch_uses_board_url():
+    seen = []
+
+    def handler(request):
+        seen.append(str(request.url))
+        return httpx.Response(200, json=load("greenhouse.json"))
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    async with Fetcher(client=client, base_delay=0) as f:
+        company = Company(id=1, name="Acme", ats="greenhouse", slug="acme")
+        result = await ADAPTERS["greenhouse"](f, company)
+    assert seen == ["https://boards-api.greenhouse.io/v1/boards/acme/jobs?content=true"]
+    assert len(result.jobs) == 3
