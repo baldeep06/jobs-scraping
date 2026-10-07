@@ -44,3 +44,34 @@ async def get_details(fetcher: Fetcher, urls: dict[str, str]) -> dict[str, dict[
 
     pairs = await asyncio.gather(*(one(k, u) for k, u in urls.items()))
     return {k: v for k, v in pairs if isinstance(v, dict)}
+
+
+def dedupe_by(
+    items: Iterable[dict[str, Any]], key: Callable[[dict[str, Any]], str]
+) -> list[dict[str, Any]]:
+    """Merge the hits of several searches, keeping the first occurrence of each posting."""
+    merged: dict[str, dict[str, Any]] = {}
+    for item in items:
+        merged.setdefault(key(item), item)
+    return list(merged.values())
+
+
+def unchanged_board(company: Company, ids: Iterable[str]) -> bool:
+    """True if the listed ids are exactly what we stored last time (so nothing needs re-reading)."""
+    from scraper.pipeline import board_hash  # local: pipeline imports the adapters
+
+    return company.job_ids_hash is not None and company.job_ids_hash == board_hash(set(ids))
+
+
+async def fetch_details(
+    fetcher: Fetcher, company: Company, all_ids: set[str], want: dict[str, str]
+) -> tuple[dict[str, dict[str, Any]], set[str]]:
+    """Details for the postings worth reading, plus the ids whose fetch failed.
+
+    Skipped entirely when the id list is unchanged since the last successful poll: nothing
+    would be re-enriched, so the requests would be wasted.
+    """
+    if not want or unchanged_board(company, all_ids):
+        return {}, set()
+    details = await get_details(fetcher, want)
+    return details, set(want) - set(details)

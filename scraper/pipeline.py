@@ -38,12 +38,13 @@ def process(company: Company, result: FetchResult) -> CompanyOutcome:
             invalid=result.invalid,
             error=f"{result.invalid} of {total} records failed validation (API change?)",
         )
-    seen = {r.source_job_id for r in result.jobs}
+    seen = {r.source_job_id for r in result.jobs} | result.pending_ids
     outcome = CompanyOutcome(
         company=company,
         ok=True,
         seen_ids=seen,
-        ids_hash=board_hash(seen),
+        # A half-fetched board must be re-read next time, never judged "unchanged".
+        ids_hash=None if result.pending_ids else board_hash(seen),
         invalid=result.invalid,
         confirmed_empty=result.confirmed_empty,
     )

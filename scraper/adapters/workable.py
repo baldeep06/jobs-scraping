@@ -1,12 +1,13 @@
 from typing import Any
 
-from scraper.adapters.base import get_details, validate, wanted
+from scraper.adapters.base import dedupe_by, fetch_details, validate, wanted
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company, FetchResult
 from scraper.text import html_to_text
 
 SOURCE = "workable"
 MAX_PAGES = 5
+QUERIES = ("intern", "co-op")
 _WORKPLACE = {"remote": "remote", "hybrid": "hybrid", "on_site": "onsite"}
 
 
@@ -44,17 +45,19 @@ def _record(slug: str, item: dict[str, Any], detail: dict[str, Any]) -> dict[str
     }
 
 
-async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
+async def _search(
+    fetcher: Fetcher, slug: str, query: str
+) -> tuple[list[dict[str, Any]], int | None]:
     items: list[dict[str, Any]] = []
     total: int | None = None
     token = None
     for page_no in range(MAX_PAGES):
         body: dict[str, Any] = {
-            "query": "intern", "location": [], "department": [], "worktype": [], "remote": []
+            "query": query, "location": [], "department": [], "worktype": [], "remote": []
         }  # fmt: skip
         if token:
             body["token"] = token
-        page = await fetcher.json("POST", list_url(company.slug), json=body)
+        page = await fetcher.json("POST", list_url(slug), json=body)
         if not isinstance(page, dict) or not isinstance(page.get("results"), list):
             raise FetchError("unexpected Workable payload")
         items.extend(page["results"])
@@ -63,18 +66,32 @@ async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
         token = page.get("nextPage")
         if not token:
             break
+    return items, total
+
+
+async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
+    found: list[dict[str, Any]] = []
+    totals: list[int | None] = []
+    for query in QUERIES:
+        items, total = await _search(fetcher, company.slug, query)
+        found.extend(items)
+        totals.append(total)
+    items = dedupe_by(found, lambda i: i.get("shortcode") or "")
 
     want = {
         i["shortcode"]: detail_url(company.slug, i["shortcode"])
         for i in items
         if i.get("shortcode") and wanted(i.get("title") or "", i.get("type"))
     }
-    details = await get_details(fetcher, want)
+    details, pending = await fetch_details(
+        fetcher, company, {i["shortcode"] for i in items if i.get("shortcode")}, want
+    )
     records = [
         _record(company.slug, i, details.get(i.get("shortcode") or "", {}))
         for i in items
-        if i.get("shortcode") not in want or i["shortcode"] in details
+        if i.get("shortcode") not in pending
     ]
     result = validate(records)
-    result.confirmed_empty = not items and total == 0
+    result.pending_ids = pending
+    result.confirmed_empty = not items and all(t == 0 for t in totals)
     return result

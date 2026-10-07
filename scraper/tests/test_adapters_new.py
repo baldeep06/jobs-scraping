@@ -124,8 +124,10 @@ async def test_smartrecruiters_paginates_until_total():
     offsets = []
 
     def handler(request):
-        offsets.append(request.url.params["offset"])
         n = int(request.url.params["offset"])
+        if request.url.params["q"] != "intern":
+            return httpx.Response(200, json={"totalFound": 0, "content": []})
+        offsets.append(request.url.params["offset"])
         content = [
             {"id": str(n + i), "name": "Account Executive", "location": {}} for i in range(100)
         ]
@@ -184,7 +186,7 @@ async def test_workday_fetch():
         seen.append((request.method, request.url.path))
         if request.method == "POST":
             body = json.loads(request.content)
-            assert body["searchText"] == "intern" and body["limit"] == 20
+            assert body["searchText"] in ("intern", "co-op") and body["limit"] == 20
             return httpx.Response(200, json=load("workday_list.json"))
         if request.url.path.endswith("JR1"):
             return httpx.Response(200, json=load("workday_detail.json"))
@@ -195,7 +197,8 @@ async def test_workday_fetch():
 
     assert ("POST", "/wday/cxs/acme/Site/jobs") in seen
     assert ("GET", "/wday/cxs/acme/Site/job/US-CA-Santa-Clara/Director_JR2") not in seen
-    assert [j.source_job_id for j in result.jobs] == ["JR1", "JR2"]  # JR3 dropped this poll
+    assert [j.source_job_id for j in result.jobs] == ["acme/Site:JR1", "acme/Site:JR2"]
+    assert result.pending_ids == {"acme/Site:JR3"}  # detail failed: listed, so not "gone"
     job = result.jobs[0]
     assert job.url.endswith("Software-Engineer-Intern_JR1")
     assert job.location_raw == "Santa Clara, CA, US | Toronto, ON, CA"  # not "2 Locations"
@@ -209,19 +212,73 @@ async def test_workday_pages_by_20_up_to_total():
 
     def handler(request):
         body = json.loads(request.content)
-        offsets.append(body["offset"])
         n = body["offset"]
+        if body["searchText"] == "intern":
+            offsets.append(n)
         posts = [
             {"title": "Account Executive", "externalPath": f"/job/x/y_{n + i}",
              "bulletFields": [f"R{n + i}"], "locationsText": "US"}
             for i in range(20)
         ]  # fmt: skip
+        if body["searchText"] != "intern":
+            return httpx.Response(200, json={"total": 0, "jobPostings": []})
         return httpx.Response(200, json={"total": 45 if n == 0 else 0, "jobPostings": posts})
 
     async with make_fetcher(handler) as f:
         result = await workday.fetch(f, wd_company())
     assert offsets == [0, 20, 40]
     assert len(result.jobs) == 60
+
+
+async def test_workday_ids_are_scoped_to_tenant_and_site():
+    def handler(request):
+        if request.method == "POST":
+            return httpx.Response(200, json=load("workday_list.json"))
+        return httpx.Response(404)
+
+    async with make_fetcher(handler) as f:
+        a = await workday.fetch(f, wd_company())
+        b = await workday.fetch(f, wd_company(workday_site="Other", slug="acme/Other"))
+    assert {j.source_job_id for j in a.jobs}.isdisjoint({j.source_job_id for j in b.jobs})
+
+
+async def test_workday_searches_coop_too_and_merges_hits():
+    queries = []
+
+    def handler(request):
+        if request.method == "POST":
+            q = json.loads(request.content)["searchText"]
+            queries.append(q)
+            item = {"title": f"Software Developer {q.title()}", "externalPath": f"/job/x/{q}",
+                    "bulletFields": [q], "locationsText": "CA, ON, Toronto"}  # fmt: skip
+            dup = {"title": "Data Analyst Intern", "externalPath": "/job/x/dup",
+                   "bulletFields": ["DUP"], "locationsText": "CA, ON, Toronto"}  # fmt: skip
+            return httpx.Response(200, json={"total": 2, "jobPostings": [item, dup]})
+        return httpx.Response(200, json={"jobPostingInfo": {"jobDescription": "<p>x</p>"}})
+
+    async with make_fetcher(handler) as f:
+        result = await workday.fetch(f, wd_company())
+    assert queries == ["intern", "co-op"]
+    assert sorted(j.source_job_id.split(":")[1] for j in result.jobs) == ["DUP", "co-op", "intern"]
+
+
+async def test_workday_unchanged_board_skips_detail_requests():
+    from scraper.pipeline import board_hash
+
+    gets = []
+
+    def handler(request):
+        if request.method == "POST":
+            return httpx.Response(200, json=load("workday_list.json"))
+        gets.append(request.url.path)
+        return httpx.Response(200, json=load("workday_detail.json"))
+
+    ids = {"acme/Site:JR1", "acme/Site:JR2", "acme/Site:JR3"}
+    async with make_fetcher(handler) as f:
+        same = await workday.fetch(f, wd_company(job_ids_hash=board_hash(ids)))
+        assert gets == [] and {j.source_job_id for j in same.jobs} == ids
+        await workday.fetch(f, wd_company(job_ids_hash="stale"))
+    assert gets  # a changed id list does fetch details
 
 
 async def test_workday_zero_total_is_confirmed_empty():
@@ -237,3 +294,35 @@ async def test_workday_needs_host_and_site():
     async with make_fetcher(lambda r: httpx.Response(200, json={})) as f:
         with pytest.raises(FetchError, match="workday_host"):
             await workday.fetch(f, wd_company(workday_host=None))
+
+
+async def test_smartrecruiters_searches_coop_too_and_marks_failed_details_pending():
+    queries = []
+
+    def handler(request):
+        if request.url.path.endswith("/postings"):
+            queries.append(request.url.params["q"])
+            return httpx.Response(200, json=load("smartrecruiters_list.json"))
+        return httpx.Response(500)  # detail fetch fails (after retries)
+
+    async with make_fetcher(handler) as f:
+        result = await smartrecruiters.fetch(
+            f, Company(id=1, name="A", ats="smartrecruiters", slug="Acme")
+        )
+    assert queries == ["intern", "co-op"]
+    assert result.pending_ids == {"111"} and [j.source_job_id for j in result.jobs] == ["222"]
+
+
+async def test_workable_searches_coop_too_and_marks_failed_details_pending():
+    queries = []
+
+    def handler(request):
+        if request.method == "POST":
+            queries.append(json.loads(request.content)["query"])
+            return httpx.Response(200, json=load("workable_list.json"))
+        return httpx.Response(500)
+
+    async with make_fetcher(handler) as f:
+        result = await workable.fetch(f, Company(id=1, name="A", ats="workable", slug="acme"))
+    assert queries == ["intern", "co-op"]
+    assert result.pending_ids == {"AAA111", "CCC333"}

@@ -1,6 +1,6 @@
 from typing import Any
 
-from scraper.adapters.base import get_details, validate, wanted
+from scraper.adapters.base import dedupe_by, fetch_details, validate, wanted
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company, FetchResult
 from scraper.text import html_to_text
@@ -8,13 +8,14 @@ from scraper.text import html_to_text
 SOURCE = "smartrecruiters"
 PAGE = 100
 MAX_PAGES = 5
+QUERIES = ("intern", "co-op")
 _SECTIONS = ("companyDescription", "jobDescription", "qualifications", "additionalInformation")
 
 
-def list_url(slug: str, offset: int) -> str:
+def list_url(slug: str, offset: int, query: str = "intern") -> str:
     return (
         f"https://api.smartrecruiters.com/v1/companies/{slug}/postings"
-        f"?q=intern&limit={PAGE}&offset={offset}"
+        f"?q={query}&limit={PAGE}&offset={offset}"
     )
 
 
@@ -59,11 +60,11 @@ def _record(slug: str, item: dict[str, Any], detail: dict[str, Any]) -> dict[str
     }
 
 
-async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
+async def _search(fetcher: Fetcher, slug: str, query: str) -> tuple[list[dict[str, Any]], int]:
     items: list[dict[str, Any]] = []
     total = 0
     for page_no in range(MAX_PAGES):
-        page = await fetcher.json("GET", list_url(company.slug, page_no * PAGE))
+        page = await fetcher.json("GET", list_url(slug, page_no * PAGE, query))
         if not isinstance(page, dict) or not isinstance(page.get("content"), list):
             raise FetchError("unexpected SmartRecruiters payload")
         if page_no == 0:
@@ -71,18 +72,32 @@ async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
         items.extend(page["content"])
         if not page["content"] or len(items) >= total:
             break
+    return items, total
+
+
+async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
+    found: list[dict[str, Any]] = []
+    totals: list[int] = []
+    for query in QUERIES:
+        items, total = await _search(fetcher, company.slug, query)
+        found.extend(items)
+        totals.append(total)
+    items = dedupe_by(found, lambda i: str(i.get("id")))
 
     want = {
         str(i["id"]): detail_url(company.slug, str(i["id"]))
         for i in items
         if i.get("id") and wanted(i.get("name") or "", _hint(i))
     }
-    details = await get_details(fetcher, want)
+    details, pending = await fetch_details(
+        fetcher, company, {str(i["id"]) for i in items if i.get("id")}, want
+    )
     records = [
         _record(company.slug, i, details.get(str(i.get("id")), {}))
         for i in items
-        if str(i.get("id")) not in want or str(i["id"]) in details
+        if str(i.get("id")) not in pending
     ]
     result = validate(records)
-    result.confirmed_empty = not items and total == 0
+    result.pending_ids = pending
+    result.confirmed_empty = not items and not any(totals)
     return result

@@ -112,6 +112,8 @@ class FetchResult:
     invalid: int = 0
     # A search-based ATS answered successfully with zero hits (so the last job may be gone).
     confirmed_empty: bool = False
+    # Listed, but its detail fetch failed: not missing, just not readable this time.
+    pending_ids: set[str] = field(default_factory=set)
 
 
 @dataclass
