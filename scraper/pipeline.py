@@ -9,7 +9,7 @@ from scraper.models import Company, CompanyOutcome, FetchResult, RawJob
 from scraper.normalize.location import parse_location
 
 # Bump when enrichment rules change so existing rows get re-enriched on the next poll.
-ENRICH_VERSION = 2
+ENRICH_VERSION = 3
 # More invalid records than this share means the ATS changed its format: don't trust the poll.
 MAX_INVALID_SHARE = 0.2
 

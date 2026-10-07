@@ -132,6 +132,8 @@ def _job_fields(job: EnrichedJob) -> dict[str, Any]:
         "flags": job.flags,
         "evidence": Jsonb(job.evidence),
         "fingerprint": job.fingerprint,
+        "title_key": job.title_key,
+        "desc_hash": job.desc_hash,
         "best_url": job.raw.url,
     }
 
@@ -141,7 +143,8 @@ _FIELD_NAMES = [
     "title", "normalized_title", "category", "term", "duration_months", "location_raw",
     "locations", "country", "work_mode", "location_unclear", "pay_min", "pay_max",
     "pay_currency", "pay_period", "pay_hourly_min", "pay_hourly_max", "pay_raw",
-    "visa_signals", "visa_status", "flags", "evidence", "fingerprint", "best_url",
+    "visa_signals", "visa_status", "flags", "evidence", "fingerprint", "title_key", "desc_hash",
+    "best_url",
 ]  # fmt: skip
 
 

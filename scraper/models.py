@@ -102,6 +102,8 @@ class EnrichedJob(BaseModel):
     flags: list[str]
     evidence: dict[str, str]
     fingerprint: str
+    title_key: str | None = None
+    desc_hash: str | None = None
 
 
 @dataclass
