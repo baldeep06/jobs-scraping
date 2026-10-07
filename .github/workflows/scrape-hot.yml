@@ -1,0 +1,24 @@
+name: scrape-hot
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: scrape-hot
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --no-dev
+      - name: Scrape hot companies
+        run: uv run python -m scraper run --tier hot
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
