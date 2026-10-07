@@ -1,0 +1,15 @@
+{
+  "offset": 0, "limit": 100, "totalFound": 2,
+  "content": [
+    {"id": "111", "name": "Software Engineer Intern (Summer 2027)",
+     "releasedDate": "2026-10-01T10:00:00.000Z",
+     "location": {"city": "Toronto", "region": "ON", "country": "ca", "remote": false,
+                  "hybrid": true, "fullLocation": "Toronto, ON, Canada"},
+     "typeOfEmployment": {"id": "intern", "label": "Intern"}},
+    {"id": "222", "name": "Internal Audit Director",
+     "releasedDate": "2026-09-01T10:00:00.000Z",
+     "location": {"city": "Chicago", "region": "IL", "country": "us", "remote": true,
+                  "hybrid": false, "fullLocation": "Chicago, IL, United States"},
+     "typeOfEmployment": {"id": "permanent", "label": "Full-time"}}
+  ]
+}

@@ -5,7 +5,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from scraper.adapters import ADAPTERS, workable
+from scraper.adapters import ADAPTERS, smartrecruiters, workable
 from scraper.adapters.base import get_details, wanted
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company
@@ -90,3 +90,60 @@ async def test_workable_bad_payload_is_an_error():
     async with make_fetcher(handler) as f:
         with pytest.raises(FetchError, match="unexpected"):
             await workable.fetch(f, Company(id=1, name="A", ats="workable", slug="a"))
+
+
+async def test_smartrecruiters_fetch():
+    seen = []
+
+    def handler(request):
+        seen.append(str(request.url))
+        if request.url.path.endswith("/postings") and request.method == "GET":
+            return httpx.Response(200, json=load("smartrecruiters_list.json"))
+        return httpx.Response(200, json=load("smartrecruiters_detail.json"))
+
+    company = Company(id=1, name="Acme", ats="smartrecruiters", slug="Acme")
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["smartrecruiters"](f, company)
+
+    assert "https://api.smartrecruiters.com/v1/companies/Acme/postings/222" not in seen
+    assert "https://api.smartrecruiters.com/v1/companies/Acme/postings/111" in seen
+    assert [j.source_job_id for j in result.jobs] == ["111", "222"]
+    job = result.jobs[0]
+    assert job.url == "https://jobs.smartrecruiters.com/Acme/111-software-engineer-intern"
+    assert job.location_raw == "Toronto, ON, Canada"
+    assert job.country_hint == "CA"
+    assert job.work_mode_hint == "hybrid"
+    assert job.employment_type_hint == "Intern"
+    assert job.source_posted_at == datetime(2026, 10, 1, 10, 0, tzinfo=UTC)
+    assert job.description_text.splitlines()[-1] == "Pay: US$40 - US$45 per hour."
+    assert result.jobs[1].work_mode_hint == "remote"
+
+
+async def test_smartrecruiters_paginates_until_total():
+    offsets = []
+
+    def handler(request):
+        offsets.append(request.url.params["offset"])
+        n = int(request.url.params["offset"])
+        content = [
+            {"id": str(n + i), "name": "Account Executive", "location": {}} for i in range(100)
+        ]
+        return httpx.Response(200, json={"totalFound": 250, "content": content})
+
+    async with make_fetcher(handler) as f:
+        result = await smartrecruiters.fetch(
+            f, Company(id=1, name="A", ats="smartrecruiters", slug="A")
+        )
+    assert offsets == ["0", "100", "200"]
+    assert len(result.jobs) == 300
+
+
+async def test_smartrecruiters_zero_total_is_confirmed_empty():
+    def handler(request):
+        return httpx.Response(200, json={"totalFound": 0, "content": []})
+
+    async with make_fetcher(handler) as f:
+        result = await smartrecruiters.fetch(
+            f, Company(id=1, name="A", ats="smartrecruiters", slug="A")
+        )
+    assert result.confirmed_empty

@@ -1,0 +1,6 @@
+{"id": "111", "postingUrl": "https://jobs.smartrecruiters.com/Acme/111-software-engineer-intern",
+ "jobAd": {"sections": {
+   "companyDescription": {"title": "Company", "text": "<p>We build.</p>"},
+   "jobDescription": {"title": "Job", "text": "<p>Write code.</p>"},
+   "qualifications": {"title": "Quals", "text": "<ul><li>Python</li></ul>"},
+   "additionalInformation": {"title": "More", "text": "<p>Pay: US$40 - US$45 per hour.</p>"}}}}
