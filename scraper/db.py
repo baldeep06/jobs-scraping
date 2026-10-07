@@ -360,7 +360,9 @@ def ingest(conn: psycopg.Connection, outcome: CompanyOutcome, now: datetime) -> 
                  fail_count = 0, consecutive_404s = 0, first_404_at = null,
                  job_ids_hash = %(hash)s,
                  last_intern_seen_at = case when %(interns)s then %(now)s
-                                            else last_intern_seen_at end
+                                            else last_intern_seen_at end,
+                 tier = case when %(interns)s and tier in ('warm', 'cold') then 'hot'
+                             else tier end
                where id = %(id)s""",
             {"now": now, "hash": outcome.ids_hash, "interns": bool(outcome.jobs), "id": company.id},
         )
@@ -436,3 +438,36 @@ def set_state_sha(conn: psycopg.Connection, source: str, sha: str) -> None:
            on conflict (source) do update set last_commit_sha = excluded.last_commit_sha""",
         (source, sha),
     )
+
+
+HOT_WINDOW = "30 days"
+COLD_AFTER = "90 days"
+COLD_REPOLL = "6 hours"
+
+
+def retier(conn: psycopg.Connection, now: datetime) -> None:
+    """hot = curated or an intern posting in the last 30 days; cold = none in 90; else warm."""
+    conn.execute(
+        """update companies set tier = case
+             when curated_hot or last_intern_seen_at >= %(now)s - %(hot)s::interval then 'hot'
+             when coalesce(last_intern_seen_at, created_at) < %(now)s - %(cold)s::interval
+               then 'cold'
+             else 'warm' end
+           where tier <> 'inactive'""",
+        {"now": now, "hot": HOT_WINDOW, "cold": COLD_AFTER},
+    )
+
+
+def get_sweep_companies(
+    conn: psycopg.Connection, *, ats: list[str], now: datetime, limit: int = 500
+) -> list[Company]:
+    rows = conn.execute(
+        """select id, name, ats, slug, job_ids_hash, workday_host, workday_site from companies
+           where ats = any(%(ats)s) and tier in ('warm', 'cold')
+             and (tier = 'warm' or last_polled_at is null
+                  or last_polled_at < %(now)s - %(repoll)s::interval)
+           order by last_polled_at nulls first, id
+           limit %(limit)s""",
+        {"ats": ats, "now": now, "repoll": COLD_REPOLL, "limit": limit},
+    ).fetchall()
+    return [Company(**r) for r in rows]

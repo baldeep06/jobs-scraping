@@ -101,13 +101,13 @@ def cmd_run(args: argparse.Namespace) -> int:
         return 0
 
     conn = _connect()
-    companies = db.get_companies(
-        conn,
-        ats=[args.ats] if args.ats else list(ADAPTERS),
-        tier=args.tier,
-        slug=args.company,
-        limit=args.limit,
-    )
+    ats = [args.ats] if args.ats else list(ADAPTERS)
+    if args.sweep:
+        companies = db.get_sweep_companies(conn, ats=ats, now=started, limit=min(args.limit, 500))
+    else:
+        companies = db.get_companies(
+            conn, ats=ats, tier=args.tier, slug=args.company, limit=args.limit
+        )
     outcomes = asyncio.run(_poll_all(companies))
     if args.dry_run:
         _print_outcomes(outcomes)
@@ -127,7 +127,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     db.record_run(
         conn,
-        workflow=f"scrape-{args.tier or 'manual'}",
+        workflow="scrape-sweep" if args.sweep else f"scrape-{args.tier or 'manual'}",
         source="ats",
         started_at=started,
         finished_at=datetime.now(UTC),
@@ -160,6 +160,9 @@ def main(argv: list[str] | None = None) -> int:
     run = sub.add_parser("run", help="poll companies and write jobs")
     run.add_argument("--tier", choices=["hot", "warm", "cold"])
     run.add_argument("--company", help="only this slug")
+    run.add_argument(
+        "--sweep", action="store_true", help="poll the least-recently-polled warm/cold companies"
+    )
     run.add_argument("--ats", choices=sorted(ADAPTERS))
     run.add_argument("--limit", type=int, default=1000)
     run.add_argument(
