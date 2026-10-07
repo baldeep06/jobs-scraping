@@ -16,7 +16,20 @@ uv run --env-file .env pytest   # TEST_DATABASE_URL from .env
 uv run python -m scraper run --dry-run --company stripe --ats greenhouse   # no DB needed
 ```
 
-Commands: `python -m scraper migrate | seed [--verify] | run [--tier hot] [--dry-run]`.
+Commands: `python -m scraper migrate | seed [--verify] | discover | run [--tier hot | --sweep] [--ats X] [--dry-run] | maintenance`.
+
+**Sources:** Greenhouse, Lever, Ashby, Workday, SmartRecruiters and Workable boards. New boards are
+discovered from the SimplifyJobs lists (checked whenever that repo has a new commit).
+
+**Tiers:** `hot` (curated, or an internship seen in the last 30 days; polled every 5 minutes by
+`scrape-hot`), `warm` and `cold` (polled in a 30-minute sweep by `scrape-sweep`; cold only every 6 h),
+`inactive` (board gone). The weekly `maintenance` workflow re-tiers, prunes old run logs and
+commits `STATS.md`, which also keeps GitHub from disabling the schedules.
+
+**Fresh vs repost:** a posting is `fresh` only if it appeared after we started watching its company.
+Postings already open when we first saw them are `existing` ("Already open"). A new ID that matches a
+closed posting (same title words, or the same description, in the same country, within 120 days)
+is a `repost`; a new term of the same role (Summer 2026 → Summer 2027) is a new opportunity.
 
 - Spec: [`docs/superpowers/specs/2026-10-07-intern-job-scraper-design.md`](docs/superpowers/specs/2026-10-07-intern-job-scraper-design.md)
 - Design reference: [`design/DESIGN.md`](design/DESIGN.md)
