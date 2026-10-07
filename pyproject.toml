@@ -24,6 +24,7 @@ asyncio_mode = "auto"
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+extend-exclude = ["docs"]  # plan/spec code blocks are documentation
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
