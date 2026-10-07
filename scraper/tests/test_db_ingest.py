@@ -47,7 +47,7 @@ def test_upsert_and_get_companies(conn):
 
 def test_new_job_inserted_as_fresh_with_source(conn):
     c = company(conn)
-    stats = db.ingest(conn, outcome(c, [raw("1")]), T0)
+    stats = db.ingest(conn, outcome(c, [raw("1", posted=T0 - timedelta(hours=2))]), T0)
     assert (stats.new, stats.seen, stats.closed) == (1, 1, 0)
     [j] = jobs(conn)
     assert (j["freshness"], j["status"], j["country"], j["first_seen_at"]) == (
@@ -247,3 +247,114 @@ def test_unconfirmed_empty_board_never_closes(conn):
         c = db.get_companies(conn, ats=["greenhouse"], slug="acme")[0]
         db.ingest(conn, _empty_outcome(c, False), T0 + timedelta(minutes=5 * i))
     assert jobs(conn)[0]["status"] == "open"
+
+
+# --- reposts vs fresh vs already-open ----------------------------------------------------------
+
+BODY = "Join the platform team and build reliable payment services in Python. " * 6
+
+
+def rjob(id_, title, location="Toronto, ON", body="", posted=None):
+    return RawJob(
+        source="greenhouse", source_job_id=id_, title=title, url=f"https://x/{id_}",
+        location_raw=location, description_text=body, source_posted_at=posted,
+    )  # fmt: skip
+
+
+def settle(conn, c, *raws, at=T0):
+    """Ingest after the company's first poll, so nothing counts as baseline backlog."""
+    conn.execute("update companies set last_success_at = %s where id = %s", (at, c.id))
+    db.ingest(conn, outcome(c, list(raws) + other()), at)
+
+
+def close_all(conn):
+    conn.execute("update jobs set status = 'closed', closed_at = %s", (T0,))
+
+
+def by_title(conn):
+    return {r["title"]: r for r in jobs(conn)}
+
+
+def test_first_poll_backlog_is_existing_not_fresh(conn):
+    c = company(conn)
+    db.ingest(conn, outcome(c, [rjob("1", "Software Engineer Intern")] + other()), T0)
+    assert jobs(conn)[0]["freshness"] == "existing"
+
+
+def test_first_poll_job_with_a_recent_date_is_still_fresh(conn):
+    c = company(conn)
+    posted = T0 - timedelta(hours=3)
+    db.ingest(conn, outcome(c, [rjob("1", "Software Engineer Intern", posted=posted)]), T0)
+    assert jobs(conn)[0]["freshness"] == "fresh"
+
+
+def test_later_undated_job_is_fresh(conn):
+    c = company(conn)
+    db.ingest(conn, outcome(c, other()), T0)
+    c = db.get_companies(conn, ats=["greenhouse"], slug="acme")[0]
+    db.ingest(conn, outcome(c, [rjob("2", "Software Engineer Intern")] + other()), T0)
+    assert by_title(conn)["Software Engineer Intern"]["freshness"] == "fresh"
+
+
+def test_old_dated_job_is_existing_even_after_the_first_poll(conn):
+    c = company(conn)
+    settle(conn, c, rjob("1", "Software Engineer Intern", posted=T0 - timedelta(days=60)))
+    assert by_title(conn)["Software Engineer Intern"]["freshness"] == "existing"
+
+
+def test_reworded_title_is_a_repost_of_the_closed_job(conn):
+    c = company(conn)
+    settle(conn, c, rjob("1", "Software Engineer Intern, Backend"))
+    close_all(conn)
+    settle(conn, c, rjob("2", "Backend Software Engineer Intern"), at=T0 + timedelta(days=10))
+    new = by_title(conn)["Backend Software Engineer Intern"]
+    old = by_title(conn)["Software Engineer Intern, Backend"]
+    assert new["freshness"] == "repost" and new["repost_of"] == old["id"]
+
+
+def test_same_title_in_another_city_of_the_same_country_is_a_repost(conn):
+    c = company(conn)
+    settle(conn, c, rjob("1", "Software Engineer Intern", location="Toronto, ON"))
+    close_all(conn)
+    settle(conn, c, rjob("2", "Software Engineer Intern", location="Waterloo, ON"),
+           at=T0 + timedelta(days=5))  # fmt: skip
+    rows = jobs(conn)
+    assert [r["freshness"] for r in rows if r["location_raw"] == "Waterloo, ON"] == ["repost"]
+
+
+def test_closed_job_in_another_country_is_not_a_repost(conn):
+    c = company(conn)
+    settle(conn, c, rjob("1", "Software Engineer Intern", location="New York, NY"))
+    close_all(conn)
+    settle(conn, c, rjob("2", "Software Engineer Intern", location="Toronto, ON"),
+           at=T0 + timedelta(days=5))  # fmt: skip
+    toronto = [r for r in jobs(conn) if r["location_raw"] == "Toronto, ON"][0]
+    assert toronto["freshness"] != "repost"
+
+
+def test_retitled_posting_with_the_same_description_is_a_repost(conn):
+    c = company(conn)
+    settle(conn, c, rjob("1", "Platform Engineering Intern", body=BODY + " Summer 2027."))
+    close_all(conn)
+    settle(conn, c, rjob("2", "Software Developer Intern", body=BODY + " Summer 2027."),
+           at=T0 + timedelta(days=9))  # fmt: skip
+    assert by_title(conn)["Software Developer Intern"]["freshness"] == "repost"
+
+
+def test_same_title_in_another_city_while_the_first_is_open_is_a_separate_job(conn):
+    c = company(conn)
+    settle(conn, c, rjob("1", "Software Engineer Intern", location="Toronto, ON"))
+    settle(conn, c, rjob("1", "Software Engineer Intern", location="Toronto, ON"),
+           rjob("2", "Software Engineer Intern", location="Waterloo, ON"),
+           at=T0 + timedelta(hours=1))  # fmt: skip
+    rows = jobs(conn)
+    assert len([r for r in rows if r["title"] == "Software Engineer Intern"]) == 2
+    assert all(r["freshness"] != "repost" for r in rows)
+
+
+def test_a_new_term_of_the_same_role_is_fresh_not_a_repost(conn):
+    c = company(conn)
+    settle(conn, c, rjob("1", "Software Engineer Intern (Summer 2026)"))
+    close_all(conn)
+    settle(conn, c, rjob("2", "Software Engineer Intern (Summer 2027)"), at=T0 + timedelta(days=30))
+    assert by_title(conn)["Software Engineer Intern (Summer 2027)"]["freshness"] == "fresh"

@@ -8,10 +8,13 @@ from scraper.models import Location
 
 REPOST_WINDOW = timedelta(days=120)
 REFRESH_MIN_AGE = timedelta(days=7)
+# A posting we meet for the first time but that was posted longer ago than this was already
+# open before we looked: it is backlog, not something that just appeared.
+FRESH_MAX_AGE = timedelta(days=3)
 CLOSE_AFTER_MISSES = 2
 
 Action = Literal["touch", "reopen", "refresh", "attach", "insert"]
-Freshness = Literal["fresh", "repost", "reopened", "refreshed", "recurring"]
+Freshness = Literal["fresh", "repost", "reopened", "refreshed", "recurring", "existing"]
 
 
 def fingerprint(company_id: int, normalized_title: str, locations: list[Location]) -> str:
@@ -59,12 +62,17 @@ def classify(
     fp_match: FingerprintMatch | None,
     now: datetime,
     incoming_term: str | None = None,
+    baseline: bool = False,
 ) -> Decision:
     """Spec §4 freshness rules, evaluated in order.
 
     The fingerprint ignores term, so "Intern (Fall 2026)" and "Intern (Winter 2027)" match.
     An open match only absorbs the incoming posting when the terms agree (or one is
-    unknown); two terms posted at the same time are separate opportunities.
+    unknown); two terms posted at the same time are separate opportunities, and a known
+    different term against a closed match is a new hiring cycle, not a repost.
+
+    `baseline` is True on a company's first successful poll: with no posted date to go on,
+    everything on its board predates us.
     """
     if existing is not None:
         if existing.job_status == "closed":
@@ -78,9 +86,9 @@ def classify(
             return Decision("refresh", job_id=existing.job_id, freshness="refreshed")
         return Decision("touch", job_id=existing.job_id)
     if fp_match is not None:
+        if fp_match.term and incoming_term and fp_match.term != incoming_term:
+            return Decision("insert", freshness=_unseen(incoming_posted_at, now, baseline))
         if fp_match.status == "open":
-            if fp_match.term and incoming_term and fp_match.term != incoming_term:
-                return Decision("insert", freshness="fresh")
             return Decision("attach", job_id=fp_match.job_id)
         if now - fp_match.last_seen_at <= REPOST_WINDOW:
             return Decision(
@@ -90,7 +98,14 @@ def classify(
                 repost_count=fp_match.repost_count + 1,
             )
         return Decision("insert", freshness="recurring")
-    return Decision("insert", freshness="fresh")
+    return Decision("insert", freshness=_unseen(incoming_posted_at, now, baseline))
+
+
+def _unseen(posted_at: datetime | None, now: datetime, baseline: bool) -> Freshness:
+    """Freshness of a posting with no history of ours: new, or already open when we arrived."""
+    if posted_at is None:
+        return "existing" if baseline else "fresh"
+    return "existing" if now - posted_at > FRESH_MAX_AGE else "fresh"
 
 
 @dataclass(frozen=True)

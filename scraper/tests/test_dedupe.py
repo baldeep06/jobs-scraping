@@ -114,3 +114,40 @@ def test_plan_closures_closes_jobs_that_no_longer_pass_the_filter():
     plan = plan_closures(jobs, {"f", "k"}, enriched_ids={"k"})
     assert plan.close == ["filtered"] and plan.increment == []
     assert plan_closures(jobs, {"f", "k"}).close == []
+
+
+# --- fresh vs existing vs repost -------------------------------------------------------------
+
+
+def test_old_posted_date_on_first_sight_is_existing_not_fresh():
+    posted = NOW - timedelta(days=20)
+    assert classify(None, posted, None, NOW) == Decision("insert", freshness="existing")
+
+
+def test_recent_posted_date_on_first_sight_is_fresh():
+    posted = NOW - timedelta(days=1)
+    assert classify(None, posted, None, NOW) == Decision("insert", freshness="fresh")
+
+
+def test_undated_posting_on_a_companys_first_poll_is_existing():
+    assert classify(None, None, None, NOW, baseline=True) == Decision(
+        "insert", freshness="existing"
+    )
+    assert classify(None, None, None, NOW, baseline=False) == Decision("insert", freshness="fresh")
+
+
+def test_dated_recent_posting_is_fresh_even_on_first_poll():
+    posted = NOW - timedelta(hours=5)
+    assert classify(None, posted, None, NOW, baseline=True).freshness == "fresh"
+
+
+def test_different_terms_are_a_new_cycle_even_with_a_closed_match():
+    fp = FingerprintMatch("job-9", "closed", NOW - timedelta(days=30), 1, term="Summer 2026")
+    d = classify(None, NOW - timedelta(hours=2), fp, NOW, incoming_term="Summer 2027")
+    assert d == Decision("insert", freshness="fresh")
+
+
+def test_same_term_closed_match_stays_a_repost_even_if_the_date_is_old():
+    fp = FingerprintMatch("job-9", "closed", NOW - timedelta(days=30), 0, term="Summer 2027")
+    d = classify(None, NOW - timedelta(days=40), fp, NOW, incoming_term="Summer 2027")
+    assert d.freshness == "repost" and d.repost_of == "job-9"

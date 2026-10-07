@@ -216,8 +216,52 @@ def _upsert_source(
     )
 
 
+def _find_match(
+    conn: psycopg.Connection, company_id: int, job: EnrichedJob
+) -> FingerprintMatch | None:
+    """The stored job this posting most likely duplicates or reposts.
+
+    An exact fingerprint (title + locations) matches open or closed jobs. The fuzzy signals
+    (same description body, or same title words) only match *closed* jobs of the same company
+    in a compatible country: two open postings with one title in different cities are
+    different openings, but a closed posting that comes back reworded or relocated is a repost.
+    """
+    row = conn.execute(
+        """select id, status, last_seen_at, repost_count, term from jobs
+           where company_id = %(cid)s and (
+             fingerprint = %(fp)s
+             or (status = 'closed' and (country = %(country)s
+                                        or 'BOTH' in (country, %(country)s)
+                                        or 'UNKNOWN' in (country, %(country)s))
+                 and ((%(dh)s::text is not null and desc_hash = %(dh)s)
+                      or (%(tk)s::text is not null and title_key = %(tk)s))))
+           order by (term is not distinct from %(term)s) desc,
+                    (fingerprint = %(fp)s) desc,
+                    (desc_hash is not distinct from %(dh)s) desc,
+                    last_seen_at desc
+           limit 1""",
+        {
+            "cid": company_id,
+            "fp": job.fingerprint,
+            "country": job.location.country,
+            "dh": job.desc_hash,
+            "tk": job.title_key,
+            "term": job.term,
+        },
+    ).fetchone()
+    if not row:
+        return None
+    return FingerprintMatch(
+        str(row["id"]), row["status"], row["last_seen_at"], row["repost_count"], row["term"]
+    )
+
+
 def _ingest_job(
-    conn: psycopg.Connection, company: Company, job: EnrichedJob, now: datetime
+    conn: psycopg.Connection,
+    company: Company,
+    job: EnrichedJob,
+    now: datetime,
+    baseline: bool = False,
 ) -> bool:
     """Returns True if a new jobs row was created."""
     raw = job.raw
@@ -234,18 +278,11 @@ def _ingest_job(
         )
     match = None
     if existing is None:
-        fp = conn.execute(
-            """select id, status, last_seen_at, repost_count, term from jobs
-               where fingerprint = %s
-               order by (term is not distinct from %s) desc, last_seen_at desc limit 1""",
-            (job.fingerprint, job.term),
-        ).fetchone()
-        if fp:
-            match = FingerprintMatch(
-                str(fp["id"]), fp["status"], fp["last_seen_at"], fp["repost_count"], fp["term"]
-            )
+        match = _find_match(conn, company.id, job)
 
-    d = classify(existing, raw.source_posted_at, match, now, incoming_term=job.term)
+    d = classify(
+        existing, raw.source_posted_at, match, now, incoming_term=job.term, baseline=baseline
+    )
     if d.action == "insert":
         job_id = _insert_job(conn, job, d, now)
         _upsert_source(conn, job_id, company.id, job, now)
@@ -348,7 +385,13 @@ def ingest(conn: psycopg.Connection, outcome: CompanyOutcome, now: datetime) -> 
         if outcome.unchanged:
             _touch_seen(conn, company.id, source, sorted(outcome.seen_ids), now)
         else:
-            stats.new = sum(_ingest_job(conn, company, job, now) for job in outcome.jobs)
+            baseline = bool(
+                conn.execute(
+                    "select last_success_at is null as b from companies where id = %s",
+                    (company.id,),
+                ).fetchone()["b"]
+            )
+            stats.new = sum(_ingest_job(conn, company, job, now, baseline) for job in outcome.jobs)
 
         # An empty board or records that failed validation look like an upstream glitch or an
         # API change, not like every job being taken down: count no misses for this poll.
