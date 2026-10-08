@@ -1,0 +1,5 @@
+# Which new internships go into the daily email.
+categories: [SWE, Data/ML, Hardware/Embedded, PM, Design, Quant, IT/Security, Other-tech]
+hide_blocked: true      # drop jobs the visa rules say you cannot take
+fresh_only: true        # only genuinely new postings (no reposts / already-open backlog)
+min_hourly_pay: null    # e.g. 25 to drop low or unlisted pay; null keeps everything
