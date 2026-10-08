@@ -430,3 +430,78 @@ async def test_talentbrew_failed_page_is_pending_empty_is_confirmed_unknown_page
     async with make_fetcher(other) as f:
         with pytest.raises(FetchError, match="TalentBrew"):
             await ADAPTERS["talentbrew"](f, co("talentbrew", "h", "-"))
+
+
+# --- Jobvite ----------------------------------------------------------------------------------
+
+
+def jobvite_list(rows, total=None):
+    body = "".join(
+        f'<tr><td class="jv-job-list-name"><a href="/ex/job/{i}">{title}</a></td>'
+        f'<td class="jv-job-list-location">\n  {loc},\n  {region}\n</td></tr>'
+        for i, title, loc, region in rows
+    )
+    count = len(rows) if total is None else total
+    return (
+        f'<table>{body}</table><div class="jv-pagination-text">1-{len(rows)} of {count}</div>'
+        if rows
+        else "<p>No results found for 'intern'. Try searching by job title.</p>"
+    )
+
+
+JOBVITE_DETAIL = (
+    '<p class="jv-job-detail-meta">Software Engineering<span class="jv-inline-separator"></span>'
+    " Lakewood, Colorado <br>Salary: USD 25.00 - 28.00 Annually<br></p>"
+    '<div class="jv-job-detail-description"><h3>Description</h3><p>Join our team next summer!</p></div>'
+)
+
+
+async def test_jobvite_lists_rows_pages_and_reads_detail():
+    asked = []
+
+    def handler(request):
+        if request.url.path == "/ex/search":
+            p = request.url.params
+            asked.append((p["q"], p.get("p", "1")))
+            if p["q"] != "intern" or p.get("p") == "1":  # Jobvite finds nothing for an explicit p=1
+                return httpx.Response(200, text=jobvite_list([]))
+            page = (
+                [(1, "Software Development Intern", "Lakewood", "Colorado")]
+                if p.get("p", "1") == "1"
+                else [(2, "Accountant", "Plano", "Texas")]
+            )
+            return httpx.Response(200, text=jobvite_list(page, total=2))
+        assert request.url.path == "/ex/job/1"
+        return httpx.Response(200, text=JOBVITE_DETAIL)
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["jobvite"](f, Company(id=1, name="Ex", ats="jobvite", slug="ex"))
+    assert ("intern", "2") in asked and {a[0] for a in asked} == {"intern", "co-op"}
+    (job,) = result.jobs
+    assert job.source_job_id == "ex:1" and job.url == "https://jobs.jobvite.com/ex/job/1"
+    assert job.title == "Software Development Intern"
+    assert job.location_raw == "Lakewood, Colorado"
+    assert (
+        "Join our team next summer!" in job.description_text
+        and "25.00 - 28.00" in job.description_text
+    )
+    assert not result.confirmed_empty
+
+
+async def test_jobvite_failed_detail_pending_empty_confirmed_and_unknown_page_raises():
+    def failing(request):
+        if request.url.path == "/ex/search":
+            return httpx.Response(200, text=jobvite_list([(1, "Data Intern", "A", "B")]))
+        return httpx.Response(500)
+
+    ex = Company(id=1, name="Ex", ats="jobvite", slug="ex")
+    async with make_fetcher(failing) as f:
+        result = await ADAPTERS["jobvite"](f, ex)
+    assert result.pending_ids == {"ex:1"} and not result.jobs
+
+    async with make_fetcher(lambda r: httpx.Response(200, text=jobvite_list([]))) as f:
+        assert (await ADAPTERS["jobvite"](f, ex)).confirmed_empty
+
+    async with make_fetcher(lambda r: httpx.Response(200, text="<html>Welcome</html>")) as f:
+        with pytest.raises(FetchError, match="Jobvite"):
+            await ADAPTERS["jobvite"](f, ex)

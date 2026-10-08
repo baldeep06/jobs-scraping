@@ -187,3 +187,9 @@
 - {name: Intuit, ats: talentbrew, slug: intuit, workday_host: jobs.intuit.com, workday_site: "-"}
 - {name: Synopsys, ats: talentbrew, slug: synopsys, workday_host: careers.synopsys.com, workday_site: "-"}
 - {name: Comcast, ats: talentbrew, slug: comcast, workday_host: jobs.comcast.com, workday_site: "-"}
+
+# Jobvite boards and Uber's campus iCIMS portal (no internships posted yet for 2027).
+- {name: Tyler Technologies, ats: jobvite, slug: tylertech}
+- {name: Nutanix, ats: jobvite, slug: nutanix}
+- {name: Ziff Davis, ats: jobvite, slug: ziffdavis}
+- {name: Uber, ats: icims, slug: uber, workday_host: university-uber.icims.com, workday_site: "-"}
