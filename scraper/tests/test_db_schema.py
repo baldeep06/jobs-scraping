@@ -13,6 +13,7 @@ def test_migrate_is_idempotent(conn):
         "20261008000000_bigtech_ats.sql",
         "20261009000000_enterprise_ats.sql",
         "20261010000000_icims_lever_eu.sql",
+        "20261011000000_jibe_talentbrew.sql",
     ]
 
 

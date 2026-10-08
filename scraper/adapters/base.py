@@ -1,4 +1,6 @@
 import asyncio
+import json
+import re
 from collections.abc import Awaitable, Callable, Iterable
 from typing import Any
 
@@ -78,3 +80,53 @@ async def fetch_details(
         return {}, set()
     details = await get_details(fetcher, want)
     return details, set(want) - set(details)
+
+
+_LD_JSON = re.compile(r'<script type="application/ld\+json"[^>]*>(.*?)</script>', re.S)
+
+
+def json_ld_posting(html: str) -> dict[str, Any]:
+    """The schema.org JobPosting embedded in a posting page ({} if there is none)."""
+    for block in _LD_JSON.findall(html):
+        try:
+            data = json.loads(block)
+        except ValueError:
+            continue
+        if isinstance(data, dict) and data.get("@type") == "JobPosting":
+            return data
+    return {}
+
+
+def posting_location(posting: dict[str, Any]) -> str:
+    places = posting.get("jobLocation") or []
+    if isinstance(places, dict):
+        places = [places]
+    out = []
+    for place in places:
+        a = (place.get("address") or {}) if isinstance(place, dict) else {}
+        text = ", ".join(
+            x
+            for x in (a.get("addressLocality"), a.get("addressRegion"), a.get("addressCountry"))
+            if x
+        )
+        if text:
+            out.append(text)
+    return " | ".join(out)
+
+
+async def read_pages(
+    fetcher: Fetcher, company: Company, all_ids: set[str], want: dict[str, str]
+) -> tuple[dict[str, str], set[str]]:
+    """fetch_details for HTML pages: (html by id, ids whose page failed to load)."""
+    if not want or unchanged_board(company, all_ids):
+        return {}, set()
+
+    async def one(key: str, url: str) -> tuple[str, str | None]:
+        try:
+            return key, await fetcher.text("GET", url)
+        except FetchError:
+            return key, None
+
+    pairs = await asyncio.gather(*(one(k, u) for k, u in want.items()))
+    pages = {k: v for k, v in pairs if v}
+    return pages, set(want) - set(pages)

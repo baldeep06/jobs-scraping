@@ -178,3 +178,12 @@
 - {name: SentinelOne, ats: icims, slug: sentinelone, workday_host: careers-sentinel.icims.com, workday_site: "-"}
 - {name: Cirrus Logic, ats: lever_eu, slug: cirrus}
 - {name: Quantinuum, ats: lever_eu, slug: quantinuum}
+
+# Jibe (iCIMS) and TalentBrew (Radancy) career sites (site host in workday_host).
+- {name: DocuSign, ats: jibe, slug: docusign, workday_host: careers.docusign.com, workday_site: "-"}
+- {name: Booking Holdings, ats: jibe, slug: booking, workday_host: jobs.booking.com, workday_site: "-"}
+- {name: PDF Solutions, ats: jibe, slug: pdfsolutions, workday_host: careers.pdf.com, workday_site: "-"}
+- {name: Certara, ats: jibe, slug: certara, workday_host: careers.certara.com, workday_site: "-"}
+- {name: Intuit, ats: talentbrew, slug: intuit, workday_host: jobs.intuit.com, workday_site: "-"}
+- {name: Synopsys, ats: talentbrew, slug: synopsys, workday_host: careers.synopsys.com, workday_site: "-"}
+- {name: Comcast, ats: talentbrew, slug: comcast, workday_host: jobs.comcast.com, workday_site: "-"}

@@ -23,7 +23,7 @@ from scraper.pipeline import poll
 DEFAULT_SEED = Path("data/companies.seed.yml")
 
 # Multi-tenant systems whose tenant host and site live in workday_host / workday_site.
-HOSTED_ATS = {"workday", "eightfold", "eightfold_v2", "oraclehcm", "icims"}
+HOSTED_ATS = {"workday", "eightfold", "eightfold_v2", "oraclehcm", "icims", "jibe", "talentbrew"}
 
 
 def load_seeds(path: Path) -> list[dict[str, Any]]:

@@ -291,3 +291,142 @@ async def test_lever_eu_reads_the_eu_api():
             f, Company(id=1, name="Cirrus", ats="lever_eu", slug="cirrus")
         )
     assert result.jobs[0].source == "lever" and result.jobs[0].source_job_id == "abc"
+
+
+# --- Jibe (iCIMS careers sites such as careers.docusign.com) -----------------------------------
+
+
+def jibe_job(i, title="Software Engineering Intern", **kw):
+    data = {
+        "slug": str(i), "req_id": str(i), "title": title, "description": "<p>Build things.</p>",
+        "qualifications": "Enrolled in a BS", "responsibilities": "Ship code",
+        "city": "Seattle", "state": "Washington", "country_code": "US",
+        "full_location": "Seattle, Washington", "posted_date": "2026-10-02T15:08:00+0000",
+        "employment_type": "INTERN", "apply_url": f"https://x.icims.com/jobs/{i}/login",
+    } | kw  # fmt: skip
+    return {"data": data}
+
+
+async def test_jibe_pages_through_results_and_maps_fields():
+    asked = []
+
+    def handler(request):
+        p = request.url.params
+        asked.append((p["keywords"], p["page"]))
+        if p["keywords"] != "intern":
+            return httpx.Response(200, json={"jobs": [], "totalCount": 0})
+        rows = (
+            [jibe_job(1), jibe_job(2, "Account Executive")] if p["page"] == "1" else [jibe_job(3)]
+        )
+        return httpx.Response(200, json={"jobs": rows, "totalCount": 3})
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["jibe"](f, co("jibe", "careers.example.com", "-"))
+    assert ("intern", "2") in asked and {a[0] for a in asked} == {"intern", "co-op"}
+    ids = {j.source_job_id for j in result.jobs}
+    assert ids == {"careers.example.com:1", "careers.example.com:3"}  # not the sales role
+    job = next(j for j in result.jobs if j.source_job_id.endswith(":1"))
+    assert job.url == "https://careers.example.com/jobs/1"
+    assert job.location_raw == "Seattle, Washington, US" and job.country_hint == "US"
+    assert "Build things." in job.description_text and "Ship code" in job.description_text
+    assert job.source_posted_at.year == 2026 and job.employment_type_hint == "INTERN"
+    assert not result.confirmed_empty and not result.truncated
+
+
+async def test_jibe_zero_total_is_confirmed_empty_and_bad_payload_or_cap_is_flagged(monkeypatch):
+    from scraper.adapters import jibe
+
+    def empty(request):
+        return httpx.Response(200, json={"jobs": [], "totalCount": 0})
+
+    async with make_fetcher(empty) as f:
+        assert (await ADAPTERS["jibe"](f, co("jibe", "h", "-"))).confirmed_empty
+
+    def bad(request):
+        return httpx.Response(200, json={"jobs": []})
+
+    async with make_fetcher(bad) as f:
+        with pytest.raises(FetchError):
+            await ADAPTERS["jibe"](f, co("jibe", "h", "-"))
+
+    monkeypatch.setattr(jibe, "MAX_PAGES", 1)
+
+    def big(request):
+        return httpx.Response(200, json={"jobs": [jibe_job(1)], "totalCount": 99})
+
+    async with make_fetcher(big) as f:
+        assert (await ADAPTERS["jibe"](f, co("jibe", "h", "-"))).truncated
+
+
+# --- TalentBrew (Radancy) career sites -----------------------------------------------------
+
+
+def tb_list(rows, pages=1):
+    body = "".join(
+        f'<li><a href="/job/city/{slug}/27595/{i}" data-job-id="{i}" class="sr-item" data-title="{title}">x</a></li>'
+        for i, slug, title in rows
+    )
+    return f'<html><section id="search-results" data-total-results="{len(rows)}" data-total-pages="{pages}"><ul>{body}</ul></section></html>'
+
+
+def tb_page(title="Product Manager Intern"):
+    import json
+
+    posting = {
+        "@type": "JobPosting", "title": title, "description": "<p>Lead the roadmap.</p>",
+        "datePosted": "2026-09-11",
+        "jobLocation": [{"address": {
+            "addressLocality": "Mountain View", "addressRegion": "CA", "addressCountry": "US"}}],
+    }  # fmt: skip
+    return f'<script type="application/ld+json">{json.dumps(posting)}</script>'
+
+
+async def test_talentbrew_reads_search_pages_then_internship_postings():
+    searched = []
+
+    def handler(request):
+        if request.url.path == "/search-jobs":
+            searched.append((request.url.params["k"], request.url.params.get("p")))
+            if request.url.params["k"] == "intern":
+                return httpx.Response(
+                    200,
+                    text=tb_list(
+                        [(24123, "pm-intern", "Product Manager Intern"), (9, "acct", "Accountant")]
+                    ),
+                )
+            return httpx.Response(200, text=tb_list([]))
+        assert request.url.path == "/job/city/pm-intern/27595/24123"
+        return httpx.Response(200, text=tb_page())
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["talentbrew"](f, co("talentbrew", "jobs.example.com", "-"))
+    assert {s[0] for s in searched} == {"intern", "co-op"}
+    job = next(j for j in result.jobs if j.source_job_id.endswith(":24123"))
+    assert job.source_job_id == "jobs.example.com:24123"
+    assert job.url == "https://jobs.example.com/job/city/pm-intern/27595/24123"
+    assert job.title == "Product Manager Intern" and job.location_raw == "Mountain View, CA, US"
+    assert "Lead the roadmap." in job.description_text and not result.confirmed_empty
+
+
+async def test_talentbrew_failed_page_is_pending_empty_is_confirmed_unknown_page_raises():
+    def failing(request):
+        if request.url.path == "/search-jobs":
+            return httpx.Response(200, text=tb_list([(1, "se-intern", "Software Engineer Intern")]))
+        return httpx.Response(500)
+
+    async with make_fetcher(failing) as f:
+        result = await ADAPTERS["talentbrew"](f, co("talentbrew", "h.example.com", "-"))
+    assert result.pending_ids == {"h.example.com:1"} and not result.jobs
+
+    def empty(request):
+        return httpx.Response(200, text=tb_list([]))
+
+    async with make_fetcher(empty) as f:
+        assert (await ADAPTERS["talentbrew"](f, co("talentbrew", "h", "-"))).confirmed_empty
+
+    def other(request):
+        return httpx.Response(200, text="<html>Access denied</html>")
+
+    async with make_fetcher(other) as f:
+        with pytest.raises(FetchError, match="TalentBrew"):
+            await ADAPTERS["talentbrew"](f, co("talentbrew", "h", "-"))
