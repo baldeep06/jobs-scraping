@@ -907,3 +907,21 @@ async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
 - **Spec coverage (§3 / §11 Phase 5):** Amazon, Microsoft, Apple, Google adapters → Tasks 2–5; Meta deliberately dropped (ruled above); registry/seed/docs → Task 6; schema → Task 1.
 - **Placeholders:** none; live-check steps give exact commands and expectations.
 - **Type consistency:** every adapter uses the existing `FetchResult` / `pending_ids` / `confirmed_empty` contract and `dedupe_by`/`fetch_details`/`validate` from `scraper/adapters/base.py`; `Fetcher.text` / `json_with_headers` (Task 1) are what Tasks 4–5 consume.
+
+---
+
+## Addendum: Meta (owner chose option 2) and a pre-requisite fix
+
+**Pre-requisite fix (done, commit "a listed-but-unreadable posting is no longer closed by the filter rule"):** the Phase 3 "pending ids" rule counted a posting as seen but ingest's "no longer passes the filter" rule then closed it immediately. `CompanyOutcome.pending_ids` now exists; ingest treats pending ids as enriched (never filter-closed) and touches their `last_seen_at`.
+
+**Meta design.** Meta's GraphQL is not usable (rotating tokens). Its published `https://www.metacareers.com/jobs/sitemap.xml` lists every job as `https://www.metacareers.com/profile/job_details/{id}/` (1,126 today), and each job page carries schema.org `JobPosting` JSON-LD (`title`, `description`, `responsibilities`, `qualifications`, `datePosted`, `employmentType`, `jobLocation[].name/address`). The sitemap does not say which roles are internships, so the adapter must open job pages, but only ones it has not looked at before:
+- `ats = 'meta'`, `slug = 'meta'`. `source_job_id` = the numeric id.
+- **Known ids.** A new table `checked_postings(source, source_job_id, checked_at, primary key (source, source_job_id))` remembers pages that were opened and rejected (not an intern title, or outside US/CA). `Company.known_ids: set[str]` (default empty) is filled for stateful ATSes (`meta`) from `checked_postings` plus the company's existing `job_sources` ids. `FetchResult.checked_ids` / `CompanyOutcome.checked_ids` carry newly rejected ids back so `ingest` stores them; ids no longer in the sitemap are deleted from `checked_postings`.
+- **Per poll:** fetch the sitemap (raise `FetchError` if it has 0 URLs or is not XML); `new = sitemap_ids - known_ids`, capped at `MAX_NEW_PAGES = 120` per poll (the first run backfills over ~10 polls, gently); open each new page (`Fetcher.text`, per-host cap 5), parse JSON-LD; wanted intern in US/CA → `RawJob`, otherwise → `checked_ids`. Ids already known as interns (in `job_sources`) and still in the sitemap → `pending_ids` (seen, not re-read). A page that fails to load is left for the next poll (not recorded). `confirmed_empty` is never set for Meta (an empty sitemap raises).
+- **Politeness/terms.** Meta's robots.txt states that automated collection is prohibited without written permission; the owner chose to proceed at low volume. Mitigations: our honest User-Agent, one sitemap fetch per poll, only never-seen pages, ≤ 120 pages per poll, and a single kill switch: remove the `meta` seed row (or set its tier to `inactive`) to stop all Meta requests. The README states the caveat.
+
+### Task 1 additions (migration)
+`supabase/migrations/20261008000000_bigtech_ats.sql` also allows `'meta'` in `companies_ats_check` and creates `checked_postings` with RLS enabled and no policies (not readable by `anon`).
+
+### Task 7: Meta adapter
+**Files:** modify `scraper/models.py` (`Company.known_ids`, `FetchResult.checked_ids`, `CompanyOutcome.checked_ids`), `scraper/pipeline.py`, `scraper/db.py` (`load_known_ids`, store/prune `checked_postings` in `ingest`), `scraper/__main__.py` (fill `known_ids` before polling); create `scraper/adapters/meta.py`; tests in `scraper/tests/test_bigtech.py` and `scraper/tests/test_db_ingest.py`. Tests: sitemap parsing; only unseen ids are fetched and the per-poll cap holds; intern vs non-intern vs non-US/CA classification from JSON-LD; known interns become pending (not re-fetched, not closed); rejected ids are stored and pruned when they leave the sitemap; a failed page is retried next poll; an empty/garbled sitemap raises; end-to-end `ingest` keeps an unchanged Meta intern open across polls and closes it after it leaves the sitemap for two polls.
