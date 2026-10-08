@@ -63,3 +63,33 @@ async def test_invalid_json():
     async with fetcher_for(lambda r: httpx.Response(200, text="<html>")) as f:
         with pytest.raises(FetchError, match="invalid JSON"):
             await f.json("GET", "https://api.example.com/x")
+
+
+async def test_text_returns_the_body_and_retries_like_json():
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        return (
+            httpx.Response(503) if len(calls) == 1 else httpx.Response(200, text="<html>ok</html>")
+        )
+
+    async with fetcher_for(handler) as f:
+        assert await f.text("GET", "https://x.test/p") == "<html>ok</html>"
+    assert len(calls) == 2
+
+
+async def test_json_with_headers_returns_both():
+    def handler(request):
+        return httpx.Response(200, json={"a": 1}, headers={"x-token": "t0"})
+
+    async with fetcher_for(handler) as f:
+        data, headers = await f.json_with_headers("GET", "https://x.test/j")
+    assert data == {"a": 1} and headers["x-token"] == "t0"
+
+
+async def test_text_raises_on_client_errors():
+    async with fetcher_for(lambda r: httpx.Response(404)) as f:
+        with pytest.raises(FetchError) as exc:
+            await f.text("GET", "https://x.test/missing")
+    assert exc.value.status == 404

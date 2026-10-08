@@ -34,7 +34,7 @@ class Fetcher:
     async def __aexit__(self, *exc: object) -> None:
         await self._client.aclose()
 
-    async def json(self, method: str, url: str, **kwargs: Any) -> Any:
+    async def _request(self, method: str, url: str, **kwargs: Any) -> httpx.Response:
         host = urlsplit(url).hostname or ""
         limit = self._limits.setdefault(host, asyncio.Semaphore(PER_HOST_LIMIT))
         last: FetchError | None = None
@@ -52,9 +52,21 @@ class Fetcher:
                 continue
             if resp.status_code >= 400:
                 raise FetchError(f"HTTP {resp.status_code}", resp.status_code)
-            try:
-                return resp.json()
-            except ValueError as e:
-                raise FetchError(f"invalid JSON: {e}") from e
+            return resp
         assert last is not None
         raise last
+
+    async def json_with_headers(
+        self, method: str, url: str, **kwargs: Any
+    ) -> tuple[Any, httpx.Headers]:
+        resp = await self._request(method, url, **kwargs)
+        try:
+            return resp.json(), resp.headers
+        except ValueError as e:
+            raise FetchError(f"invalid JSON: {e}") from e
+
+    async def json(self, method: str, url: str, **kwargs: Any) -> Any:
+        return (await self.json_with_headers(method, url, **kwargs))[0]
+
+    async def text(self, method: str, url: str, **kwargs: Any) -> str:
+        return (await self._request(method, url, **kwargs)).text

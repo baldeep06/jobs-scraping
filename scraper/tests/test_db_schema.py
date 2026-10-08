@@ -7,7 +7,11 @@ from scraper import db
 def test_migrate_is_idempotent(conn):
     assert db.migrate(conn) == []
     names = [r["name"] for r in conn.execute("select name from schema_migrations")]
-    assert names == ["20261007000000_init.sql", "20261007120000_repost_signals.sql"]
+    assert names == [
+        "20261007000000_init.sql",
+        "20261007120000_repost_signals.sql",
+        "20261008000000_bigtech_ats.sql",
+    ]
 
 
 def test_anon_reads_open_jobs_only_and_cannot_write(conn):
@@ -51,3 +55,26 @@ def test_freshness_allows_existing_and_signal_columns_exist(conn):
                values (%s, 't', 'x', 'SWE', 'CA', 'open', 'f', 'https://x', 'bogus')""",
             (cid,),
         )
+
+
+def test_bigtech_ats_values_are_accepted_and_junk_is_not(conn):
+    for ats in ("amazon", "microsoft", "apple", "google", "meta"):
+        conn.execute("insert into companies (name, ats, slug) values (%s, %s, %s)", (ats, ats, ats))
+    with pytest.raises(psycopg.errors.CheckViolation):
+        conn.execute("insert into companies (name, ats, slug) values ('x','taleo','x')")
+
+
+def test_checked_postings_exist_and_are_private(conn):
+    conn.execute("insert into checked_postings (source, source_job_id) values ('meta', '1')")
+    with pytest.raises(psycopg.errors.UniqueViolation):
+        conn.execute("insert into checked_postings (source, source_job_id) values ('meta', '1')")
+
+
+def test_anon_cannot_read_checked_postings(conn):
+    conn.execute("insert into checked_postings (source, source_job_id) values ('meta', '2')")
+    conn.execute("set role anon")
+    try:
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            conn.execute("select * from checked_postings")
+    finally:
+        conn.execute("reset role")
