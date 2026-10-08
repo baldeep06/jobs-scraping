@@ -105,3 +105,4 @@ def test_pending_ids_count_as_seen_and_force_a_reprocess_next_time():
     out = process(ACME, FetchResult(jobs=[raw("1")], pending_ids={"2"}))
     assert out.seen_ids == {"1", "2"}  # listed => not missing
     assert out.ids_hash is None  # so the half-fetched board is never treated as "unchanged"
+    assert out.pending_ids == {"2"}  # ingest must not close it for failing the filter

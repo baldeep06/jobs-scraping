@@ -415,7 +415,13 @@ def ingest(conn: psycopg.Connection, outcome: CompanyOutcome, now: datetime) -> 
         # An empty board or records that failed validation look like an upstream glitch or an
         # API change, not like every job being taken down: count no misses for this poll.
         if (outcome.seen_ids or outcome.confirmed_empty) and not outcome.invalid:
-            enriched = None if outcome.unchanged else {j.raw.source_job_id for j in outcome.jobs}
+            enriched = (
+                None
+                if outcome.unchanged
+                else {j.raw.source_job_id for j in outcome.jobs} | outcome.pending_ids
+            )
+            if outcome.pending_ids:
+                _touch_seen(conn, company.id, source, sorted(outcome.pending_ids), now)
             plan = plan_closures(_open_jobs(conn, company.id, source), outcome.seen_ids, enriched)
             _apply_closures(conn, plan, now)
             stats.closed = len(plan.close)

@@ -407,3 +407,30 @@ def test_unchanged_board_with_open_internships_keeps_the_company_hot(conn):
     db.ingest(conn, outcome(c, [raw("1")], unchanged=True), later)
     seen = conn.execute("select last_intern_seen_at from companies").fetchone()
     assert seen["last_intern_seen_at"] == later
+
+
+# --- listed-but-unreadable postings (pending) ----------------------------------------------
+
+
+def pending_outcome(c, raws, pending):
+    out = outcome(c, raws)
+    out.seen_ids = out.seen_ids | set(pending)
+    out.pending_ids = set(pending)
+    out.ids_hash = None
+    return out
+
+
+def test_pending_posting_stays_open_and_is_touched(conn):
+    c = company(conn)
+    db.ingest(conn, outcome(c, [raw("1")] + other()), T0)
+    later = T0 + timedelta(minutes=30)
+    for i in range(3):  # its detail fetch keeps failing, but the board still lists it
+        c = db.get_companies(conn, ats=["greenhouse"], slug="acme")[0]
+        db.ingest(
+            conn,
+            pending_outcome(c, [raw("2", title="Data Analyst Intern")], {"1"}),
+            later + timedelta(minutes=i),
+        )
+    job = by_title(conn)["Software Engineer Intern"]
+    assert job["status"] == "open" and job["miss_count"] == 0
+    assert job["last_seen_at"] == later + timedelta(minutes=2)

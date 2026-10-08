@@ -128,5 +128,7 @@ class CompanyOutcome:
     unchanged: bool = False
     invalid: int = 0
     confirmed_empty: bool = False
+    # Listed but not read this time: seen (so not missing) and neither re-enriched nor closed.
+    pending_ids: set[str] = field(default_factory=set)
     error: str | None = None
     status: int | None = None

@@ -47,6 +47,7 @@ def process(company: Company, result: FetchResult) -> CompanyOutcome:
         ids_hash=None if result.pending_ids else board_hash(seen),
         invalid=result.invalid,
         confirmed_empty=result.confirmed_empty,
+        pending_ids=set(result.pending_ids),
     )
     if outcome.ids_hash == company.job_ids_hash:
         outcome.unchanged = True
