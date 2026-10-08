@@ -16,6 +16,7 @@ class Company(BaseModel):
     ats: str
     slug: str
     job_ids_hash: str | None = None
+    # Tenant host and site/domain for Workday, Eightfold and Oracle HCM (one pair for all three).
     workday_host: str | None = None
     workday_site: str | None = None
     # Only for sites that need one request per posting (Meta): ids of open internships we

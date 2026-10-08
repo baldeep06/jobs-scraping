@@ -11,6 +11,7 @@ def test_migrate_is_idempotent(conn):
         "20261007000000_init.sql",
         "20261007120000_repost_signals.sql",
         "20261008000000_bigtech_ats.sql",
+        "20261009000000_enterprise_ats.sql",
     ]
 
 

@@ -22,6 +22,9 @@ def test_seed_file_is_valid():
         "apple",
         "google",
         "meta",
+        "eightfold",
+        "eightfold_v2",
+        "oraclehcm",
     }
     keys = [(s["ats"], s["slug"]) for s in seeds]
     assert len(keys) == len(set(keys))

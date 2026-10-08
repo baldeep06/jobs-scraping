@@ -22,14 +22,17 @@ from scraper.pipeline import poll
 
 DEFAULT_SEED = Path("data/companies.seed.yml")
 
+# Multi-tenant systems whose tenant host and site live in workday_host / workday_site.
+HOSTED_ATS = {"workday", "eightfold", "eightfold_v2", "oraclehcm"}
+
 
 def load_seeds(path: Path) -> list[dict[str, Any]]:
     seeds = yaml.safe_load(path.read_text()) or []
     for s in seeds:
         if s.get("ats") not in ADAPTERS or not s.get("slug") or not s.get("name"):
             raise ValueError(f"bad seed entry (ats={s.get('ats')}): {s}")
-        if s["ats"] == "workday" and not (s.get("workday_host") and s.get("workday_site")):
-            raise ValueError(f"workday seed needs workday_host and workday_site: {s}")
+        if s["ats"] in HOSTED_ATS and not (s.get("workday_host") and s.get("workday_site")):
+            raise ValueError(f"{s['ats']} seed needs workday_host and workday_site: {s}")
     return seeds
 
 

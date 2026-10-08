@@ -155,3 +155,20 @@
 - {name: Vertex, ats: workday, slug: vertexinc/VertexInc, workday_host: vertexinc.wd1.myworkdayjobs.com, workday_site: VertexInc}
 - {name: Planet Labs, ats: workday, slug: planet/Planet, workday_host: planet.wd3.myworkdayjobs.com, workday_site: Planet}
 - {name: nCino, ats: workday, slug: ncino/nCinoCareers, workday_host: ncino.wd5.myworkdayjobs.com, workday_site: nCinoCareers}
+
+# Eightfold (pcsx / v2 API) and Oracle Recruiting Cloud career sites. workday_host / workday_site
+# hold the tenant host and the site domain (Eightfold) or career-site number (Oracle).
+- {name: PayPal, ats: eightfold, slug: paypal, workday_host: paypal.eightfold.ai, workday_site: paypal.com}
+- {name: Qualcomm, ats: eightfold, slug: qualcomm, workday_host: qualcomm.eightfold.ai, workday_site: qualcomm.com}
+- {name: Lam Research, ats: eightfold, slug: lamresearch, workday_host: lamresearch.eightfold.ai, workday_site: lamresearch.com}
+- {name: Plexus, ats: eightfold, slug: plexus, workday_host: plexus.eightfold.ai, workday_site: plexus.com}
+- {name: Lumen, ats: eightfold, slug: lumen, workday_host: lumen.eightfold.ai, workday_site: lumen.com}
+- {name: Omnicell, ats: eightfold, slug: omnicell, workday_host: omnicell.eightfold.ai, workday_site: omnicell.com}
+- {name: Netflix, ats: eightfold_v2, slug: netflix, workday_host: explore.jobs.netflix.net, workday_site: netflix.com}
+- {name: NetApp, ats: eightfold_v2, slug: netapp, workday_host: netapp.eightfold.ai, workday_site: netapp.com}
+- {name: Oracle, ats: oraclehcm, slug: oracle, workday_host: eeho.fa.us2.oraclecloud.com, workday_site: CX_45001}
+- {name: Dell Technologies, ats: oraclehcm, slug: dell, workday_host: iawmqy.fa.ocs.oraclecloud.com, workday_site: careers}
+- {name: Texas Instruments, ats: oraclehcm, slug: texasinstruments, workday_host: edbz.fa.us2.oraclecloud.com, workday_site: CX}
+- {name: Fortinet, ats: oraclehcm, slug: fortinet, workday_host: edel.fa.us2.oraclecloud.com, workday_site: CX_2001}
+- {name: Vertiv, ats: oraclehcm, slug: vertiv, workday_host: egup.fa.us2.oraclecloud.com, workday_site: CX}
+- {name: ON Semiconductor, ats: oraclehcm, slug: onsemi, workday_host: hctz.fa.us2.oraclecloud.com, workday_site: CX_1001}
