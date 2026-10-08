@@ -123,7 +123,13 @@ def cmd_digest(args: argparse.Namespace) -> int:
 
     conn = _connect()
     now = datetime.now(UTC)
-    regions = select_jobs(conn, now - timedelta(hours=args.hours), load_config(args.config))
+    # Start where the previous digest left off, so a late cron neither skips nor repeats jobs.
+    last = db.last_digest_at(conn)
+    if args.hours is not None:
+        since = now - timedelta(hours=args.hours)
+    else:
+        since = max(last, now - timedelta(hours=72)) if last else now - timedelta(hours=24)
+    regions = select_jobs(conn, since, load_config(args.config))
     subject, html, text = render(regions, db.health(conn, now), now)
     if args.out:
         args.out.write_text(html)
@@ -135,6 +141,10 @@ def cmd_digest(args: argparse.Namespace) -> int:
     except SendError as e:
         print(f"digest not sent: {e}")
         return 1
+    db.record_run(
+        conn, workflow="digest", source="digest", started_at=now, finished_at=datetime.now(UTC),
+        companies_polled=0, jobs_seen=0, jobs_new=0, jobs_closed=0, errors=0, error_samples=[],
+    )  # fmt: skip
     print(f"digest sent: {subject}")
     return 0
 
@@ -205,7 +215,9 @@ def main(argv: list[str] | None = None) -> int:
     maint.add_argument("--stats-path", type=Path, default=Path("STATS.md"))
 
     dig = sub.add_parser("digest", help="email the daily digest of new internships")
-    dig.add_argument("--hours", type=int, default=24)
+    dig.add_argument(
+        "--hours", type=int, help="look back this many hours instead of since the last digest"
+    )
     dig.add_argument("--config", type=Path, default=Path("digest.config.yml"))
     dig.add_argument("--dry-run", action="store_true", help="render only; send nothing")
     dig.add_argument("--out", type=Path, help="also write the HTML here")

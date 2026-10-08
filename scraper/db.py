@@ -590,7 +590,9 @@ def health(conn: psycopg.Connection, now: datetime) -> list[dict[str, Any]]:
         r["workflow"]: r
         for r in conn.execute(
             """select distinct on (workflow) workflow, finished_at, errors from scrape_runs
-               where workflow = any(%s) order by workflow, finished_at desc""",
+               where workflow = any(%s)
+                 and not (companies_polled > 0 and errors >= companies_polled)  -- all failed
+               order by workflow, finished_at desc""",
             (list(HEALTH_WINDOWS),),
         )
     }
@@ -609,3 +611,10 @@ def health(conn: psycopg.Connection, now: datetime) -> list[dict[str, Any]]:
             }
         )
     return out
+
+
+def last_digest_at(conn: psycopg.Connection) -> datetime | None:
+    row = conn.execute(
+        "select max(finished_at) as t from scrape_runs where workflow = 'digest'"
+    ).fetchone()
+    return row["t"] if row else None

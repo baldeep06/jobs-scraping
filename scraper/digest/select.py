@@ -10,6 +10,11 @@ REGION_COUNTRIES = {"US": ["US", "BOTH", "UNKNOWN"], "CA": ["CA", "BOTH", "UNKNO
 FRESH = ("fresh", "recurring")
 
 
+def safe_url(url: str | None) -> str:
+    """Only http(s) links go into the email; anything else (javascript:, data:) is dropped."""
+    return url if url and url.lower().startswith(("http://", "https://")) else ""
+
+
 @dataclass(frozen=True)
 class DigestConfig:
     categories: list[str]
@@ -50,7 +55,7 @@ def select_jobs(conn: psycopg.Connection, since: datetime, cfg: DigestConfig) ->
                   c.name as company
            from jobs j join companies c on c.id = j.company_id
            where j.status = 'open' and j.first_seen_at >= %(since)s
-             and j.category = any(%(cats)s)
+             and (cardinality(%(cats)s::text[]) = 0 or j.category = any(%(cats)s))
              and (not %(hide)s or j.visa_status <> 'blocked')
              and (not %(fresh)s or j.freshness = any(%(fresh_values)s))
              and (%(min_pay)s::numeric is null or j.pay_hourly_max >= %(min_pay)s)
@@ -69,7 +74,7 @@ def select_jobs(conn: psycopg.Connection, since: datetime, cfg: DigestConfig) ->
         job = {
             "company": r["company"], "title": r["title"], "category": r["category"],
             "location": r["location_raw"], "term": r["term"], "pay": _pay_text(r),
-            "visa_status": r["visa_status"], "freshness": r["freshness"], "url": r["best_url"],
+            "visa_status": r["visa_status"], "freshness": r["freshness"], "url": safe_url(r["best_url"]),
         }  # fmt: skip
         for code, countries in REGION_COUNTRIES.items():
             if r["country"] in countries:

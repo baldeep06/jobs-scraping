@@ -212,3 +212,87 @@ def test_digest_send_failure_exits_nonzero_without_secrets(conn, monkeypatch, ca
     assert cli.main(["digest"]) == 1
     shown = capsys.readouterr().out
     assert "RESEND_API_KEY" in shown and "me@example.com" not in shown
+
+
+# --- review fixes ---------------------------------------------------------------------------
+
+
+def test_non_http_links_are_not_rendered_as_links():
+    evil = job(url="javascript:alert(1)")
+    ok = job(title="Fine", url="https://x/ok")
+    _, html, text = render({"US": Region(rest=[evil, ok]), "CA": Region()}, HEALTHY, NOW)
+    assert "javascript:" not in html and "javascript:" not in text
+    assert 'href="https://x/ok"' in html and "SWE Intern" in html
+
+
+def test_select_blanks_unsafe_urls(conn):
+    c = company(conn)
+    add(conn, c.id, "hostile")
+    conn.execute("update jobs set best_url = 'javascript:alert(1)'")
+    got = select_jobs(conn, NOW - timedelta(hours=24), CFG)
+    assert got["US"].rest[0]["url"] == ""
+
+
+def test_empty_categories_means_all_categories(conn):
+    c = company(conn)
+    add(conn, c.id, "any category", category="Quant")
+    cfg = DigestConfig(categories=[], hide_blocked=True, fresh_only=True, min_hourly_pay=None)
+    got = select_jobs(conn, NOW - timedelta(hours=24), cfg)
+    assert titles(got["US"].rest) == ["any category"]
+
+
+def test_window_starts_at_the_last_digest_not_a_fixed_24h(conn, monkeypatch, capsys):
+    from scraper import __main__ as cli
+    from scraper import db
+
+    c = company(conn)
+    now = datetime.now(UTC)
+
+    def at(hours_ago):
+        return now - timedelta(hours=hours_ago)
+
+    def seen(title, hours_ago):
+        add(conn, c.id, title, hours_ago=0)
+        conn.execute("update jobs set first_seen_at = %s where title = %s", (at(hours_ago), title))
+
+    seen("after last digest", 28)  # a late cron stretched the gap to 30 h
+    seen("before last digest", 31)
+    db.record_run(
+        conn, workflow="digest", source="digest", started_at=at(30), finished_at=at(30),
+        companies_polled=0, jobs_seen=0, jobs_new=0, jobs_closed=0, errors=0, error_samples=[],
+    )  # fmt: skip
+    sent = {}
+    monkeypatch.setattr(cli, "_connect", lambda: conn)
+    monkeypatch.setattr(
+        "scraper.digest.send.send_email", lambda subject, html, text, env: sent.update(t=text)
+    )
+    assert cli.main(["digest"]) == 0
+    assert "after last digest" in sent["t"] and "before last digest" not in sent["t"]
+    # sending recorded a new digest run, so the next window starts there
+    last = conn.execute(
+        "select max(finished_at) as t from scrape_runs where workflow = 'digest'"
+    ).fetchone()["t"]
+    assert last > at(1)
+
+
+def test_dry_run_does_not_move_the_window(conn, monkeypatch):
+    from scraper import __main__ as cli
+
+    monkeypatch.setattr(cli, "_connect", lambda: conn)
+    cli.main(["digest", "--dry-run"])
+    assert conn.execute("select count(*) as n from scrape_runs").fetchone()["n"] == 0
+
+
+def test_digest_workflow_passes_every_env_var_the_readme_documents():
+    from pathlib import Path
+
+    import yaml
+
+    wf = yaml.safe_load(
+        (Path(__file__).resolve().parents[2] / ".github/workflows/digest.yml").read_text()
+    )
+    env = wf["jobs"]["digest"]["steps"][-1]["env"]
+    assert {
+        "DATABASE_URL", "RESEND_API_KEY", "DIGEST_TO", "DIGEST_FROM", "DIGEST_TRANSPORT",
+        "SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD",
+    } <= set(env)  # fmt: skip

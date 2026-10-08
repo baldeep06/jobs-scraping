@@ -1,6 +1,6 @@
 {% macro row(j) -%}
 <div style="background:#fff;border-radius:16px;padding:12px 16px;margin:0 0 8px">
-  <a href="{{ j.url }}" style="color:#111827;font-weight:600;text-decoration:none">{{ j.title }}</a>
+  {% if j.url %}<a href="{{ j.url }}" style="color:#111827;font-weight:600;text-decoration:none">{{ j.title }}</a>{% else %}<span style="font-weight:600">{{ j.title }}</span>{% endif %}
   <div style="font-size:13px;color:#6b7280">{{ j.company }} · {{ j.location }}{% if j.term %} · {{ j.term }}{% endif %}{% if j.pay %} · {{ j.pay }}{% endif %} · visa {{ j.visa_status }}</div>
 </div>
 {%- endmacro %}
