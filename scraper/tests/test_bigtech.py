@@ -1,9 +1,10 @@
+import json
 from datetime import UTC, datetime
 
 import httpx
 import pytest
 
-from scraper.adapters import ADAPTERS, amazon, microsoft
+from scraper.adapters import ADAPTERS, amazon, apple, microsoft
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company
 
@@ -164,3 +165,84 @@ async def test_microsoft_zero_count_confirmed_empty_and_bad_payload_raises():
     async with make_fetcher(lambda r: httpx.Response(200, json={"status": 200})) as f:
         with pytest.raises(FetchError, match="unexpected"):
             await microsoft.fetch(f, co("microsoft"))
+
+
+# --- Apple ----------------------------------------------------------------------------------
+
+US_LOC = {"city": "Cupertino", "stateProvince": "California", "countryName": "United States"}
+CA_LOC = {"city": "Toronto", "stateProvince": "Ontario", "countryName": "Canada"}
+
+
+def apple_res(i, title="Software Engineering Intern", **kw):
+    base = {
+        "positionId": f"1000{i}", "postingTitle": title,
+        "transformedPostingTitle": title.lower().replace(" ", "-"),
+        "jobSummary": "Build things. Pay: $48 per hour.", "locations": [US_LOC],
+        "postDateInGMT": "2026-10-08T19:37:18.420Z",
+    }  # fmt: skip
+    return base | kw
+
+
+def apple_handler(results_by_query, token="tok123"):
+    seen = {"tokens": [], "bodies": []}
+
+    def handler(request):
+        if request.url.path.endswith("/CSRFToken"):
+            headers = {"x-apple-csrf-token": token} if token else {}
+            return httpx.Response(200, content=b"", headers=headers)
+        seen["tokens"].append(request.headers.get("x-apple-csrf-token"))
+        body = json.loads(request.content)
+        seen["bodies"].append(body)
+        rows = results_by_query.get(body["query"], [])
+        page = body["page"]
+        res = {"searchResults": rows[(page - 1) * 20 : page * 20], "totalRecords": len(rows)}
+        return httpx.Response(200, json={"res": res})
+
+    handler.seen = seen
+    return handler
+
+
+async def test_apple_fetch_sends_csrf_and_maps_fields():
+    h = apple_handler(
+        {
+            "internships": [apple_res(1)],
+            "co-op": [apple_res(2, "Hardware Co-op", locations=[CA_LOC])],
+        }
+    )
+    async with make_fetcher(h) as f:
+        result = await ADAPTERS["apple"](f, co("apple"))
+    assert set(h.seen["tokens"]) == {"tok123"}
+    assert h.seen["bodies"][0]["filters"]["locations"] == ["postLocation-USA", "postLocation-CAN"]
+    assert [j.source_job_id for j in result.jobs] == ["10001", "10002"]
+    job = result.jobs[0]
+    assert job.url == "https://jobs.apple.com/en-us/details/10001/software-engineering-intern"
+    assert job.location_raw == "Cupertino, California, United States"
+    assert job.country_hint == "US"
+    assert job.source_posted_at == datetime(2026, 10, 8, 19, 37, 18, 420000, tzinfo=UTC)
+    assert "Pay: $48 per hour." in job.description_text
+    assert result.jobs[1].country_hint == "CA"
+
+
+async def test_apple_pages_by_twenty():
+    h = apple_handler({"internships": [apple_res(i, "Sales Rep") for i in range(45)]})
+    async with make_fetcher(h) as f:
+        result = await apple.fetch(f, co("apple"))
+    pages = [b["page"] for b in h.seen["bodies"] if b["query"] == "internships"]
+    assert pages == [1, 2, 3] and len(result.jobs) == 45
+
+
+async def test_apple_missing_token_or_bad_payload_raises_and_zero_is_confirmed_empty():
+    async with make_fetcher(apple_handler({}, token=None)) as f:
+        with pytest.raises(FetchError, match="CSRF"):
+            await apple.fetch(f, co("apple"))
+    async with make_fetcher(apple_handler({})) as f:
+        assert (await apple.fetch(f, co("apple"))).confirmed_empty
+
+    def bad(request):
+        if request.url.path.endswith("/CSRFToken"):
+            return httpx.Response(200, content=b"", headers={"x-apple-csrf-token": "t"})
+        return httpx.Response(200, json={"res": {}})
+
+    async with make_fetcher(bad) as f:
+        with pytest.raises(FetchError, match="unexpected"):
+            await apple.fetch(f, co("apple"))

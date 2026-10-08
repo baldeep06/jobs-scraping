@@ -56,17 +56,16 @@ class Fetcher:
         assert last is not None
         raise last
 
-    async def json_with_headers(
-        self, method: str, url: str, **kwargs: Any
-    ) -> tuple[Any, httpx.Headers]:
-        resp = await self._request(method, url, **kwargs)
-        try:
-            return resp.json(), resp.headers
-        except ValueError as e:
-            raise FetchError(f"invalid JSON: {e}") from e
+    async def response_headers(self, method: str, url: str, **kwargs: Any) -> httpx.Headers:
+        """Response headers only (some endpoints, like a CSRF token, answer with an empty body)."""
+        return (await self._request(method, url, **kwargs)).headers
 
     async def json(self, method: str, url: str, **kwargs: Any) -> Any:
-        return (await self.json_with_headers(method, url, **kwargs))[0]
+        resp = await self._request(method, url, **kwargs)
+        try:
+            return resp.json()
+        except ValueError as e:
+            raise FetchError(f"invalid JSON: {e}") from e
 
     async def text(self, method: str, url: str, **kwargs: Any) -> str:
         return (await self._request(method, url, **kwargs)).text

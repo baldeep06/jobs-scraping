@@ -79,13 +79,13 @@ async def test_text_returns_the_body_and_retries_like_json():
     assert len(calls) == 2
 
 
-async def test_json_with_headers_returns_both():
+async def test_response_headers_works_for_an_empty_body():
     def handler(request):
-        return httpx.Response(200, json={"a": 1}, headers={"x-token": "t0"})
+        return httpx.Response(200, content=b"", headers={"x-token": "t0"})
 
     async with fetcher_for(handler) as f:
-        data, headers = await f.json_with_headers("GET", "https://x.test/j")
-    assert data == {"a": 1} and headers["x-token"] == "t0"
+        headers = await f.response_headers("GET", "https://x.test/j")
+    assert headers["x-token"] == "t0"
 
 
 async def test_text_raises_on_client_errors():
