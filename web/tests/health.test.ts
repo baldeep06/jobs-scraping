@@ -8,8 +8,8 @@ describe("workflowHealth", () => {
   it("uses the latest run per workflow and flags stale or missing ones", () => {
     const h = workflowHealth(
       [
-        { workflow: "scrape-hot", finished_at: ago(200), errors: 0 },
-        { workflow: "scrape-hot", finished_at: ago(10), errors: 3 },
+        { workflow: "scrape-hot", finished_at: ago(200), errors: 0, companies_polled: 5 },
+        { workflow: "scrape-hot", finished_at: ago(10), errors: 3, companies_polled: 5 },
       ],
       NOW,
     );
@@ -20,7 +20,35 @@ describe("workflowHealth", () => {
   });
 
   it("degrades once the window has passed", () => {
-    const h = workflowHealth([{ workflow: "scrape-hot", finished_at: ago(61), errors: 0 }], NOW);
+    const h = workflowHealth([{ workflow: "scrape-hot", finished_at: ago(61), errors: 0, companies_polled: 5 }], NOW);
+    expect(h.find((x) => x.workflow === "scrape-hot")!.degraded).toBe(true);
+  });
+
+  it("ignores runs where every company failed", () => {
+    const h = workflowHealth(
+      [
+        { workflow: "scrape-hot", finished_at: ago(30), errors: 0, companies_polled: 40 },
+        { workflow: "scrape-hot", finished_at: ago(5), errors: 40, companies_polled: 40 },
+      ],
+      NOW,
+    );
+    expect(h.find((x) => x.workflow === "scrape-hot")).toMatchObject({
+      degraded: false,
+      minutesAgo: 30,
+    });
+    const onlyFailed = workflowHealth(
+      [{ workflow: "scrape-hot", finished_at: ago(5), errors: 40, companies_polled: 40 }],
+      NOW,
+    );
+    expect(onlyFailed.find((x) => x.workflow === "scrape-hot")!.degraded).toBe(true);
+  });
+
+  it("agrees with the scraper at the boundary: 60m20s is already degraded", () => {
+    const at = new Date(NOW.getTime() - (60 * 60_000 + 20_000)).toISOString();
+    const h = workflowHealth(
+      [{ workflow: "scrape-hot", finished_at: at, errors: 0, companies_polled: 5 }],
+      NOW,
+    );
     expect(h.find((x) => x.workflow === "scrape-hot")!.degraded).toBe(true);
   });
 });

@@ -16,7 +16,7 @@ export default async function StatusPage() {
   const [runs, jobsUs, jobsCa, ...tiers] = await Promise.all([
     client
       .from("scrape_runs")
-      .select("workflow,finished_at,errors")
+      .select("workflow,finished_at,errors,companies_polled")
       .gte("finished_at", since)
       .order("finished_at", { ascending: false })
       .limit(400),
