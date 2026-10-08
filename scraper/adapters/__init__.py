@@ -2,6 +2,7 @@ from scraper.adapters import (
     amazon,
     apple,
     ashby,
+    google,
     greenhouse,
     lever,
     microsoft,
@@ -12,6 +13,7 @@ from scraper.adapters import (
 from scraper.adapters.base import Adapter
 
 ADAPTERS: dict[str, Adapter] = {
+    "google": google.fetch,
     "greenhouse": greenhouse.fetch,
     "lever": lever.fetch,
     "microsoft": microsoft.fetch,

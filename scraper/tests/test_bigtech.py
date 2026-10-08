@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 import httpx
 import pytest
 
-from scraper.adapters import ADAPTERS, amazon, apple, microsoft
+from scraper.adapters import ADAPTERS, amazon, apple, google, microsoft
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company
 
@@ -246,3 +246,83 @@ async def test_apple_missing_token_or_bad_payload_raises_and_zero_is_confirmed_e
     async with make_fetcher(bad) as f:
         with pytest.raises(FetchError, match="unexpected"):
             await apple.fetch(f, co("apple"))
+
+
+# --- Google ---------------------------------------------------------------------------------
+
+
+def g_job(i, title="Software Engineering Intern, Summer 2027", loc="Mountain View, CA, USA"):
+    row = [None] * 21
+    row[0], row[1] = f"9100{i}", title
+    row[2] = f"https://www.google.com/about/careers/applications/signin?jobId=abc{i}&loc=US"
+    row[3] = [None, "<ul><li>Write code.</li></ul>"]
+    row[4] = [None, "<p>Pay: $52 per hour.</p>"]
+    row[7] = "Google"
+    row[9] = [[loc, ["addr"], "Mountain View", "94043", "CA", "US"]]
+    row[10] = [None, "<p>About the team.</p>"]
+    row[19] = [None, "<p>Python</p>"]
+    return row
+
+
+def g_page(jobs, total=None):
+    blob = json.dumps([jobs, None, len(jobs) if total is None else total, 20])
+    return (
+        "<html><script>AF_initDataCallback({key: 'ds:1', hash: '2', data:"
+        f"{blob}, sideChannel: {{}}}});</script></html>"
+    )
+
+
+def test_google_parse_page():
+    jobs, total = google.parse_page(g_page([g_job(1)], total=25))
+    assert total == 25 and jobs[0][1].startswith("Software Engineering Intern")
+
+
+def test_google_parse_page_raises_when_the_page_shape_changes():
+    empty = (
+        "<script>AF_initDataCallback({key: 'ds:1', hash: '2', data:{}, sideChannel: {}});</script>"
+    )
+    for html in ("<html>no data</html>", empty):
+        with pytest.raises(FetchError, match="unexpected"):
+            google.parse_page(html)
+
+
+async def test_google_fetch_maps_fields_for_both_countries():
+    def handler(request):
+        p = request.url.params
+        if (p["q"], p["location"]) == ("intern", "United States"):
+            return httpx.Response(200, text=g_page([g_job(1), g_job(2, "Sales Manager")]))
+        if (p["q"], p["location"]) == ("co-op", "Canada"):
+            job = g_job(3, "Software Engineer Co-op", "Waterloo, ON, Canada")
+            return httpx.Response(200, text=g_page([job]))
+        return httpx.Response(200, text=g_page([], total=0))
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["google"](f, co("google"))
+    assert [j.source_job_id for j in result.jobs] == ["91001", "91002", "91003"]
+    job = result.jobs[0]
+    assert job.url.startswith("https://www.google.com/about/careers/applications/signin?jobId=")
+    assert job.location_raw == "Mountain View, CA, USA" and job.country_hint == "US"
+    assert job.source_posted_at is None
+    assert "Pay: $52 per hour." in job.description_text
+    assert "Write code." in job.description_text
+    assert result.jobs[2].country_hint == "CA" and not result.confirmed_empty
+
+
+async def test_google_pages_until_total_and_zero_is_confirmed_empty():
+    pages = []
+
+    def handler(request):
+        p = request.url.params
+        if (p["q"], p["location"]) != ("intern", "United States"):
+            return httpx.Response(200, text=g_page([], total=0))
+        n = int(p["page"])
+        pages.append(n)
+        jobs = [g_job(n * 100 + i, "Sales Rep") for i in range(20)]
+        return httpx.Response(200, text=g_page(jobs, total=45))
+
+    async with make_fetcher(handler) as f:
+        result = await google.fetch(f, co("google"))
+    assert pages == [1, 2, 3] and len(result.jobs) == 60
+
+    async with make_fetcher(lambda r: httpx.Response(200, text=g_page([], total=0))) as f:
+        assert (await google.fetch(f, co("google"))).confirmed_empty
