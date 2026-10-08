@@ -51,3 +51,13 @@
 - {name: RBC, ats: workday, slug: rbc/ExternalPrivatePostingStudents, workday_host: rbc.wd3.myworkdayjobs.com, workday_site: ExternalPrivatePostingStudents, domain: rbc.com, hot: true}
 - {name: BMO, ats: workday, slug: bmo/Campus, workday_host: bmo.wd3.myworkdayjobs.com, workday_site: Campus, domain: bmo.com, hot: true}
 - {name: TD, ats: workday, slug: td/TD_Bank_Careers, workday_host: td.wd3.myworkdayjobs.com, workday_site: TD_Bank_Careers, domain: td.com, hot: true}
+
+# Companies with their own career sites (one adapter each; slug = adapter name).
+- {name: Amazon, ats: amazon, slug: amazon, domain: amazon.jobs, hot: true}
+- {name: Microsoft, ats: microsoft, slug: microsoft, domain: microsoft.com, hot: true}
+- {name: Apple, ats: apple, slug: apple, domain: apple.com, hot: true}
+- {name: Google, ats: google, slug: google, domain: google.com, hot: true}
+# Meta publishes a job sitemap; its robots.txt discourages automated collection. Remove this line
+# (or set the company's tier to inactive) to stop every request to metacareers.com.
+- {name: Meta, ats: meta, slug: meta, domain: meta.com, hot: true}
+

@@ -17,6 +17,11 @@ def test_seed_file_is_valid():
         "workday",
         "smartrecruiters",
         "workable",
+        "amazon",
+        "microsoft",
+        "apple",
+        "google",
+        "meta",
     }
     keys = [(s["ats"], s["slug"]) for s in seeds]
     assert len(keys) == len(set(keys))
