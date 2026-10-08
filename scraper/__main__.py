@@ -114,6 +114,31 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_digest(args: argparse.Namespace) -> int:
+    from datetime import timedelta
+
+    from scraper.digest.build import render
+    from scraper.digest.select import load_config, select_jobs
+    from scraper.digest.send import SendError, send_email
+
+    conn = _connect()
+    now = datetime.now(UTC)
+    regions = select_jobs(conn, now - timedelta(hours=args.hours), load_config(args.config))
+    subject, html, text = render(regions, db.health(conn, now), now)
+    if args.out:
+        args.out.write_text(html)
+    if args.dry_run:
+        print(subject)
+        return 0
+    try:
+        send_email(subject, html, text, os.environ)
+    except SendError as e:
+        print(f"digest not sent: {e}")
+        return 1
+    print(f"digest sent: {subject}")
+    return 0
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     started = datetime.now(UTC)
     if args.dry_run and args.company and args.ats:
@@ -179,6 +204,12 @@ def main(argv: list[str] | None = None) -> int:
     maint = sub.add_parser("maintenance", help="re-tier, prune, write STATS.md")
     maint.add_argument("--stats-path", type=Path, default=Path("STATS.md"))
 
+    dig = sub.add_parser("digest", help="email the daily digest of new internships")
+    dig.add_argument("--hours", type=int, default=24)
+    dig.add_argument("--config", type=Path, default=Path("digest.config.yml"))
+    dig.add_argument("--dry-run", action="store_true", help="render only; send nothing")
+    dig.add_argument("--out", type=Path, help="also write the HTML here")
+
     sub.add_parser("discover", help="add companies found in the Simplify lists")
 
     run = sub.add_parser("run", help="poll companies and write jobs")
@@ -202,6 +233,7 @@ def main(argv: list[str] | None = None) -> int:
         "run": cmd_run,
         "discover": cmd_discover,
         "maintenance": cmd_maintenance,
+        "digest": cmd_digest,
     }
     return handlers[args.cmd](args)
 

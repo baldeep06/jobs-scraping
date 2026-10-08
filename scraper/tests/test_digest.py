@@ -123,3 +123,92 @@ def test_render_escapes_third_party_text():
     evil = job(title="<script>alert(1)</script>", company="A&B")
     _, html, _ = render({"US": Region(rest=[evil]), "CA": Region()}, HEALTHY, NOW)
     assert "<script>" not in html and "&lt;script&gt;" in html and "A&amp;B" in html
+
+
+# --- sending --------------------------------------------------------------------------------
+
+import httpx  # noqa: E402
+import pytest  # noqa: E402
+
+from scraper.digest.send import SendError, send_email  # noqa: E402
+
+ENV = {"RESEND_API_KEY": "re_secretkey123", "DIGEST_TO": "me@example.com"}
+
+
+def test_resend_request_shape():
+    seen = {}
+
+    def handler(request):
+        seen["auth"] = request.headers["authorization"]
+        seen["body"] = request.content.decode()
+        return httpx.Response(200, json={"id": "1"})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    send_email("Subj", "<b>hi</b>", "hi", ENV, client=client)
+    assert seen["auth"] == "Bearer re_secretkey123"
+    assert "me@example.com" in seen["body"] and "Subj" in seen["body"]
+
+
+def test_send_failure_never_leaks_key_or_recipient():
+    client = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(403, text="bad")))
+    with pytest.raises(SendError) as exc:
+        send_email("S", "h", "t", ENV, client=client)
+    assert "re_secretkey123" not in str(exc.value) and "example.com" not in str(exc.value)
+    assert "403" in str(exc.value)
+
+
+def test_missing_credentials_is_a_clear_error():
+    with pytest.raises(SendError, match="RESEND_API_KEY"):
+        send_email("S", "h", "t", {"DIGEST_TO": "me@example.com"})
+    with pytest.raises(SendError, match="DIGEST_TO"):
+        send_email("S", "h", "t", {"RESEND_API_KEY": "k"})
+
+
+def test_smtp_fallback(monkeypatch):
+    sent = {}
+
+    class FakeSMTP:
+        def __init__(self, host, port, **kw):
+            sent["host"] = host
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def login(self, user, password):
+            sent["user"] = user
+
+        def send_message(self, msg):
+            sent["to"] = msg["To"]
+
+    monkeypatch.setattr("scraper.digest.send.smtplib.SMTP_SSL", FakeSMTP)
+    env = {"DIGEST_TRANSPORT": "smtp", "DIGEST_TO": "me@example.com", "SMTP_HOST": "smtp.x.test",
+           "SMTP_USER": "u", "SMTP_PASSWORD": "p"}  # fmt: skip
+    send_email("S", "<b>h</b>", "t", env)
+    assert sent == {"host": "smtp.x.test", "user": "u", "to": "me@example.com"}
+
+
+# --- CLI ------------------------------------------------------------------------------------
+
+
+def test_digest_dry_run_prints_subject_and_writes_html(conn, monkeypatch, capsys, tmp_path):
+    from scraper import __main__ as cli
+
+    monkeypatch.setattr(cli, "_connect", lambda: conn)
+    out = tmp_path / "d.html"
+    assert cli.main(["digest", "--dry-run", "--out", str(out)]) == 0
+    assert capsys.readouterr().out.startswith("Intern Radar —")
+    assert "<html" in out.read_text()
+
+
+def test_digest_send_failure_exits_nonzero_without_secrets(conn, monkeypatch, capsys):
+    from scraper import __main__ as cli
+
+    monkeypatch.setattr(cli, "_connect", lambda: conn)
+    monkeypatch.delenv("RESEND_API_KEY", raising=False)
+    monkeypatch.setenv("DIGEST_TO", "me@example.com")
+    assert cli.main(["digest"]) == 1
+    shown = capsys.readouterr().out
+    assert "RESEND_API_KEY" in shown and "me@example.com" not in shown
