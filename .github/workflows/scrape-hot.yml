@@ -1,4 +1,7 @@
 name: scrape-hot
+# GitHub's cron fires only every few hours on a quiet repo, so each run polls on its own clock
+# (every 5 minutes for ~55 minutes) and then starts its successor. The queued successor waits
+# in the concurrency group until this run ends. The cron is only a restart if the chain breaks.
 on:
   schedule:
     - cron: "*/5 * * * *"
@@ -8,17 +11,27 @@ concurrency:
   group: scrape-hot
   cancel-in-progress: false
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
       - run: uv sync --frozen --no-dev
-      - name: Scrape hot companies
-        run: uv run python -m scraper run --tier hot
+      - name: Scrape hot companies every 5 minutes
+        run: uv run python -m scraper run --tier hot --loop-minutes 55 --every-seconds 300
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Start the next run
+        if: success()
+        run: gh workflow run scrape-hot.yml
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
