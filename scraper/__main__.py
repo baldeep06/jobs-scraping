@@ -20,6 +20,8 @@ from scraper.models import Company, CompanyOutcome
 from scraper.pipeline import poll
 
 DEFAULT_SEED = Path("data/companies.seed.yml")
+# Sites that need one request per posting remember what they have already opened.
+STATEFUL_ATS = {"meta"}
 
 
 def load_seeds(path: Path) -> list[dict[str, Any]]:
@@ -173,6 +175,9 @@ def _poll_and_write(conn: psycopg.Connection, args: argparse.Namespace, started:
         companies = db.get_companies(
             conn, ats=ats, tier=args.tier, slug=args.company, limit=args.limit
         )
+    for c in companies:
+        if c.ats in STATEFUL_ATS:
+            c.known_ids, c.checked_ids = db.load_known(conn, c)
     outcomes = asyncio.run(_poll_all(companies))
     if args.dry_run:
         _print_outcomes(outcomes)

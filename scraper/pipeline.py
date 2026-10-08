@@ -48,6 +48,8 @@ def process(company: Company, result: FetchResult) -> CompanyOutcome:
         invalid=result.invalid,
         confirmed_empty=result.confirmed_empty,
         pending_ids=set(result.pending_ids),
+        rejected_ids=set(result.rejected_ids),
+        forgotten_ids=set(result.forgotten_ids),
     )
     if outcome.ids_hash == company.job_ids_hash:
         outcome.unchanged = True

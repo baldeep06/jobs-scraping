@@ -434,3 +434,78 @@ def test_pending_posting_stays_open_and_is_touched(conn):
     job = by_title(conn)["Software Engineer Intern"]
     assert job["status"] == "open" and job["miss_count"] == 0
     assert job["last_seen_at"] == later + timedelta(minutes=2)
+
+
+# --- remembered postings (Meta) --------------------------------------------------------------
+
+
+def meta_raw(id_, title="Software Engineer Intern"):
+    return RawJob(
+        source="meta", source_job_id=id_, title=title, url=f"https://m/{id_}",
+        location_raw="Menlo Park, CA, US", source_posted_at=T0,
+    )  # fmt: skip
+
+
+def meta_outcome(c, raws, pending=(), rejected=(), forgotten=()):
+    out = outcome(c, raws)
+    out.pending_ids = set(pending)
+    out.seen_ids = out.seen_ids | set(pending)
+    out.ids_hash = None
+    out.rejected_ids = set(rejected)
+    out.forgotten_ids = set(forgotten)
+    return out
+
+
+def test_load_known_separates_open_jobs_from_rejected_pages(conn):
+    c = company(conn, "meta", ats="greenhouse")
+    conn.execute("update companies set ats = 'meta' where id = %s", (c.id,))
+    c = db.get_companies(conn, ats=["meta"])[0]
+    db.ingest(conn, meta_outcome(c, [], rejected={"7", "8"}), T0)
+    conn.execute("insert into checked_postings (source, source_job_id) values ('other', '9')")
+    open_ids, checked = db.load_known(conn, c)
+    assert (open_ids, checked) == (set(), {"7", "8"})
+
+
+def test_rejected_ids_are_stored_once_and_forgotten_ids_deleted(conn):
+    c = company(conn, "meta2")
+    conn.execute("update companies set ats = 'meta' where id = %s", (c.id,))
+    c = db.get_companies(conn, ats=["meta"])[0]
+    db.ingest(conn, meta_outcome(c, [], rejected={"1", "2"}), T0)
+    db.ingest(conn, meta_outcome(c, [], rejected={"2", "3"}, forgotten={"1"}), T0)
+    rows = conn.execute("select source_job_id from checked_postings order by 1").fetchall()
+    assert [r["source_job_id"] for r in rows] == ["2", "3"]
+
+
+def test_known_open_job_survives_polls_while_listed_and_closes_after_it_leaves(conn):
+    c = company(conn, "meta3")
+    conn.execute("update companies set ats = 'meta' where id = %s", (c.id,))
+    c = db.get_companies(conn, ats=["meta"])[0]
+    db.ingest(conn, meta_outcome(c, [meta_raw("1")]), T0)
+    open_ids, _ = db.load_known(conn, c)
+    assert open_ids == {"1"}
+    for i in range(1, 4):  # listed but not re-read (pending), plus another posting each time
+        db.ingest(
+            conn,
+            meta_outcome(c, [meta_raw(f"x{i}", "Data Analyst Intern")], pending={"1"}),
+            T0 + timedelta(minutes=5 * i),
+        )
+    job = by_title(conn)["Software Engineer Intern"]
+    assert job["status"] == "open" and job["miss_count"] == 0
+    for i in (4, 5):  # now it has left the sitemap
+        db.ingest(
+            conn,
+            meta_outcome(c, [meta_raw("y", "Data Analyst Intern")]),
+            T0 + timedelta(minutes=5 * i),
+        )
+    assert by_title(conn)["Software Engineer Intern"]["status"] == "closed"
+
+
+def test_two_reworded_postings_that_are_both_still_listed_stay_separate(conn):
+    c = company(conn)
+    settle(
+        conn, c,
+        rjob("1", "Software Engineer Intern, Backend"),
+        rjob("2", "Backend Software Engineer Intern"),
+    )  # fmt: skip
+    rows = [r for r in jobs(conn)]
+    assert len(rows) == 2  # both are listed right now, so neither is a continuation of the other

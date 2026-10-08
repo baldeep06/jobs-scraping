@@ -410,8 +410,22 @@ def ingest(conn: psycopg.Connection, outcome: CompanyOutcome, now: datetime) -> 
                     (company.id,),
                 ).fetchone()["b"]
             )
-            stats.new = sum(_ingest_job(conn, company, job, now, baseline) for job in outcome.jobs)
+            seen = sorted(outcome.seen_ids)
+            stats.new = sum(
+                _ingest_job(conn, company, job, now, baseline, seen) for job in outcome.jobs
+            )
 
+        if outcome.rejected_ids:
+            conn.execute(
+                """insert into checked_postings (source, source_job_id)
+                   select %s, unnest(%s::text[]) on conflict do nothing""",
+                (source, sorted(outcome.rejected_ids)),
+            )
+        if outcome.forgotten_ids:
+            conn.execute(
+                "delete from checked_postings where source = %s and source_job_id = any(%s)",
+                (source, sorted(outcome.forgotten_ids)),
+            )
         # An empty board or records that failed validation look like an upstream glitch or an
         # API change, not like every job being taken down: count no misses for this poll.
         if (outcome.seen_ids or outcome.confirmed_empty) and not outcome.invalid:
@@ -624,3 +638,23 @@ def last_digest_at(conn: psycopg.Connection) -> datetime | None:
         "select max(finished_at) as t from scrape_runs where workflow = 'digest'"
     ).fetchone()
     return row["t"] if row else None
+
+
+def load_known(conn: psycopg.Connection, company: Company) -> tuple[set[str], set[str]]:
+    """For sites that need one request per posting: (ids of our open internships, ids of
+    pages we already opened and rejected). Both let the adapter skip re-reading them."""
+    open_ids = {
+        r["source_job_id"]
+        for r in conn.execute(
+            """select js.source_job_id from job_sources js join jobs j on j.id = js.job_id
+               where js.company_id = %s and js.source = %s and j.status = 'open'""",
+            (company.id, company.ats),
+        )
+    }
+    checked = {
+        r["source_job_id"]
+        for r in conn.execute(
+            "select source_job_id from checked_postings where source = %s", (company.ats,)
+        )
+    }
+    return open_ids, checked

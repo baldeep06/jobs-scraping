@@ -18,6 +18,10 @@ class Company(BaseModel):
     job_ids_hash: str | None = None
     workday_host: str | None = None
     workday_site: str | None = None
+    # Only for sites that need one request per posting (Meta): ids of open internships we
+    # already hold, and ids of pages we opened and rejected. Filled by the CLI before polling.
+    known_ids: set[str] = set()
+    checked_ids: set[str] = set()
 
 
 class PayRange(BaseModel):
@@ -114,6 +118,8 @@ class FetchResult:
     confirmed_empty: bool = False
     # Listed, but its detail fetch failed: not missing, just not readable this time.
     pending_ids: set[str] = field(default_factory=set)
+    rejected_ids: set[str] = field(default_factory=set)  # opened and not wanted: remember
+    forgotten_ids: set[str] = field(default_factory=set)  # remembered ids that left the listing
 
 
 @dataclass
@@ -130,5 +136,7 @@ class CompanyOutcome:
     confirmed_empty: bool = False
     # Listed but not read this time: seen (so not missing) and neither re-enriched nor closed.
     pending_ids: set[str] = field(default_factory=set)
+    rejected_ids: set[str] = field(default_factory=set)
+    forgotten_ids: set[str] = field(default_factory=set)
     error: str | None = None
     status: int | None = None

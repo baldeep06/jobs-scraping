@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 import httpx
 import pytest
 
-from scraper.adapters import ADAPTERS, amazon, apple, google, microsoft
+from scraper.adapters import ADAPTERS, amazon, apple, google, meta, microsoft
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company
 
@@ -326,3 +326,109 @@ async def test_google_pages_until_total_and_zero_is_confirmed_empty():
 
     async with make_fetcher(lambda r: httpx.Response(200, text=g_page([], total=0))) as f:
         assert (await google.fetch(f, co("google"))).confirmed_empty
+
+
+# --- Meta (sitemap + one JSON-LD page per posting) -------------------------------------------
+
+
+def meta_sitemap(ids):
+    urls = "".join(
+        f"<url><loc>https://www.metacareers.com/profile/job_details/{i}/</loc></url>" for i in ids
+    )
+    return f'<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>'
+
+
+def meta_page(title, countries=("US",), employment="INTERN", posted="2026-10-01T10:00:00-07:00"):
+    places = [
+        {
+            "@type": "Place",
+            "name": f"City{n}, ST",
+            "address": {"@type": "PostalAddress", "addressCountry": c},
+        }
+        for n, c in enumerate(countries)
+    ]
+    ld = {
+        "@context": "https://schema.org", "@type": "JobPosting", "title": title,
+        "description": "Build <b>things</b>.", "responsibilities": "Ship it.",
+        "qualifications": "Pay: $60 per hour.", "datePosted": posted,
+        "employmentType": employment, "jobLocation": places,
+    }  # fmt: skip
+    return f'<html><head><script type="application/ld+json">{json.dumps(ld)}</script></head></html>'
+
+
+def meta_handler(ids, pages, fail=()):
+    fetched = []
+
+    def handler(request):
+        if request.url.path.endswith("sitemap.xml"):
+            return httpx.Response(200, text=meta_sitemap(ids))
+        job_id = request.url.path.rstrip("/").rsplit("/", 1)[-1]
+        fetched.append(job_id)
+        if job_id in fail:
+            return httpx.Response(500)
+        return httpx.Response(200, text=pages[job_id])
+
+    handler.fetched = fetched
+    return handler
+
+
+def meta_company(known=(), checked=()):
+    return Company(
+        id=1, name="Meta", ats="meta", slug="meta", known_ids=set(known), checked_ids=set(checked)
+    )
+
+
+async def test_meta_classifies_pages_and_maps_fields():
+    h = meta_handler(
+        ["1", "2", "3", "4"],
+        {
+            "1": meta_page("Software Engineer Intern, ML", ("US", "CA")),
+            "2": meta_page("Staff Software Engineer", ("US",), employment="FULL_TIME"),
+            "3": meta_page("Software Engineer Intern", ("GB",)),
+            "4": meta_page("Research Scientist Intern", ("CA",)),
+        },
+    )
+    async with make_fetcher(h) as f:
+        result = await ADAPTERS["meta"](f, meta_company())
+    assert sorted(j.source_job_id for j in result.jobs) == ["1", "4"]
+    assert result.rejected_ids == {"2", "3"}  # senior role; interns outside US/CA
+    job = next(j for j in result.jobs if j.source_job_id == "1")
+    assert job.url == "https://www.metacareers.com/profile/job_details/1/"
+    assert job.location_raw == "City0, ST, US | City1, ST, CA"
+    assert job.source_posted_at == datetime(2026, 10, 1, 17, 0, tzinfo=UTC)
+    assert "Pay: $60 per hour." in job.description_text and "Build things." in job.description_text
+
+
+async def test_meta_only_opens_unknown_ids_and_caps_each_poll(monkeypatch):
+    monkeypatch.setattr(meta, "MAX_NEW_PAGES", 2)
+    pages = {str(i): meta_page("Account Executive", employment="FULL_TIME") for i in range(1, 8)}
+    h = meta_handler(list(pages), pages)
+    async with make_fetcher(h) as f:
+        result = await meta.fetch(f, meta_company(known={"1"}, checked={"2", "3"}))
+    assert h.fetched == ["4", "5"]  # 1-3 already known; at most 2 new pages per poll
+    assert result.rejected_ids == {"4", "5"}
+
+
+async def test_meta_known_interns_still_listed_are_pending_and_gone_ones_are_not():
+    h = meta_handler(["1", "2"], {})
+    async with make_fetcher(h) as f:
+        result = await meta.fetch(f, meta_company(known={"1", "9"}, checked={"2", "8"}))
+    assert h.fetched == []
+    assert result.pending_ids == {"1"}  # 9 left the sitemap: it must count as missing
+    assert result.forgotten_ids == {"8"}  # a rejected id that left the sitemap is forgotten
+    assert result.jobs == [] and not result.confirmed_empty
+
+
+async def test_meta_failed_page_is_retried_next_poll_not_remembered():
+    pages = {"1": meta_page("Software Engineer Intern")}
+    h = meta_handler(["1"], pages, fail={"1"})
+    async with make_fetcher(h) as f:
+        result = await meta.fetch(f, meta_company())
+    assert result.jobs == [] and result.rejected_ids == set() and result.pending_ids == set()
+
+
+async def test_meta_empty_or_garbled_sitemap_raises():
+    for body in (meta_sitemap([]), "<html>blocked</html>"):
+        async with make_fetcher(lambda r, b=body: httpx.Response(200, text=b)) as f:
+            with pytest.raises(FetchError, match="unexpected"):
+                await meta.fetch(f, meta_company())
