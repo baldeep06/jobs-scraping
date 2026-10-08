@@ -296,3 +296,16 @@ def test_digest_workflow_passes_every_env_var_the_readme_documents():
         "DATABASE_URL", "RESEND_API_KEY", "DIGEST_TO", "DIGEST_FROM", "DIGEST_TRANSPORT",
         "SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD",
     } <= set(env)  # fmt: skip
+
+
+def test_rejection_reports_resend_error_name_but_never_its_message():
+    body = {
+        "name": "validation_error",
+        "message": "You can only send testing emails to your own email address (owner@example.org).",
+    }
+    client = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(403, json=body)))
+    with pytest.raises(SendError) as exc:
+        send_email("S", "h", "t", ENV, client=client)
+    shown = str(exc.value)
+    assert "403" in shown and "validation_error" in shown
+    assert "owner@example.org" not in shown and "testing emails" not in shown
