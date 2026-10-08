@@ -2,6 +2,8 @@ import argparse
 import asyncio
 import os
 import sys
+import time
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -149,7 +151,7 @@ def cmd_digest(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_run(args: argparse.Namespace) -> int:
+def _run_once(args: argparse.Namespace) -> int:
     started = datetime.now(UTC)
     if args.dry_run and args.company and args.ats:
         company = Company(id=0, name=args.company, ats=args.ats, slug=args.company)
@@ -157,6 +159,13 @@ def cmd_run(args: argparse.Namespace) -> int:
         return 0
 
     conn = _connect()
+    try:
+        return _poll_and_write(conn, args, started)
+    finally:
+        conn.close()
+
+
+def _poll_and_write(conn: psycopg.Connection, args: argparse.Namespace, started: datetime) -> int:
     ats = [args.ats] if args.ats else list(ADAPTERS)
     if args.sweep:
         companies = db.get_sweep_companies(conn, ats=ats, now=started, limit=min(args.limit, 500))
@@ -201,6 +210,46 @@ def cmd_run(args: argparse.Namespace) -> int:
     return 1 if outcomes and len(errors) == len(outcomes) else 0
 
 
+def run_loop(
+    once: Callable[[], int],
+    loop_seconds: float,
+    every_seconds: float,
+    clock: Callable[[], float] = time.monotonic,
+    sleep: Callable[[float], None] = time.sleep,
+) -> int:
+    """Run `once` every `every_seconds` until `loop_seconds` have passed.
+
+    GitHub's cron fires every few hours on a quiet repo, so a workflow polls on its own clock
+    instead. A cycle that crashes or exits with a message is reported and the loop carries on;
+    the exit code is a failure only if every cycle failed.
+    """
+    deadline = clock() + loop_seconds
+    results: list[int] = []
+    while True:
+        started = clock()
+        try:
+            results.append(once())
+        except SystemExit as e:  # e.g. "could not connect to the database" (already sanitized)
+            print(f"cycle failed: {e}")
+            results.append(1)
+        except Exception as e:
+            print(f"cycle failed: {type(e).__name__}")
+            results.append(1)
+        next_start = started + every_seconds
+        if next_start >= deadline:
+            break
+        sleep(max(0.0, next_start - clock()))
+    return 0 if 0 in results else 1
+
+
+def cmd_run(args: argparse.Namespace) -> int:
+    if not args.loop_minutes:
+        return _run_once(args)
+    if not os.environ.get("DATABASE_URL"):
+        raise SystemExit("DATABASE_URL is not set (see .env.example)")
+    return run_loop(lambda: _run_once(args), args.loop_minutes * 60, args.every_seconds)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m scraper")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -230,6 +279,10 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument(
         "--sweep", action="store_true", help="poll the least-recently-polled warm/cold companies"
     )
+    run.add_argument(
+        "--loop-minutes", type=int, help="keep polling every --every-seconds for this long"
+    )
+    run.add_argument("--every-seconds", type=int, default=300)
     run.add_argument("--ats", choices=sorted(ADAPTERS))
     run.add_argument("--limit", type=int, default=1000)
     run.add_argument(

@@ -1,4 +1,5 @@
 name: scrape-sweep
+# Like scrape-hot: polls on its own clock (every 30 minutes for ~55) and starts its successor.
 on:
   schedule:
     - cron: "7,37 * * * *"
@@ -10,11 +11,12 @@ concurrency:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   sweep:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 85
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -27,6 +29,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           GITHUB_TOKEN: ${{ github.token }}
       - name: Sweep warm and cold companies
-        run: uv run python -m scraper run --sweep
+        run: uv run python -m scraper run --sweep --loop-minutes 55 --every-seconds 1800
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Start the next run
+        if: success()
+        run: gh workflow run scrape-sweep.yml
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
