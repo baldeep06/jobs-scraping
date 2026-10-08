@@ -50,4 +50,12 @@ def send_email(
     except httpx.HTTPError as e:
         raise SendError(f"Resend request failed ({type(e).__name__})") from None
     if resp.status_code >= 400:
-        raise SendError(f"Resend rejected the email (HTTP {resp.status_code})")
+        # Resend's error "name" is a fixed code (e.g. validation_error). Its "message" can quote
+        # the account's email address, so it must never reach the public Actions log.
+        try:
+            name = str(resp.json().get("name") or "")
+        except (ValueError, AttributeError):
+            name = ""
+        raise SendError(
+            f"Resend rejected the email (HTTP {resp.status_code}{', ' + name if name else ''})"
+        )
