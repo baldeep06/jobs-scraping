@@ -16,6 +16,7 @@ from scraper import stats as stats_report
 from scraper.adapters import ADAPTERS
 from scraper.adapters.base import STATEFUL_ATS
 from scraper.discovery import discover
+from scraper.domains import resolve_domains
 from scraper.http import Fetcher
 from scraper.models import Company, CompanyOutcome
 from scraper.pipeline import poll
@@ -102,11 +103,22 @@ def cmd_seed(args: argparse.Namespace) -> int:
 
 
 def cmd_discover(_: argparse.Namespace) -> int:
+    async def go(conn: psycopg.Connection) -> tuple[int, int]:
+        async with Fetcher() as fetcher:
+            added = await discover(fetcher, conn)
+            return added, await resolve_domains(fetcher, conn)
+
+    added, domains = asyncio.run(go(_connect()))
+    print(f"discovered {added} new companies; found {domains} company websites")
+    return 0
+
+
+def cmd_domains(args: argparse.Namespace) -> int:
     async def go(conn: psycopg.Connection) -> int:
         async with Fetcher() as fetcher:
-            return await discover(fetcher, conn)
+            return await resolve_domains(fetcher, conn, limit=args.limit)
 
-    print(f"discovered {asyncio.run(go(_connect()))} new companies")
+    print(f"found {asyncio.run(go(_connect()))} company websites")
     return 0
 
 
@@ -279,6 +291,10 @@ def main(argv: list[str] | None = None) -> int:
     dig.add_argument("--out", type=Path, help="also write the HTML here")
 
     sub.add_parser("discover", help="add companies found in the Simplify lists")
+    domains = sub.add_parser(
+        "domains", help="look up websites (for logos) of companies without one"
+    )
+    domains.add_argument("--limit", type=int, default=2000)
 
     run = sub.add_parser("run", help="poll companies and write jobs")
     run.add_argument("--tier", choices=["hot", "warm", "cold"])
@@ -304,6 +320,7 @@ def main(argv: list[str] | None = None) -> int:
         "seed": cmd_seed,
         "run": cmd_run,
         "discover": cmd_discover,
+        "domains": cmd_domains,
         "maintenance": cmd_maintenance,
         "digest": cmd_digest,
     }

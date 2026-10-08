@@ -1,7 +1,7 @@
 import { Badge } from "@/components/Badge";
 import { flagBadges, freshnessBadge, visaBadge } from "@/lib/badges";
 import type { Filters } from "@/lib/filters";
-import { faviconUrl, formatLocation, formatPay, relativeTime, safeUrl } from "@/lib/format";
+import { companyInitial, faviconUrl, formatLocation, formatPay, relativeTime, safeUrl } from "@/lib/format";
 import type { JobRow, JobSource } from "@/lib/types";
 
 // Company | Role | Location | Term | Pay | Visa | Flags | Seen
@@ -39,8 +39,16 @@ function Row({ job, sources, now }: { job: JobRow; sources: JobSource[]; now: Da
       <details className="group">
         <summary className={`cursor-pointer px-4 py-3 hover:bg-canvas/60 md:px-6 ${GRID}`}>
           <div className="flex items-center gap-2 text-sm font-medium text-ink">
-            {icon && (
+            {icon ? (
               <img src={icon} alt="" width={16} height={16} className="h-4 w-4 rounded-sm" />
+            ) : (
+              <span
+                data-testid="company-initial"
+                aria-hidden="true"
+                className="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-divider text-[10px] font-semibold leading-none text-graphite"
+              >
+                {companyInitial(job.company_name)}
+              </span>
             )}
             <span className="truncate">{job.company_name}</span>
           </div>

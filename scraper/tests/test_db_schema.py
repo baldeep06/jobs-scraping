@@ -15,6 +15,7 @@ def test_migrate_is_idempotent(conn):
         "20261010000000_icims_lever_eu.sql",
         "20261011000000_jibe_talentbrew.sql",
         "20261012000000_jobvite.sql",
+        "20261013000000_domain_checked.sql",
     ]
 
 

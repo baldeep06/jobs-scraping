@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { faviconUrl, formatLocation, formatPay, relativeTime, safeUrl } from "@/lib/format";
+import {
+  companyInitial,
+  faviconUrl,
+  formatLocation,
+  formatPay,
+  relativeTime,
+  safeUrl,
+} from "@/lib/format";
 
 const NOW = new Date("2026-10-07T12:00:00Z");
 
@@ -79,5 +86,17 @@ describe("faviconUrl", () => {
       "https://www.google.com/s2/favicons?domain=stripe.com&sz=64",
     );
     expect(faviconUrl(null)).toBeNull();
+  });
+});
+
+describe("companyInitial", () => {
+  it("uses the first letter or digit, upper-cased", () => {
+    expect(companyInitial("zeta labs")).toBe("Z");
+    expect(companyInitial("  3M")).toBe("3");
+    expect(companyInitial("The Walt Disney Company")).toBe("T");
+  });
+  it("falls back to a placeholder for names without letters", () => {
+    expect(companyInitial("")).toBe("?");
+    expect(companyInitial("--")).toBe("?");
   });
 });

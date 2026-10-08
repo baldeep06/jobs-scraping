@@ -60,3 +60,9 @@ export function faviconUrl(domain: string | null): string | null {
     ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`
     : null;
 }
+
+/** First letter or digit of a company name, for the tile shown when it has no logo. */
+export function companyInitial(name: string): string {
+  const m = name.match(/[\p{L}\p{N}]/u);
+  return m ? m[0].toUpperCase() : "?";
+}

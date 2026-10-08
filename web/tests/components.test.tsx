@@ -106,3 +106,26 @@ describe("FilterBar", () => {
     expect(html).toMatch(/<input[^>]*name="fresh"[^>]*checked=""/);
   });
 });
+
+describe("company icon", () => {
+  it("shows the site's favicon when the company has a domain", () => {
+    const html = renderToStaticMarkup(
+      <JobList rows={[makeJob({ company_domain: "stripe.com" })]} sources={{}} now={NOW} filters={US} />,
+    );
+    expect(html).toContain("favicons?domain=stripe.com");
+  });
+
+  it("falls back to a letter tile for a company without a domain", () => {
+    const html = renderToStaticMarkup(
+      <JobList
+        rows={[makeJob({ company_domain: null, company_name: "Zeta Labs" })]}
+        sources={{}}
+        now={NOW}
+        filters={US}
+      />,
+    );
+    expect(html).not.toContain("favicons");
+    expect(html).toContain('data-testid="company-initial"');
+    expect(html).toContain(">Z<");
+  });
+});
