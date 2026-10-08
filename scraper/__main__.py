@@ -14,14 +14,13 @@ import yaml
 from scraper import db
 from scraper import stats as stats_report
 from scraper.adapters import ADAPTERS
+from scraper.adapters.base import STATEFUL_ATS
 from scraper.discovery import discover
 from scraper.http import Fetcher
 from scraper.models import Company, CompanyOutcome
 from scraper.pipeline import poll
 
 DEFAULT_SEED = Path("data/companies.seed.yml")
-# Sites that need one request per posting remember what they have already opened.
-STATEFUL_ATS = {"meta"}
 
 
 def load_seeds(path: Path) -> list[dict[str, Any]]:

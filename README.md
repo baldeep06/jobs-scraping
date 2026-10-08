@@ -25,8 +25,9 @@ each job page's structured data, because its API needs rotating tokens).
 **Meta:** Meta's `robots.txt` states that automated collection is prohibited without written
 permission. The Meta adapter is deliberately gentle (one sitemap request per poll, never-seen pages
 only, at most 120 per poll, each page remembered once read). To stop every request to
-metacareers.com, remove the `meta` line from `data/companies.seed.yml` and set the company's tier to
-`inactive`. New boards are
+metacareers.com, add `disabled: true` to the `meta` line in `data/companies.seed.yml` and run
+`python -m scraper seed`: the company goes inactive and its open jobs are closed. (Removing the line
+alone changes nothing; `seed` never deletes companies.) New boards are
 discovered from the SimplifyJobs lists (checked whenever that repo has a new commit).
 
 **Tiers:** `hot` (curated, or an internship seen in the last 30 days; polled every 5 minutes by

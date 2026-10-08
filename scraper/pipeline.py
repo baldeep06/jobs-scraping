@@ -1,7 +1,7 @@
 from collections import Counter
 
 from scraper.adapters import ADAPTERS
-from scraper.adapters.base import Adapter
+from scraper.adapters.base import STATEFUL_ATS, Adapter
 from scraper.dedupe import ids_hash
 from scraper.enrich import enrich
 from scraper.http import Fetcher, FetchError
@@ -50,12 +50,17 @@ def process(company: Company, result: FetchResult) -> CompanyOutcome:
         pending_ids=set(result.pending_ids),
         rejected_ids=set(result.rejected_ids),
         forgotten_ids=set(result.forgotten_ids),
+        truncated=result.truncated,
     )
     if outcome.ids_hash == company.job_ids_hash:
         outcome.unchanged = True
         return outcome
     default = dominant_country(result.jobs)
     outcome.jobs = [e for r in result.jobs if (e := enrich(r, company.id, default)) is not None]
+    if company.ats in STATEFUL_ATS:
+        # Read but dropped by enrichment: remember it so the page is not opened again.
+        kept = {j.raw.source_job_id for j in outcome.jobs}
+        outcome.rejected_ids |= {r.source_job_id for r in result.jobs} - kept
     return outcome
 
 

@@ -106,3 +106,21 @@ def test_pending_ids_count_as_seen_and_force_a_reprocess_next_time():
     assert out.seen_ids == {"1", "2"}  # listed => not missing
     assert out.ids_hash is None  # so the half-fetched board is never treated as "unchanged"
     assert out.pending_ids == {"2"}  # ingest must not close it for failing the filter
+
+
+def test_rejected_ids_include_postings_enrichment_drops_for_stateful_sites():
+    from scraper.models import Company, FetchResult
+
+    berlin = raw("2", location="Berlin, Germany")
+    toronto = raw("1", location="Toronto, ON")
+    meta = Company(id=1, name="Meta", ats="meta", slug="meta")
+    out = process(meta, FetchResult(jobs=[toronto, berlin]))
+    assert [j.raw.source_job_id for j in out.jobs] == ["1"]
+    assert out.rejected_ids == {"2"}  # remembered, so the page is not opened again
+    other_site = process(ACME, FetchResult(jobs=[toronto, berlin]))
+    assert other_site.rejected_ids == set()
+
+
+def test_truncated_flag_reaches_the_outcome():
+    out = process(ACME, FetchResult(jobs=[raw("1")], truncated=True))
+    assert out.truncated

@@ -80,3 +80,9 @@ def test_seed_verify_passes_workday_host_and_site(monkeypatch, tmp_path):
     monkeypatch.setattr(cli, "_poll_all", fake_poll_all)
     cli.main(["seed", str(seed), "--verify"])
     assert (seen[0].workday_host, seen[0].workday_site) == ("a.wd5.myworkdayjobs.com", "S")
+
+
+def test_seed_file_allows_the_disabled_flag(tmp_path):
+    ok = tmp_path / "seed.yml"
+    ok.write_text("- {name: X, ats: greenhouse, slug: x, hot: true, disabled: true}\n")
+    assert load_seeds(ok)[0]["disabled"] is True

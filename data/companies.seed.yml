@@ -57,7 +57,8 @@
 - {name: Microsoft, ats: microsoft, slug: microsoft, domain: microsoft.com, hot: true}
 - {name: Apple, ats: apple, slug: apple, domain: apple.com, hot: true}
 - {name: Google, ats: google, slug: google, domain: google.com, hot: true}
-# Meta publishes a job sitemap; its robots.txt discourages automated collection. Remove this line
-# (or set the company's tier to inactive) to stop every request to metacareers.com.
+# Meta publishes a job sitemap; its robots.txt discourages automated collection. To stop every
+# request to metacareers.com, add `disabled: true` to this line and run `python -m scraper seed`
+# (it sets the company inactive and closes its open jobs; removing the line alone does nothing).
 - {name: Meta, ats: meta, slug: meta, domain: meta.com, hot: true}
 

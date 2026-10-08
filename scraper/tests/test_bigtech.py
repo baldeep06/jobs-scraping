@@ -416,15 +416,19 @@ async def test_meta_known_interns_still_listed_are_pending_and_gone_ones_are_not
     assert h.fetched == []
     assert result.pending_ids == {"1"}  # 9 left the sitemap: it must count as missing
     assert result.forgotten_ids == {"8"}  # a rejected id that left the sitemap is forgotten
-    assert result.jobs == [] and not result.confirmed_empty
+    assert result.jobs == []
+    # the sitemap parsed, so an empty read really means "nothing new"; known interns that left
+    # the sitemap must be allowed to close
+    assert result.confirmed_empty
 
 
 async def test_meta_failed_page_is_retried_next_poll_not_remembered():
-    pages = {"1": meta_page("Software Engineer Intern")}
-    h = meta_handler(["1"], pages, fail={"1"})
+    pages = {i: meta_page("Software Engineer Intern") for i in ("1", "2", "3")}
+    h = meta_handler(["1", "2", "3"], pages, fail={"1"})
     async with make_fetcher(h) as f:
         result = await meta.fetch(f, meta_company())
-    assert result.jobs == [] and result.rejected_ids == set() and result.pending_ids == set()
+    assert sorted(j.source_job_id for j in result.jobs) == ["2", "3"]
+    assert "1" not in result.rejected_ids and "1" not in result.pending_ids  # retried later
 
 
 async def test_meta_empty_or_garbled_sitemap_raises():
@@ -432,3 +436,126 @@ async def test_meta_empty_or_garbled_sitemap_raises():
         async with make_fetcher(lambda r, b=body: httpx.Response(200, text=b)) as f:
             with pytest.raises(FetchError, match="unexpected"):
                 await meta.fetch(f, meta_company())
+
+
+async def test_meta_remembers_gone_pages_and_pages_without_job_data():
+    h = meta_handler(
+        ["1", "2", "3"], {"1": meta_page("Software Engineer Intern"), "3": "<html>gone</html>"}
+    )
+    orig = h
+
+    def handler(request):
+        if request.url.path.rstrip("/").endswith("/2"):
+            orig.fetched.append("2")
+            return httpx.Response(404)
+        return orig(request)
+
+    async with make_fetcher(handler) as f:
+        result = await meta.fetch(f, meta_company())
+    assert [j.source_job_id for j in result.jobs] == ["1"]
+    assert result.rejected_ids == {"2", "3"}  # a 404 and an isolated page with no JSON-LD
+
+
+async def test_meta_pages_without_job_data_en_masse_mean_we_are_blocked():
+    ids = [str(i) for i in range(1, 9)]
+    h = meta_handler(ids, {i: "<html>please log in</html>" for i in ids})
+    async with make_fetcher(h) as f:
+        with pytest.raises(FetchError, match="unexpected"):
+            await meta.fetch(f, meta_company())
+
+
+async def test_meta_does_not_remember_pages_when_the_country_format_changes():
+    ids = [str(i) for i in range(1, 9)]
+    pages = {i: meta_page("Software Engineer Intern", ("United States",)) for i in ids}
+    async with make_fetcher(meta_handler(ids, pages)) as f:
+        with pytest.raises(FetchError, match="unexpected"):
+            await meta.fetch(f, meta_company())
+
+
+async def test_meta_invalid_record_is_remembered_not_counted_as_invalid():
+    page = meta_page("Software Engineer Intern").replace(
+        '"title": "Software Engineer Intern"', '"title": "  "'
+    )
+    h = meta_handler(["1"], {"1": page})
+    async with make_fetcher(h) as f:
+        result = await meta.fetch(f, meta_company())
+    assert result.jobs == [] and result.invalid == 0 and result.rejected_ids == {"1"}
+
+
+async def test_meta_stops_after_a_failing_batch_instead_of_hammering_the_site(monkeypatch):
+    monkeypatch.setattr(meta, "BATCH", 4)
+    ids = [str(i) for i in range(1, 21)]
+    pages = {i: meta_page("Software Engineer Intern") for i in ids[:4]}
+    ok = meta_handler(ids, pages, fail=set(ids[4:]))
+    async with make_fetcher(ok) as f:
+        result = await meta.fetch(f, meta_company())
+    assert len(result.jobs) == 4  # progress from the good batch is kept
+    assert set(ok.fetched) <= set(ids[:8])  # the failing batch ended the poll; no later batches
+    assert result.rejected_ids == set()
+
+
+async def test_meta_raises_when_nothing_loads_at_all():
+    ids = ["1", "2", "3"]
+    h = meta_handler(ids, {}, fail=set(ids))
+    async with make_fetcher(h) as f:
+        with pytest.raises(FetchError, match="not serving"):
+            await meta.fetch(f, meta_company())
+
+
+# --- caps and missing totals never close live jobs -------------------------------------------
+
+
+async def test_amazon_missing_total_raises_and_a_capped_search_is_truncated(monkeypatch):
+    async with make_fetcher(lambda r: httpx.Response(200, json={"jobs": []})) as f:
+        with pytest.raises(FetchError, match="unexpected"):
+            await amazon.fetch(f, co("amazon"))
+    monkeypatch.setattr(amazon, "MAX_PAGES", 1)
+
+    def handler(request):
+        if request.url.params["base_query"] != "intern":
+            return httpx.Response(200, json={"hits": 0, "jobs": []})
+        return httpx.Response(
+            200, json={"hits": 500, "jobs": [amazon_job(i, "Sales") for i in range(100)]}
+        )
+
+    async with make_fetcher(handler) as f:
+        result = await amazon.fetch(f, co("amazon"))
+    assert result.truncated
+
+
+async def test_microsoft_apple_google_flag_truncation_and_missing_totals(monkeypatch):
+    # Microsoft
+    monkeypatch.setattr(microsoft, "MAX_PAGES", 1)
+    h = ms_handler({("intern", "United States"): [ms_pos(i, "Sales Rep") for i in range(25)]})
+    async with make_fetcher(h) as f:
+        assert (await microsoft.fetch(f, co("microsoft"))).truncated
+    async with make_fetcher(lambda r: httpx.Response(200, json={"data": {"positions": []}})) as f:
+        with pytest.raises(FetchError, match="unexpected"):
+            await microsoft.fetch(f, co("microsoft"))
+    # Apple
+    monkeypatch.setattr(apple, "MAX_PAGES", 1)
+    h = apple_handler({"internships": [apple_res(i, "Sales Rep") for i in range(45)]})
+    async with make_fetcher(h) as f:
+        assert (await apple.fetch(f, co("apple"))).truncated
+
+    def no_total(request):
+        if request.url.path.endswith("/CSRFToken"):
+            return httpx.Response(200, content=b"", headers={"x-apple-csrf-token": "t"})
+        return httpx.Response(200, json={"res": {"searchResults": []}})
+
+    async with make_fetcher(no_total) as f:
+        with pytest.raises(FetchError, match="unexpected"):
+            await apple.fetch(f, co("apple"))
+    # Google
+    monkeypatch.setattr(google, "MAX_PAGES", 1)
+
+    def g(request):
+        p = request.url.params
+        if (p["q"], p["location"]) != ("intern", "United States"):
+            return httpx.Response(200, text=g_page([], total=0))
+        return httpx.Response(
+            200, text=g_page([g_job(i, "Sales Rep") for i in range(20)], total=45)
+        )
+
+    async with make_fetcher(g) as f:
+        assert (await google.fetch(f, co("google"))).truncated

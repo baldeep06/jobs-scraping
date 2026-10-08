@@ -78,12 +78,15 @@ async def _search(fetcher: Fetcher, query: str, location: str) -> tuple[list[lis
 async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
     found: list[list[Any]] = []
     totals: list[int] = []
+    truncated = False
     for query in QUERIES:
         for location in LOCATIONS:
             jobs, total = await _search(fetcher, query, location)
             found.extend(jobs)
             totals.append(total)
+            truncated = truncated or len(jobs) < total
     unique = {str(j[0]): j for j in found if j and j[0]}
     result = validate(_record(j) for j in unique.values() if len(j) > 2 and isinstance(j[1], str))
     result.confirmed_empty = not unique and not any(totals)
+    result.truncated = truncated
     return result

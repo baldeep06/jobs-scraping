@@ -49,21 +49,28 @@ def migrate(conn: psycopg.Connection, migrations_dir: Path = MIGRATIONS_DIR) -> 
 
 
 def upsert_companies(conn: psycopg.Connection, seeds: list[dict[str, Any]]) -> int:
+    """Insert/refresh seed companies. `disabled: true` switches a company off: inactive, not
+    curated, its open jobs closed (removing the seed line alone would change nothing)."""
     with conn.transaction():
         for s in seeds:
+            disabled = bool(s.get("disabled", False))
+            hot = bool(s.get("hot", False)) and not disabled
             conn.execute(
                 """insert into companies (name, ats, slug, domain, workday_host, workday_site,
                                           curated_hot, tier)
                    values (%(name)s, %(ats)s, %(slug)s, %(domain)s, %(workday_host)s,
                            %(workday_site)s, %(hot)s,
-                           case when %(hot)s then 'hot' else 'warm' end)
+                           case when %(disabled)s then 'inactive'
+                                when %(hot)s then 'hot' else 'warm' end)
                    on conflict (ats, slug) do update set
                      name = excluded.name, domain = excluded.domain,
                      workday_host = excluded.workday_host,
                      workday_site = excluded.workday_site,
                      curated_hot = excluded.curated_hot,
-                     -- re-seeding a curated company reactivates it
-                     tier = case when excluded.curated_hot then 'hot' else companies.tier end,
+                     -- re-seeding a curated company reactivates it; disabling switches it off
+                     tier = case when %(disabled)s then 'inactive'
+                                 when excluded.curated_hot then 'hot'
+                                 else companies.tier end,
                      consecutive_404s = case when excluded.curated_hot then 0
                                              else companies.consecutive_404s end,
                      first_404_at = case when excluded.curated_hot then null
@@ -75,9 +82,17 @@ def upsert_companies(conn: psycopg.Connection, seeds: list[dict[str, Any]]) -> i
                     "domain": s.get("domain"),
                     "workday_host": s.get("workday_host"),
                     "workday_site": s.get("workday_site"),
-                    "hot": bool(s.get("hot", False)),
+                    "hot": hot,
+                    "disabled": disabled,
                 },
             )
+            if disabled:
+                conn.execute(
+                    """update jobs set status = 'closed', closed_at = now(), updated_at = now()
+                       where status = 'open' and company_id in
+                         (select id from companies where ats = %s and slug = %s)""",
+                    (s["ats"], s["slug"]),
+                )
     return len(seeds)
 
 
@@ -428,7 +443,11 @@ def ingest(conn: psycopg.Connection, outcome: CompanyOutcome, now: datetime) -> 
             )
         # An empty board or records that failed validation look like an upstream glitch or an
         # API change, not like every job being taken down: count no misses for this poll.
-        if (outcome.seen_ids or outcome.confirmed_empty) and not outcome.invalid:
+        if (
+            (outcome.seen_ids or outcome.confirmed_empty)
+            and not outcome.invalid
+            and not outcome.truncated
+        ):
             enriched = (
                 None
                 if outcome.unchanged

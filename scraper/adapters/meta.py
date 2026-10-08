@@ -5,7 +5,7 @@ from typing import Any
 
 from scraper.adapters.base import validate, wanted
 from scraper.http import Fetcher, FetchError
-from scraper.models import Company, FetchResult
+from scraper.models import Company, FetchResult, RawJob
 from scraper.text import html_to_text
 
 SOURCE = "meta"
@@ -16,6 +16,8 @@ JOB_URL = "https://www.metacareers.com/profile/job_details/{}/"
 # (the first run backfills gradually). Meta's robots.txt discourages automated collection, so
 # this stays small; remove the `meta` seed row to stop all requests.
 MAX_NEW_PAGES = 120
+BATCH = 10  # pages opened at once; a failing batch ends the poll
+MIN_PAGES_FOR_CHECK = 5  # below this, a page without data is just one odd page
 _JOB_ID = re.compile(r"<loc>\s*https://www\.metacareers\.com/profile/job_details/(\d+)/?\s*</loc>")
 _LD_JSON = re.compile(r'<script type="application/ld\+json"[^>]*>(.*?)</script>', re.S)
 _WANTED_COUNTRIES = {"US", "CA"}
@@ -70,15 +72,37 @@ def _record(job_id: str, posting: dict[str, Any], places: list[tuple[str, str]])
     }
 
 
-async def _load_pages(fetcher: Fetcher, ids: list[str]) -> dict[str, str]:
-    async def one(job_id: str) -> tuple[str, str | None]:
-        try:
-            return job_id, await fetcher.text("GET", JOB_URL.format(job_id))
-        except FetchError:
-            return job_id, None  # retried on the next poll (not remembered)
+async def _read_pages(fetcher: Fetcher, ids: list[str]) -> tuple[dict[str, str], set[str]]:
+    """Open pages in small batches. Returns (pages, ids that are gone: HTTP 404/410).
 
-    pages = await asyncio.gather(*(one(i) for i in ids))
-    return {i: html for i, html in pages if html is not None}
+    A batch where half the requests fail for any other reason means Meta is blocking or rate
+    limiting us: stop for this poll (keeping what was read) instead of hammering the site. If
+    not a single page could be read, raise so the failure is visible.
+    """
+
+    async def one(job_id: str) -> tuple[str, str | None, int | None]:
+        try:
+            return job_id, await fetcher.text("GET", JOB_URL.format(job_id)), None
+        except FetchError as e:
+            return job_id, None, e.status
+
+    pages: dict[str, str] = {}
+    gone: set[str] = set()
+    for start in range(0, len(ids), BATCH):
+        batch = ids[start : start + BATCH]
+        failures = 0
+        for job_id, html, status in await asyncio.gather(*(one(i) for i in batch)):
+            if html is not None:
+                pages[job_id] = html
+            elif status in (404, 410):
+                gone.add(job_id)
+            else:
+                failures += 1
+        if failures * 2 >= len(batch):
+            if not pages and not gone:
+                raise FetchError("Meta is not serving job pages (blocked or rate limited)")
+            break
+    return pages, gone
 
 
 async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
@@ -87,10 +111,19 @@ async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
     known = company.known_ids | company.checked_ids
     new = [i for i in ids if i not in known][:MAX_NEW_PAGES]
 
-    records: list[dict[str, Any]] = []
-    rejected: set[str] = set()
-    for job_id, html in (await _load_pages(fetcher, new)).items():
-        posting = parse_job_page(html)
+    pages, gone = await _read_pages(fetcher, new)
+    postings = {job_id: parse_job_page(html) for job_id, html in pages.items()}
+    if len(pages) >= MIN_PAGES_FOR_CHECK:
+        if sum(p is None for p in postings.values()) * 2 > len(pages):
+            raise FetchError("unexpected Meta pages (no job data: blocked or changed)")
+        readable = [p for p in postings.values() if p]
+        if readable and not any(c in _WANTED_COUNTRIES for p in readable for _, c in _places(p)):
+            # Every page has job data but none says US/CA: more likely a format change than reality.
+            raise FetchError("unexpected Meta pages (no US/CA location found: format changed?)")
+
+    jobs: list[RawJob] = []
+    rejected: set[str] = set(gone)
+    for job_id, posting in postings.items():
         places = _places(posting) if posting else []
         title = (posting or {}).get("title") or ""
         if (
@@ -98,12 +131,18 @@ async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
             and wanted(title, posting.get("employmentType"))
             and any(country in _WANTED_COUNTRIES for _, country in places)
         ):
-            records.append(_record(job_id, posting, places))
-        elif posting:
-            rejected.add(job_id)
+            checked = validate([_record(job_id, posting, places)])
+            if checked.jobs:
+                jobs.extend(checked.jobs)
+                continue
+        rejected.add(job_id)  # not an internship / not US-CA / unreadable: never open it again
 
-    result = validate(records)
-    result.pending_ids = company.known_ids & listed
-    result.rejected_ids = rejected
-    result.forgotten_ids = company.checked_ids - listed
-    return result
+    return FetchResult(
+        jobs=jobs,
+        # The sitemap parsed (an empty one raises), so "nothing new" is real and known interns
+        # that left it may be closed.
+        confirmed_empty=True,
+        pending_ids=company.known_ids & listed,
+        rejected_ids=rejected,
+        forgotten_ids=company.checked_ids - listed,
+    )

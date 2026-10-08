@@ -73,7 +73,9 @@ async def _search(fetcher: Fetcher, token: str, query: str) -> tuple[list[dict[s
         if not isinstance(res, dict) or not isinstance(res.get("searchResults"), list):
             raise FetchError("unexpected Apple payload")
         if page_no == 1:
-            total = int(res.get("totalRecords") or 0)
+            if "totalRecords" not in res:
+                raise FetchError("unexpected Apple payload (no result count)")
+            total = int(res["totalRecords"] or 0)
         items.extend(res["searchResults"])
         if not res["searchResults"] or len(items) >= total:
             break
@@ -84,11 +86,14 @@ async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
     token = await _csrf(fetcher)
     found: list[dict[str, Any]] = []
     totals: list[int] = []
+    truncated = False
     for query in QUERIES:
         items, total = await _search(fetcher, token, query)
         found.extend(items)
         totals.append(total)
+        truncated = truncated or len(items) < total
     items = dedupe_by(found, lambda i: str(i.get("positionId") or ""))
     result = validate(_record(i) for i in items)
     result.confirmed_empty = not items and not any(totals)
+    result.truncated = truncated
     return result

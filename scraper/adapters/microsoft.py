@@ -58,7 +58,9 @@ async def _search(fetcher: Fetcher, query: str, location: str) -> tuple[list[dic
         if not isinstance(body, dict) or not isinstance(body.get("positions"), list):
             raise FetchError("unexpected Microsoft payload")
         if page_no == 0:
-            count = int(body.get("count") or 0)
+            if "count" not in body:
+                raise FetchError("unexpected Microsoft payload (no result count)")
+            count = int(body["count"] or 0)
         items.extend(body["positions"])
         if not body["positions"] or len(items) >= count:
             break
@@ -68,11 +70,13 @@ async def _search(fetcher: Fetcher, query: str, location: str) -> tuple[list[dic
 async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
     found: list[dict[str, Any]] = []
     counts: list[int] = []
+    truncated = False
     for query in QUERIES:
         for location in LOCATIONS:
             items, count = await _search(fetcher, query, location)
             found.extend(items)
             counts.append(count)
+            truncated = truncated or len(items) < count
     items = dedupe_by(found, _key)
 
     want = {
@@ -87,4 +91,5 @@ async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
     result = validate(records)
     result.pending_ids = pending
     result.confirmed_empty = not items and not any(counts)
+    result.truncated = truncated
     return result

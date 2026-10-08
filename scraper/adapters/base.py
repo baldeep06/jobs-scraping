@@ -10,6 +10,9 @@ from scraper.models import Company, FetchResult, RawJob
 
 Adapter = Callable[[Fetcher, Company], Awaitable[FetchResult]]
 
+# Sites that need one request per posting remember what they have already opened.
+STATEFUL_ATS = {"meta"}
+
 
 def as_id(value: Any) -> str:
     return "" if value is None else str(value)

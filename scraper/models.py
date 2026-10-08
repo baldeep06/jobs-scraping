@@ -120,6 +120,8 @@ class FetchResult:
     pending_ids: set[str] = field(default_factory=set)
     rejected_ids: set[str] = field(default_factory=set)  # opened and not wanted: remember
     forgotten_ids: set[str] = field(default_factory=set)  # remembered ids that left the listing
+    # The search hit its page cap before reaching the last result: absence proves nothing.
+    truncated: bool = False
 
 
 @dataclass
@@ -138,5 +140,6 @@ class CompanyOutcome:
     pending_ids: set[str] = field(default_factory=set)
     rejected_ids: set[str] = field(default_factory=set)
     forgotten_ids: set[str] = field(default_factory=set)
+    truncated: bool = False
     error: str | None = None
     status: int | None = None

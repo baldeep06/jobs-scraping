@@ -509,3 +509,54 @@ def test_two_reworded_postings_that_are_both_still_listed_stay_separate(conn):
     )  # fmt: skip
     rows = [r for r in jobs(conn)]
     assert len(rows) == 2  # both are listed right now, so neither is a continuation of the other
+
+
+def test_truncated_poll_never_counts_misses(conn):
+    c = company(conn)
+    db.ingest(conn, outcome(c, [raw("1")] + other()), T0)
+    for i in (1, 2, 3):
+        c = db.get_companies(conn, ats=["greenhouse"], slug="acme")[0]
+        out = outcome(c, other())
+        out.truncated = True  # the listing was cut short: absence proves nothing
+        db.ingest(conn, out, T0 + timedelta(minutes=5 * i))
+    assert by_title(conn)["Software Engineer Intern"]["status"] == "open"
+
+
+def test_last_known_meta_job_closes_when_it_leaves_an_otherwise_quiet_sitemap(conn):
+    c = company(conn, "meta4")
+    conn.execute("update companies set ats = 'meta' where id = %s", (c.id,))
+    c = db.get_companies(conn, ats=["meta"])[0]
+    db.ingest(conn, meta_outcome(c, [meta_raw("1")]), T0)
+    for i in (1, 2):  # nothing new, nothing pending: only the confirmed-listing flag
+        out = meta_outcome(c, [])
+        out.confirmed_empty = True
+        db.ingest(conn, out, T0 + timedelta(minutes=5 * i))
+    assert by_title(conn)["Software Engineer Intern"]["status"] == "closed"
+
+
+def test_seed_disabled_company_goes_inactive_and_its_open_jobs_close(conn):
+    c = company(conn, "metaoff")
+    db.ingest(conn, outcome(c, [raw("1")] + other()), T0)
+    db.upsert_companies(
+        conn,
+        [
+            {
+                "name": "Metaoff",
+                "ats": "greenhouse",
+                "slug": "metaoff",
+                "hot": True,
+                "disabled": True,
+            }
+        ],
+    )
+    row = conn.execute("select tier, curated_hot from companies where slug = 'metaoff'").fetchone()
+    assert (row["tier"], row["curated_hot"]) == ("inactive", False)
+    assert by_title(conn)["Software Engineer Intern"]["status"] == "closed"
+    # re-seeding it enabled brings it back
+    db.upsert_companies(
+        conn, [{"name": "Metaoff", "ats": "greenhouse", "slug": "metaoff", "hot": True}]
+    )
+    assert (
+        conn.execute("select tier from companies where slug = 'metaoff'").fetchone()["tier"]
+        == "hot"
+    )

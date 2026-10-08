@@ -51,7 +51,9 @@ async def _search(fetcher: Fetcher, query: str) -> tuple[list[dict[str, Any]], i
         if not isinstance(data, dict) or not isinstance(data.get("jobs"), list):
             raise FetchError("unexpected Amazon payload")
         if page_no == 0:
-            hits = int(data.get("hits") or 0)
+            if "hits" not in data:
+                raise FetchError("unexpected Amazon payload (no hit count)")
+            hits = int(data["hits"] or 0)
         items.extend(data["jobs"])
         if not data["jobs"] or len(items) >= hits:
             break
@@ -61,11 +63,14 @@ async def _search(fetcher: Fetcher, query: str) -> tuple[list[dict[str, Any]], i
 async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
     found: list[dict[str, Any]] = []
     totals: list[int] = []
+    truncated = False
     for query in QUERIES:
         items, hits = await _search(fetcher, query)
         found.extend(items)
         totals.append(hits)
+        truncated = truncated or len(items) < hits
     items = dedupe_by(found, lambda i: str(i.get("id_icims") or ""))
     result = validate(_record(i) for i in items)
     result.confirmed_empty = not items and not any(totals)
+    result.truncated = truncated
     return result
