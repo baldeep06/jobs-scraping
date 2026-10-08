@@ -172,3 +172,9 @@
 - {name: Fortinet, ats: oraclehcm, slug: fortinet, workday_host: edel.fa.us2.oraclecloud.com, workday_site: CX_2001}
 - {name: Vertiv, ats: oraclehcm, slug: vertiv, workday_host: egup.fa.us2.oraclecloud.com, workday_site: CX}
 - {name: ON Semiconductor, ats: oraclehcm, slug: onsemi, workday_host: hctz.fa.us2.oraclecloud.com, workday_site: CX_1001}
+
+# iCIMS portals (host in workday_host) and Lever's EU instance.
+- {name: Rambus, ats: icims, slug: rambus, workday_host: careers-rambus.icims.com, workday_site: "-"}
+- {name: SentinelOne, ats: icims, slug: sentinelone, workday_host: careers-sentinel.icims.com, workday_site: "-"}
+- {name: Cirrus Logic, ats: lever_eu, slug: cirrus}
+- {name: Quantinuum, ats: lever_eu, slug: quantinuum}

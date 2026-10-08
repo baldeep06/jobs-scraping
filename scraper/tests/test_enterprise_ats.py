@@ -192,3 +192,102 @@ async def test_oracle_hcm_failed_detail_pending_truncation_and_bad_payload():
     async with make_fetcher(bad) as f:
         with pytest.raises(FetchError):
             await ADAPTERS["oraclehcm"](f, co("oraclehcm", "h.example.com", "CX"))
+
+
+# --- iCIMS ------------------------------------------------------------------------------------
+
+ICIMS_HOST = "careers-ex.icims.com"
+
+
+def icims_list(rows, pages=1):
+    body = "".join(
+        f'<div class="iCIMS_JobListingRow"><a href="https://{ICIMS_HOST}/jobs/{i}/slug/job?in_iframe=1">'
+        f'<span class="sr-only field-label">Job Title</span><h3>{title}</h3></a></div>'
+        for i, title in rows
+    )
+    return f'<html><body><div class="iCIMS_JobsTable">{body}</div><span>Page 1 of {pages}</span></body></html>'
+
+
+def icims_page(title="Cybersecurity Intern", country="US", **kw):
+    import json
+
+    posting = {
+        "@type": "JobPosting", "title": title, "description": "<p>Protect things.</p>",
+        "datePosted": "2026-10-07T04:00:00.000Z",
+        "jobLocation": [{"address": {
+            "addressLocality": "Downers Grove", "addressRegion": "IL", "addressCountry": country}}],
+    } | kw  # fmt: skip
+    return f'<html><script type="application/ld+json">{json.dumps(posting)}</script></html>'
+
+
+async def test_icims_lists_each_query_and_reads_internship_pages():
+    queries = []
+
+    def handler(request):
+        if request.url.path == "/jobs/search":
+            queries.append((request.url.params["searchKeyword"], request.url.params.get("pr")))
+            rows = [(5131, "Cybersecurity Intern"), (5132, "Accountant")]
+            return httpx.Response(200, text=icims_list(rows if "intern" in queries[-1][0] else []))
+        assert request.url.path == "/jobs/5131/slug/job"
+        return httpx.Response(200, text=icims_page())
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["icims"](f, co("icims", ICIMS_HOST, "-"))
+    assert {q[0] for q in queries} == {"intern", "co-op"}
+    job = next(j for j in result.jobs if j.source_job_id.endswith(":5131"))
+    assert job.source_job_id == f"{ICIMS_HOST}:5131" and job.title == "Cybersecurity Intern"
+    assert job.url == f"https://{ICIMS_HOST}/jobs/5131/slug/job"
+    assert job.location_raw == "Downers Grove, IL, US" and "Protect things." in job.description_text
+    assert job.source_posted_at.year == 2026 and not result.confirmed_empty
+
+
+async def test_icims_follows_pages_failed_detail_is_pending_and_empty_is_confirmed():
+    seen_pages = []
+
+    def paged(request):
+        if request.url.path == "/jobs/search":
+            page = int(request.url.params.get("pr", "0"))
+            seen_pages.append(page)
+            rows = [(100 + page, "Software Engineer Intern")]
+            return httpx.Response(200, text=icims_list(rows, pages=2))
+        return httpx.Response(500)
+
+    async with make_fetcher(paged) as f:
+        result = await ADAPTERS["icims"](f, co("icims", ICIMS_HOST, "-"))
+    assert {0, 1} <= set(seen_pages)
+    assert result.pending_ids == {f"{ICIMS_HOST}:100", f"{ICIMS_HOST}:101"} and not result.jobs
+
+    def empty(request):
+        return httpx.Response(200, text=icims_list([]))
+
+    async with make_fetcher(empty) as f:
+        assert (await ADAPTERS["icims"](f, co("icims", ICIMS_HOST, "-"))).confirmed_empty
+
+
+async def test_icims_unrecognised_page_raises_instead_of_looking_empty():
+    def handler(request):
+        return httpx.Response(200, text="<html>Please enable JavaScript</html>")
+
+    async with make_fetcher(handler) as f:
+        with pytest.raises(FetchError, match="iCIMS"):
+            await ADAPTERS["icims"](f, co("icims", ICIMS_HOST, "-"))
+
+
+# --- Lever (EU) -------------------------------------------------------------------------------
+
+
+async def test_lever_eu_reads_the_eu_api():
+    def handler(request):
+        assert request.url.host == "api.eu.lever.co" and request.url.path == "/v0/postings/cirrus"
+        item = {
+            "id": "abc",
+            "text": "Firmware Intern",
+            "hostedUrl": "https://jobs.eu.lever.co/cirrus/abc",
+        }
+        return httpx.Response(200, json=[item])
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["lever_eu"](
+            f, Company(id=1, name="Cirrus", ats="lever_eu", slug="cirrus")
+        )
+    assert result.jobs[0].source == "lever" and result.jobs[0].source_job_id == "abc"

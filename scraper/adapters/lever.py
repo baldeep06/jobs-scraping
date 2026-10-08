@@ -16,8 +16,8 @@ _INTERVALS = {
 _WORKPLACE = {"onsite": "onsite", "remote": "remote", "hybrid": "hybrid"}
 
 
-def board_url(slug: str) -> str:
-    return f"https://api.lever.co/v0/postings/{slug}?mode=json"
+def board_url(slug: str, api: str = "api.lever.co") -> str:
+    return f"https://{api}/v0/postings/{slug}?mode=json"
 
 
 def _description(item: dict[str, Any]) -> str:
@@ -75,3 +75,8 @@ def parse(payload: Any) -> FetchResult:
 
 async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
     return parse(await fetcher.json("GET", board_url(company.slug)))
+
+
+async def fetch_eu(fetcher: Fetcher, company: Company) -> FetchResult:
+    """Boards on Lever's EU instance (jobs.eu.lever.co) live behind a different API host."""
+    return parse(await fetcher.json("GET", board_url(company.slug, "api.eu.lever.co")))

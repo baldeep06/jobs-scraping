@@ -5,6 +5,7 @@ from scraper.adapters import (
     eightfold,
     google,
     greenhouse,
+    icims,
     lever,
     meta,
     microsoft,
@@ -18,7 +19,9 @@ from scraper.adapters.base import Adapter
 ADAPTERS: dict[str, Adapter] = {
     "google": google.fetch,
     "greenhouse": greenhouse.fetch,
+    "icims": icims.fetch,
     "lever": lever.fetch,
+    "lever_eu": lever.fetch_eu,
     "meta": meta.fetch,
     "microsoft": microsoft.fetch,
     "amazon": amazon.fetch,

@@ -11,6 +11,7 @@ from scraper.http import Fetcher
         ("https://job-boards.greenhouse.io/Stripe/jobs/123", {"ats": "greenhouse", "slug": "stripe"}),
         ("https://boards.greenhouse.io/airbnb/jobs/9?gh_src=x", {"ats": "greenhouse", "slug": "airbnb"}),
         ("https://jobs.lever.co/Palantir/abc-def", {"ats": "lever", "slug": "palantir"}),
+        ("https://jobs.eu.lever.co/Cirrus/abc/apply", {"ats": "lever_eu", "slug": "cirrus"}),
         ("https://jobs.ashbyhq.com/openai/uuid", {"ats": "ashby", "slug": "openai"}),
         ("https://jobs.smartrecruiters.com/ServiceNow/744-title", {"ats": "smartrecruiters", "slug": "ServiceNow"}),
         ("https://apply.workable.com/huggingface/j/ABC123/", {"ats": "workable", "slug": "huggingface"}),
