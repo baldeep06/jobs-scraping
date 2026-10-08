@@ -11,6 +11,9 @@ export function Header() {
           <Link href="/us" className="rounded-nav px-3 py-1.5 hover:bg-canvas hover:text-ink">
             Jobs
           </Link>
+          <Link href="/status" className="rounded-nav px-3 py-1.5 hover:bg-canvas hover:text-ink">
+            Status
+          </Link>
           <a
             href="https://github.com/baldeep06/jobs-scraping"
             className="rounded-nav px-3 py-1.5 hover:bg-canvas hover:text-ink"
