@@ -62,3 +62,96 @@
 # (it sets the company inactive and closes its open jobs; removing the line alone does nothing).
 - {name: Meta, ats: meta, slug: meta, domain: meta.com, hot: true}
 
+
+# US public tech companies >= $1B market cap (from US_Tech_Companies_by_Market_Cap.xlsx), found by probing public ATS endpoints.
+- {name: AppLovin, ats: greenhouse, slug: applovin}
+- {name: CoreWeave, ats: greenhouse, slug: coreweave}
+- {name: Block, ats: greenhouse, slug: block}
+- {name: Twilio, ats: greenhouse, slug: twilio}
+- {name: Ubiquiti, ats: greenhouse, slug: ubiquiti}
+- {name: Zscaler, ats: greenhouse, slug: zscaler}
+- {name: Verisign, ats: greenhouse, slug: verisign}
+- {name: Rubrik, ats: greenhouse, slug: rubrik}
+- {name: Roku, ats: greenhouse, slug: roku}
+- {name: SoFi, ats: greenhouse, slug: sofi}
+- {name: Toast, ats: greenhouse, slug: toast}
+- {name: IonQ, ats: greenhouse, slug: ionq}
+- {name: GoDaddy, ats: greenhouse, slug: godaddy}
+- {name: JFrog, ats: greenhouse, slug: jfrog}
+- {name: Chime, ats: greenhouse, slug: chime}
+- {name: Commvault, ats: greenhouse, slug: commvault}
+- {name: Doximity, ats: greenhouse, slug: doximity}
+- {name: Box, ats: greenhouse, slug: boxinc}
+- {name: Fastly, ats: greenhouse, slug: fastly}
+- {name: Life360, ats: greenhouse, slug: life360}
+- {name: Braze, ats: greenhouse, slug: braze}
+- {name: Agilysys, ats: greenhouse, slug: agilysys}
+- {name: Alarm.com, ats: greenhouse, slug: alarmcom}
+- {name: Appian, ats: greenhouse, slug: appian}
+- {name: CarGurus, ats: greenhouse, slug: cargurus}
+- {name: Via, ats: greenhouse, slug: via}
+- {name: Liftoff, ats: greenhouse, slug: liftoff}
+- {name: Five9, ats: greenhouse, slug: five9}
+- {name: ePlus, ats: greenhouse, slug: eplusinc}
+- {name: Innodata, ats: greenhouse, slug: innodatainc}
+- {name: nCino, ats: greenhouse, slug: ncinoinc}
+- {name: Bandwidth, ats: greenhouse, slug: bandwidth}
+- {name: Ambiq Micro, ats: greenhouse, slug: ambiqmicroinc}
+- {name: HawkEye 360, ats: greenhouse, slug: hawkeye360}
+- {name: Coursera, ats: greenhouse, slug: coursera}
+- {name: PagerDuty, ats: greenhouse, slug: pagerduty}
+- {name: ZoomInfo, ats: greenhouse, slug: zoominfo}
+- {name: Upwork, ats: greenhouse, slug: upwork}
+- {name: Zeta Global, ats: greenhouse, slug: zetaglobal}
+- {name: Netskope, ats: greenhouse, slug: netskope}
+- {name: AvePoint, ats: greenhouse, slug: avepoint}
+- {name: Unusual Machines, ats: greenhouse, slug: unusualmachines}
+- {name: Clear Secure, ats: greenhouse, slug: clear}
+- {name: Snowflake, ats: ashby, slug: snowflake}
+- {name: Cerebras, ats: ashby, slug: cerebras}
+- {name: Gen Digital, ats: ashby, slug: gen-digital}
+- {name: Hinge Health, ats: ashby, slug: hinge-health}
+- {name: UiPath, ats: ashby, slug: uipath}
+- {name: Amplitude, ats: ashby, slug: amplitude}
+- {name: Circle, ats: ashby, slug: circle}
+- {name: Veeva, ats: lever, slug: veeva}
+- {name: Extreme Networks, ats: lever, slug: extremenetworks}
+- {name: Microchip, ats: smartrecruiters, slug: microchip}
+- {name: ServiceTitan, ats: smartrecruiters, slug: servicetitan}
+- {name: Freshworks, ats: smartrecruiters, slug: freshworks}
+- {name: Cricut, ats: smartrecruiters, slug: cricut}
+- {name: Broadcom, ats: workday, slug: broadcom/External_Career, workday_host: broadcom.wd1.myworkdayjobs.com, workday_site: External_Career}
+- {name: Cisco, ats: workday, slug: cisco/Cisco_Careers, workday_host: cisco.wd5.myworkdayjobs.com, workday_site: Cisco_Careers}
+- {name: CrowdStrike, ats: workday, slug: crowdstrike/crowdstrikecareers, workday_host: crowdstrike.wd5.myworkdayjobs.com, workday_site: crowdstrikecareers}
+- {name: Qualcomm, ats: workday, slug: qualcomm/External, workday_host: qualcomm.wd12.myworkdayjobs.com, workday_site: External}
+- {name: AT&T, ats: workday, slug: att/ATTCollege, workday_host: att.wd1.myworkdayjobs.com, workday_site: ATTCollege}
+- {name: AT&T, ats: workday, slug: att/ATTGeneral, workday_host: att.wd1.myworkdayjobs.com, workday_site: ATTGeneral}
+- {name: HP, ats: workday, slug: hp/ExternalCareerSite, workday_host: hp.wd5.myworkdayjobs.com, workday_site: ExternalCareerSite}
+- {name: Logitech, ats: workday, slug: logitech/Logitech, workday_host: logitech.wd5.myworkdayjobs.com, workday_site: Logitech}
+- {name: PTC, ats: workday, slug: ptc/PTC, workday_host: ptc.wd1.myworkdayjobs.com, workday_site: PTC}
+- {name: Tempus AI, ats: workday, slug: tempus/Tempus_Careers, workday_host: tempus.wd5.myworkdayjobs.com, workday_site: Tempus_Careers}
+- {name: FormFactor, ats: workday, slug: formfactor/FFI-Careers, workday_host: formfactor.wd1.myworkdayjobs.com, workday_site: FFI-Careers}
+- {name: Procore, ats: workday, slug: procore/Procore_External_Careers, workday_host: procore.wd12.myworkdayjobs.com, workday_site: Procore_External_Careers}
+- {name: Qualys, ats: workday, slug: qualys/Careers, workday_host: qualys.wd5.myworkdayjobs.com, workday_site: Careers}
+- {name: Etsy, ats: workday, slug: etsy/Etsy_Careers, workday_host: etsy.wd5.myworkdayjobs.com, workday_site: Etsy_Careers}
+- {name: Ingram Micro, ats: workday, slug: ingrammicro/IngramMicro, workday_host: ingrammicro.wd5.myworkdayjobs.com, workday_site: IngramMicro}
+- {name: RingCentral, ats: workday, slug: ringcentral/RingCentral_Careers, workday_host: ringcentral.wd1.myworkdayjobs.com, workday_site: RingCentral_Careers}
+- {name: Zillow, ats: workday, slug: zillow/Zillow_Group_External, workday_host: zillow.wd5.myworkdayjobs.com, workday_site: Zillow_Group_External}
+- {name: Waystar, ats: workday, slug: waystar/Waystar, workday_host: waystar.wd1.myworkdayjobs.com, workday_site: Waystar}
+- {name: CCC Intelligent Solutions, ats: workday, slug: ccc/ccc_External, workday_host: ccc.wd5.myworkdayjobs.com, workday_site: ccc_External}
+- {name: First Advantage, ats: workday, slug: firstadvantage/FirstAdvantage, workday_host: firstadvantage.wd5.myworkdayjobs.com, workday_site: FirstAdvantage}
+- {name: Intapp, ats: workday, slug: intapp/Intapp, workday_host: intapp.wd1.myworkdayjobs.com, workday_site: Intapp}
+- {name: DoubleVerify, ats: workday, slug: doubleverify/DV_Careers, workday_host: doubleverify.wd5.myworkdayjobs.com, workday_site: DV_Careers}
+- {name: Blackbaud, ats: workday, slug: blackbaud/ExternalCareers, workday_host: blackbaud.wd1.myworkdayjobs.com, workday_site: ExternalCareers}
+- {name: Blackbaud, ats: workday, slug: blackbaud/ExternalCareersIntern, workday_host: blackbaud.wd1.myworkdayjobs.com, workday_site: ExternalCareersIntern}
+- {name: Sprinklr, ats: workday, slug: sprinklr/intern_newgrad, workday_host: sprinklr.wd1.myworkdayjobs.com, workday_site: intern_newgrad}
+- {name: Sprinklr, ats: workday, slug: sprinklr/careers, workday_host: sprinklr.wd1.myworkdayjobs.com, workday_site: careers}
+- {name: GoodRx, ats: workday, slug: goodrx/Careers, workday_host: goodrx.wd1.myworkdayjobs.com, workday_site: Careers}
+- {name: Rackspace, ats: workday, slug: rackspace/External, workday_host: rackspace.wd1.myworkdayjobs.com, workday_site: External}
+- {name: Alkami, ats: workday, slug: alkami/Alkami, workday_host: alkami.wd12.myworkdayjobs.com, workday_site: Alkami}
+- {name: EverCommerce, ats: workday, slug: evercommerce/EverCommerce_Careers, workday_host: evercommerce.wd1.myworkdayjobs.com, workday_site: EverCommerce_Careers}
+- {name: Gen Digital, ats: workday, slug: gen/careers, workday_host: gen.wd1.myworkdayjobs.com, workday_site: careers}
+- {name: Gen Digital, ats: workday, slug: gen/university, workday_host: gen.wd1.myworkdayjobs.com, workday_site: university}
+- {name: Vertex, ats: workday, slug: vertexinc/VertexInc, workday_host: vertexinc.wd1.myworkdayjobs.com, workday_site: VertexInc}
+- {name: Planet Labs, ats: workday, slug: planet/Planet, workday_host: planet.wd3.myworkdayjobs.com, workday_site: Planet}
+- {name: nCino, ats: workday, slug: ncino/nCinoCareers, workday_host: ncino.wd5.myworkdayjobs.com, workday_site: nCinoCareers}
