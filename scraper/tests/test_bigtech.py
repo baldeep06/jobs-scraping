@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import httpx
 import pytest
 
-from scraper.adapters import ADAPTERS, amazon
+from scraper.adapters import ADAPTERS, amazon, microsoft
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company
 
@@ -82,3 +82,85 @@ async def test_amazon_zero_hits_is_confirmed_empty_and_bad_payload_raises():
     async with make_fetcher(lambda r: httpx.Response(200, text="<html>blocked</html>")) as f:
         with pytest.raises(FetchError):
             await amazon.fetch(f, co("amazon"))
+
+
+# --- Microsoft ------------------------------------------------------------------------------
+
+
+def ms_pos(i, name="Software Engineer Intern", locs=("Redmond, WA, US",), **kw):
+    base = {
+        "id": 1000 + i, "displayJobId": f"2000{i}", "name": name,
+        "standardizedLocations": list(locs), "postedTs": 1791482125,
+        "workLocationOption": "hybrid", "positionUrl": f"/careers/job/{1000 + i}",
+    }  # fmt: skip
+    return base | kw
+
+
+def ms_handler(positions_by_search, details=None):
+    seen = []
+
+    def handler(request):
+        if request.url.path.endswith("/search"):
+            q = request.url.params
+            seen.append((q["query"], q["location"], q["start"]))
+            items = positions_by_search.get((q["query"], q["location"]), [])
+            start = int(q["start"])
+            body = {"positions": items[start : start + 10], "count": len(items)}
+            return httpx.Response(200, json={"data": body})
+        pid = request.url.params["position_id"]
+        if details is None or pid not in details:
+            return httpx.Response(404)
+        return httpx.Response(200, json={"data": details[pid]})
+
+    handler.seen = seen
+    return handler
+
+
+async def test_microsoft_fetch_searches_each_country_and_reads_details():
+    detail = {
+        "jobDescription": "<p>Build.</p><p>Pay: $50 per hour.</p>",
+        "publicUrl": "https://apply.careers.microsoft.com/careers/job/1001",
+        "efcustomTextEmploymentType": ["Internship"],
+    }
+    h = ms_handler(
+        {
+            ("intern", "United States"): [ms_pos(1), ms_pos(2, "Account Executive")],
+            ("co-op", "Canada"): [ms_pos(3, "Software Engineer Co-op", locs=("Toronto, ON, CA",))],
+        },
+        details={"1001": detail, "1003": {"jobDescription": "<p>Co-op.</p>"}},
+    )
+    async with make_fetcher(h) as f:
+        result = await ADAPTERS["microsoft"](f, co("microsoft"))
+    assert {(q, loc) for q, loc, _ in h.seen} == {
+        (q, loc) for q in ("intern", "co-op") for loc in ("United States", "Canada")
+    }
+    assert [j.source_job_id for j in result.jobs] == ["20001", "20002", "20003"]
+    job = result.jobs[0]
+    assert job.url == "https://apply.careers.microsoft.com/careers/job/1001"
+    assert job.location_raw == "Redmond, WA, US" and job.work_mode_hint == "hybrid"
+    assert job.employment_type_hint == "Internship"
+    assert "Pay: $50 per hour." in job.description_text
+    assert job.source_posted_at == datetime.fromtimestamp(1791482125, UTC)
+
+
+async def test_microsoft_failed_detail_is_pending_not_gone():
+    h = ms_handler({("intern", "United States"): [ms_pos(1)]}, details={})
+    async with make_fetcher(h) as f:
+        result = await microsoft.fetch(f, co("microsoft"))
+    assert result.jobs == [] and result.pending_ids == {"20001"}
+
+
+async def test_microsoft_pages_by_ten():
+    h = ms_handler({("intern", "United States"): [ms_pos(i, "Sales Rep") for i in range(25)]})
+    async with make_fetcher(h) as f:
+        result = await microsoft.fetch(f, co("microsoft"))
+    starts = [s for q, loc, s in h.seen if (q, loc) == ("intern", "United States")]
+    assert starts == ["0", "10", "20"] and len(result.jobs) == 25
+
+
+async def test_microsoft_zero_count_confirmed_empty_and_bad_payload_raises():
+    async with make_fetcher(ms_handler({})) as f:
+        assert (await microsoft.fetch(f, co("microsoft"))).confirmed_empty
+    async with make_fetcher(lambda r: httpx.Response(200, json={"status": 200})) as f:
+        with pytest.raises(FetchError, match="unexpected"):
+            await microsoft.fetch(f, co("microsoft"))
