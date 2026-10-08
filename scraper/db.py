@@ -580,3 +580,32 @@ def stats(conn: psycopg.Connection, now: datetime) -> dict[str, Any]:
         ),
         "last_run": last,
     }
+
+
+HEALTH_WINDOWS = {"scrape-hot": 60, "scrape-sweep": 120}  # minutes without a run => degraded
+
+
+def health(conn: psycopg.Connection, now: datetime) -> list[dict[str, Any]]:
+    rows = {
+        r["workflow"]: r
+        for r in conn.execute(
+            """select distinct on (workflow) workflow, finished_at, errors from scrape_runs
+               where workflow = any(%s) order by workflow, finished_at desc""",
+            (list(HEALTH_WINDOWS),),
+        )
+    }
+    out = []
+    for workflow, window in HEALTH_WINDOWS.items():
+        row = rows.get(workflow)
+        last = row["finished_at"] if row else None
+        stale = last is None or (now - last).total_seconds() > window * 60
+        out.append(
+            {
+                "workflow": workflow,
+                "last_finished_at": last,
+                "window_minutes": window,
+                "degraded": stale,
+                "errors": row["errors"] if row else 0,
+            }
+        )
+    return out
