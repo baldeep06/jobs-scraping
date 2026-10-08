@@ -71,3 +71,55 @@ def test_min_pay_drops_unlisted_and_low_pay(conn):
     cfg = DigestConfig(["SWE"], True, True, 25.0)
     got = select_jobs(conn, NOW - timedelta(hours=24), cfg)
     assert titles(got["US"].top + got["US"].rest) == ["high"]
+
+
+# --- rendering ------------------------------------------------------------------------------
+
+from scraper.digest.build import render  # noqa: E402
+from scraper.digest.select import Region  # noqa: E402
+
+HEALTHY = [
+    {
+        "workflow": "scrape-hot",
+        "degraded": False,
+        "last_finished_at": NOW,
+        "errors": 0,
+        "window_minutes": 60,
+    }  # fmt: skip
+]
+
+
+def job(**kw):
+    base = dict(company="Acme", title="SWE Intern", category="SWE", location="Toronto, ON",
+                term="Summer 2027", pay="CAD 30/h", visa_status="open", freshness="fresh",
+                url="https://x/1")  # fmt: skip
+    return base | kw
+
+
+def test_render_lists_jobs_by_region_with_links():
+    regions = {
+        "US": Region(),
+        "CA": Region(top=[job()], rest=[job(title="Data Intern", url="https://x/2", pay="")]),
+    }
+    subject, html, text = render(regions, HEALTHY, NOW)
+    assert subject == "Intern Radar — 2 new internships (0 US · 2 CA)"
+    assert "https://x/1" in html and "Acme" in html and "Top picks" in html
+    assert "Data Intern" in text and "https://x/2" in text
+
+
+def test_render_empty_day_still_sends_with_health():
+    subject, html, text = render({"US": Region(), "CA": Region()}, HEALTHY, NOW)
+    assert subject == "Intern Radar — no new internships today"
+    assert "No new internships" in html and "All sources healthy" in html
+
+
+def test_render_shows_degraded_sources():
+    bad = [{**HEALTHY[0], "degraded": True}]
+    _, html, text = render({"US": Region(), "CA": Region()}, bad, NOW)
+    assert "scrape-hot" in html and "degraded" in html.lower() and "degraded" in text.lower()
+
+
+def test_render_escapes_third_party_text():
+    evil = job(title="<script>alert(1)</script>", company="A&B")
+    _, html, _ = render({"US": Region(rest=[evil]), "CA": Region()}, HEALTHY, NOW)
+    assert "<script>" not in html and "&lt;script&gt;" in html and "A&amp;B" in html

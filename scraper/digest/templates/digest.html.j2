@@ -1,0 +1,30 @@
+{% macro row(j) -%}
+<div style="background:#fff;border-radius:16px;padding:12px 16px;margin:0 0 8px">
+  <a href="{{ j.url }}" style="color:#111827;font-weight:600;text-decoration:none">{{ j.title }}</a>
+  <div style="font-size:13px;color:#6b7280">{{ j.company }} · {{ j.location }}{% if j.term %} · {{ j.term }}{% endif %}{% if j.pay %} · {{ j.pay }}{% endif %} · visa {{ j.visa_status }}</div>
+</div>
+{%- endmacro %}
+<!doctype html>
+<html><body style="margin:0;background:#f6f7fb;font-family:Inter,Arial,sans-serif;color:#111827">
+<div style="max-width:640px;margin:0 auto;padding:24px 16px">
+  <h1 style="font-family:Poppins,Arial,sans-serif;font-size:22px;margin:0 0 4px">Intern Radar</h1>
+  <p style="margin:0 0 20px;color:#6b7280">{{ date }} · new tech internships from the last 24 hours</p>
+  {% if total == 0 %}
+  <p style="background:#fff;border-radius:16px;padding:16px">No new internships matched today.</p>
+  {% endif %}
+  {% for code, label in [("US", "United States"), ("CA", "Canada")] %}
+    {% set region = regions[code] %}
+    {% if region.top or region.rest %}
+    <h2 style="font-family:Poppins,Arial,sans-serif;font-size:17px;margin:24px 0 8px">{{ label }}</h2>
+    {% if region.top %}
+      <h3 style="font-size:13px;color:#1b55f5;margin:12px 0 6px">Top picks</h3>
+      {% for j in region.top %}{{ row(j) }}{% endfor %}
+    {% endif %}
+    {% if region.rest %}
+      <h3 style="font-size:13px;color:#6b7280;margin:12px 0 6px">All other new matches</h3>
+      {% for j in region.rest %}{{ row(j) }}{% endfor %}
+    {% endif %}
+    {% endif %}
+  {% endfor %}
+  <p style="margin:28px 0 0;font-size:12px;color:#6b7280">{{ health_line }}</p>
+</div></body></html>
