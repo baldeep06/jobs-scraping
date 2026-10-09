@@ -18,6 +18,7 @@ _WORKDAY = re.compile(
 _SIMPLE = [
     ("greenhouse", re.compile(r"^https?://(?:job-)?boards\.greenhouse\.io/" + _SEG, re.I), True),
     ("lever", re.compile(r"^https?://jobs\.lever\.co/" + _SEG, re.I), True),
+    ("rippling", re.compile(r"^https?://ats\.rippling\.com/" + _SEG, re.I), True),
     ("lever_eu", re.compile(r"^https?://jobs\.eu\.lever\.co/" + _SEG, re.I), True),
     ("ashby", re.compile(r"^https?://jobs\.ashbyhq\.com/" + _SEG, re.I), True),
     ("smartrecruiters", re.compile(r"^https?://jobs\.smartrecruiters\.com/" + _SEG, re.I), False),

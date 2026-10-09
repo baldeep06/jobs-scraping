@@ -505,3 +505,98 @@ async def test_jobvite_failed_detail_pending_empty_confirmed_and_unknown_page_ra
     async with make_fetcher(lambda r: httpx.Response(200, text="<html>Welcome</html>")) as f:
         with pytest.raises(FetchError, match="Jobvite"):
             await ADAPTERS["jobvite"](f, ex)
+
+
+# --- Gem ----------------------------------------------------------------------------------------
+
+
+def gem_job(i, title="Software Engineer Intern", **kw):
+    return {
+        "id": str(i), "title": title, "absolute_url": f"https://jobs.gem.com/ex/{i}",
+        "content": "<p>Build &amp; ship.</p>", "content_plain": "Build & ship.",
+        "location": {"name": "New York, United States"}, "location_type": "in_office",
+        "employment_type": "intern", "first_published_at": "2026-09-30T12:00:00.000Z",
+    } | kw  # fmt: skip
+
+
+async def test_gem_maps_job_posts():
+    def handler(request):
+        assert request.url.path == "/job_board/v0/ex/job_posts/"
+        return httpx.Response(200, json=[gem_job(1), gem_job(2, location_type="remote")])
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["gem"](f, Company(id=1, name="Ex", ats="gem", slug="ex"))
+    job = result.jobs[0]
+    assert (
+        job.source == "gem" and job.source_job_id == "1" and job.url == "https://jobs.gem.com/ex/1"
+    )
+    assert job.location_raw == "New York, United States" and "Build & ship." in job.description_text
+    assert job.work_mode_hint == "onsite" and job.employment_type_hint == "intern"
+    assert job.source_posted_at.year == 2026
+    assert result.jobs[1].work_mode_hint == "remote"
+
+
+async def test_gem_empty_board_has_no_jobs_and_bad_payload_raises():
+    async with make_fetcher(lambda r: httpx.Response(200, json=[])) as f:
+        co_ = Company(id=1, name="Ex", ats="gem", slug="ex")
+        assert (await ADAPTERS["gem"](f, co_)).jobs == []
+    async with make_fetcher(lambda r: httpx.Response(200, json={"error": "x"})) as f:
+        with pytest.raises(FetchError):
+            await ADAPTERS["gem"](f, co_)
+
+
+# --- Rippling ATS -------------------------------------------------------------------------------
+
+
+async def test_rippling_lists_then_reads_details_for_internships_only():
+    detail_calls = []
+
+    def handler(request):
+        if request.url.path.endswith("/board/ex/jobs"):
+            return httpx.Response(
+                200,
+                json=[
+                    {"uuid": "u1", "name": "Data Science Intern - Summer 2027", "url": "https://ats.rippling.com/ex/jobs/u1",
+                     "workLocation": {"label": "San Francisco, CA"}},
+                    {"uuid": "u2", "name": "Account Executive", "url": "https://ats.rippling.com/ex/jobs/u2",
+                     "workLocation": {"label": "AR"}},
+                ],
+            )  # fmt: skip
+        detail_calls.append(request.url.path)
+        return httpx.Response(
+            200,
+            json={
+                "description": {"company": "<p>About us.</p>", "role": "<p>Analyze data.</p>"},
+                "workLocations": ["San Francisco, CA", "New York, NY"],
+                "employmentType": {"label": "TEMP", "id": "Temporary / Intern"},
+                "createdOn": "2026-09-21T16:52:52.420000-07:00",
+            },
+        )
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["rippling"](f, Company(id=1, name="Ex", ats="rippling", slug="ex"))
+    assert detail_calls == ["/platform/api/ats/v1/board/ex/jobs/u1"]
+    (job,) = result.jobs
+    assert job.source == "rippling" and job.source_job_id == "ex:u1"
+    assert job.url == "https://ats.rippling.com/ex/jobs/u1"
+    assert job.location_raw == "San Francisco, CA | New York, NY"
+    assert "Analyze data." in job.description_text and job.source_posted_at.year == 2026
+    assert job.employment_type_hint == "Temporary / Intern"
+
+
+async def test_rippling_failed_detail_is_pending_and_bad_payload_raises():
+    def failing(request):
+        if request.url.path.endswith("/board/ex/jobs"):
+            return httpx.Response(
+                200, json=[{"uuid": "u1", "name": "Software Engineer Intern", "url": "x"}]
+            )
+        return httpx.Response(500)
+
+    ex = Company(id=1, name="Ex", ats="rippling", slug="ex")
+    async with make_fetcher(failing) as f:
+        result = await ADAPTERS["rippling"](f, ex)
+    assert result.pending_ids == {"ex:u1"} and not result.jobs
+
+    async with make_fetcher(lambda r: httpx.Response(200, json={"error": "x"})) as f:
+        with pytest.raises(FetchError):
+            await ADAPTERS["rippling"](f, ex)

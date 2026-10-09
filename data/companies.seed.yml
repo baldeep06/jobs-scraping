@@ -368,3 +368,13 @@
 - {name: Harness, ats: greenhouse, slug: harnessinc}
 - {name: Dutchie, ats: greenhouse, slug: thedutchie}
 - {name: Ironclad, ats: ashby, slug: ironcladhq}
+
+# Gem boards, plus boards found on private companies' careers pages.
+- {name: The Boring Company, ats: gem, slug: the-boring-company}
+- {name: Bilt Rewards, ats: gem, slug: bilt}
+- {name: Retool, ats: gem, slug: retool}
+- {name: Talkdesk, ats: greenhouse, slug: talkdesk2}
+- {name: GOAT, ats: greenhouse, slug: goatgroup}
+- {name: Saronic Technologies, ats: ashby, slug: saronic}
+- {name: NinjaOne, ats: jobvite, slug: ninjaone}
+- {name: Rippling, ats: rippling, slug: rippling}
