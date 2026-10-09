@@ -42,6 +42,9 @@ def make_fetcher(handler):
         # The top hit of an exact-name match is trusted when its site has a plain one-word name.
         ("Texas Instruments", [{"name": "Texas Instruments", "domain": "ti.com"}], "ti.com"),
         ("Texas Instruments", [{"name": "Texas Instruments", "domain": "texas-japan.com"}], None),
+        # A longer registered name ("Marvell Technology") still matches the short one.
+        ("Marvell", [{"name": "Marvell Technology", "domain": "marvell.com"}], "marvell.com"),
+        ("KLA", [{"name": "Klaviyo", "domain": "klaviyo.com"}], None),
         ("Acme", [], None),
         ("Acme", [{"name": "Acme", "domain": ""}, {"name": "Acme", "domain": None}], None),
     ],
@@ -100,3 +103,32 @@ async def test_resolve_domains_respects_the_limit(conn):
         await resolve_domains(f, conn, limit=2)
     unchecked = conn.execute("select count(*) n from companies where domain_checked_at is null")
     assert unchecked.fetchone()["n"] == 3
+
+
+async def test_overrides_win_over_the_lookup_and_are_matched_case_insensitively(conn):
+    db.upsert_companies(
+        conn,
+        [
+            {"name": "Booz Allen", "ats": "greenhouse", "slug": "booz"},
+            {"name": "Zscaler", "ats": "greenhouse", "slug": "zscaler"},
+        ],
+    )
+    asked = []
+
+    def handler(request):
+        asked.append(request.url.params["query"])
+        return httpx.Response(200, json=[{"name": "Zscaler", "domain": "zscaler.com"}])
+
+    async with make_fetcher(handler) as f:
+        await resolve_domains(f, conn, overrides={"booz allen": "boozallen.com"})
+    rows = {r["name"]: r["domain"] for r in conn.execute("select name, domain from companies")}
+    assert rows == {"Booz Allen": "boozallen.com", "Zscaler": "zscaler.com"}
+    assert asked == ["Zscaler"]
+
+
+def test_the_shipped_override_file_is_well_formed():
+    from scraper.domains import load_overrides
+
+    overrides = load_overrides()
+    assert overrides and all("." in d and d == d.lower() for d in overrides.values())
+    assert all(k == k.lower() for k in overrides)

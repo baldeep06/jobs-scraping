@@ -1,9 +1,11 @@
 import asyncio
 import re
+from pathlib import Path
 from typing import Any
 from urllib.parse import quote
 
 import psycopg
+import yaml
 
 from scraper.http import Fetcher, FetchError
 
@@ -51,17 +53,44 @@ def pick_domain(name: str, suggestions: list[dict[str, Any]]) -> str | None:
     for domain in exact:
         if _looks_like(domain, wanted):
             return domain
+    if len(wanted) >= 4:  # "Marvell" for "Marvell Technology": the site must be named exactly so
+        for s in suggestions:
+            domain = str(s.get("domain") or "").lower()
+            if domain and _norm(str(s.get("name") or "")).startswith(wanted):
+                if _label(domain).replace("-", "") == wanted:
+                    return domain
     top = str(suggestions[0].get("domain") or "").lower() if suggestions else ""
     if top and top in exact and "-" not in _label(top):
         return top
     return None
 
 
+OVERRIDES = Path(__file__).resolve().parents[1] / "data" / "domain_overrides.yml"
+
+
+def load_overrides(path: Path = OVERRIDES) -> dict[str, str]:
+    """Hand-checked websites for companies the lookup cannot place, keyed by lower-case name."""
+    data = yaml.safe_load(path.read_text()) or {}
+    return {str(k).strip().lower(): str(v).strip().lower() for k, v in data.items()}
+
+
 async def resolve_domains(
-    fetcher: Fetcher, conn: psycopg.Connection, limit: int = 200, parallel: int = 5
+    fetcher: Fetcher,
+    conn: psycopg.Connection,
+    limit: int = 200,
+    parallel: int = 5,
+    overrides: dict[str, str] | None = None,
 ) -> int:
     """Look up the website of companies that have none, for their logo. A company the lookup
     answered for is not asked again (even when nothing matched); a failed lookup is retried."""
+    known = load_overrides() if overrides is None else overrides
+    filled = 0
+    for name, domain in known.items():
+        filled += conn.execute(
+            """update companies set domain = %s, domain_checked_at = now()
+               where lower(name) = %s and domain is null""",
+            (domain, name),
+        ).rowcount
     rows = conn.execute(
         """select c.id, c.name from companies c
            where c.domain is null and c.domain_checked_at is null
@@ -81,7 +110,6 @@ async def resolve_domains(
         found = pick_domain(row["name"], data) if isinstance(data, list) else None
         return row["id"], found, True
 
-    filled = 0
     for company_id, domain, answered in await asyncio.gather(*(lookup(r) for r in rows)):
         if not answered:
             continue
