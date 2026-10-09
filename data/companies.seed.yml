@@ -363,3 +363,8 @@
 - {name: o9 Solutions, ats: workday, slug: o9solutions/o9SolutionsExternal, workday_host: o9solutions.wd5.myworkdayjobs.com, workday_site: o9SolutionsExternal}
 - {name: BrowserStack, ats: workday, slug: browserstack/External, workday_host: browserstack.wd3.myworkdayjobs.com, workday_site: External}
 - {name: Rappi, ats: workday, slug: rappi/Rappi_jobs, workday_host: rappi.wd12.myworkdayjobs.com, workday_site: Rappi_jobs}
+- {name: Fanatics, ats: greenhouse, slug: fanaticsinc}
+- {name: Automattic, ats: greenhouse, slug: automatticcareers}
+- {name: Harness, ats: greenhouse, slug: harnessinc}
+- {name: Dutchie, ats: greenhouse, slug: thedutchie}
+- {name: Ironclad, ats: ashby, slug: ironcladhq}
