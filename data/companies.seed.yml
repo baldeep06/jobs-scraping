@@ -378,3 +378,28 @@
 - {name: Saronic Technologies, ats: ashby, slug: saronic}
 - {name: NinjaOne, ats: jobvite, slug: ninjaone}
 - {name: Rippling, ats: rippling, slug: rippling}
+
+# Quant / trading firms (public Greenhouse/Lever/Ashby boards).
+- {name: AQR Capital Management, ats: greenhouse, slug: aqr, domain: aqr.com}
+- {name: Akuna Capital, ats: greenhouse, slug: akunacapital, domain: akunacapital.com, hot: true}
+- {name: Ansatz Capital, ats: lever, slug: ansatzcapital, domain: ansatz.com}
+- {name: B2C2, ats: greenhouse, slug: b2c2, domain: b2c2.com}
+- {name: Crabel Capital, ats: greenhouse, slug: crabel, domain: crabel.com}
+- {name: Eclipse Trading, ats: greenhouse, slug: eclipsetrading, domain: eclipsetrading.com}
+- {name: Engineers Gate, ats: greenhouse, slug: engineersgate, domain: engineersgate.com}
+- {name: ExodusPoint, ats: greenhouse, slug: exoduspoint, domain: exoduspoint.com}
+- {name: Flowdesk, ats: greenhouse, slug: flowdesk, domain: flowdesk.co}
+- {name: Gelber Group, ats: greenhouse, slug: gelbergroup, domain: gelbergroup.com}
+- {name: IMC Trading, ats: greenhouse, slug: imc, domain: imc.com, hot: true}
+- {name: Jump Trading, ats: greenhouse, slug: jumptrading, domain: jumptrading.com, hot: true}
+- {name: Magnetar, ats: greenhouse, slug: magnetar, domain: magnetar.com}
+- {name: Mako Trading, ats: greenhouse, slug: mako, domain: mako.com}
+- {name: Man Group, ats: greenhouse, slug: mangroup, domain: man.com}
+- {name: Marshall Wace, ats: greenhouse, slug: marshallwace, domain: mwam.com}
+- {name: Old Mission Capital, ats: ashby, slug: old-mission-capital, domain: oldmissioncapital.com, hot: true}
+- {name: Optiver, ats: greenhouse, slug: optiverus, domain: optiver.com, hot: true}
+- {name: Selini Capital, ats: greenhouse, slug: selinicapital, domain: selinicapital.com}
+- {name: Squarepoint Capital, ats: greenhouse, slug: squarepointcapital, domain: squarepoint-capital.com, hot: true}
+- {name: Tower Research Capital, ats: greenhouse, slug: towerresearchcapital, domain: tower-research.com, hot: true}
+- {name: Winton, ats: greenhouse, slug: winton, domain: winton.com}
+- {name: WorldQuant, ats: greenhouse, slug: worldquant, domain: worldquant.com}
