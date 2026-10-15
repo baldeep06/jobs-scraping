@@ -405,3 +405,6 @@
 - {name: WorldQuant, ats: greenhouse, slug: worldquant, domain: worldquant.com}
 - {name: Susquehanna International Group, ats: jibe, slug: sig, domain: sig.com, workday_host: careers.sig.com, workday_site: "-", hot: true}
 - {name: XTX Markets, ats: greenhouse, slug: xtxmarketstechnologies, domain: xtxmarkets.com}
+- {name: Headlands Technologies, ats: greenhouse, slug: headlandstechnologiesllc, domain: headlandstech.com}
+- {name: Qube Research & Technologies, ats: greenhouse, slug: quberesearchandtechnologies, domain: qube-rt.com}
+- {name: GSR, ats: greenhouse, slug: gsrmarkets, domain: gsr.io}
