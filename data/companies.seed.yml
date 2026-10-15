@@ -403,3 +403,5 @@
 - {name: Tower Research Capital, ats: greenhouse, slug: towerresearchcapital, domain: tower-research.com, hot: true}
 - {name: Winton, ats: greenhouse, slug: winton, domain: winton.com}
 - {name: WorldQuant, ats: greenhouse, slug: worldquant, domain: worldquant.com}
+- {name: Susquehanna International Group, ats: jibe, slug: sig, domain: sig.com, workday_host: careers.sig.com, workday_site: "-", hot: true}
+- {name: XTX Markets, ats: greenhouse, slug: xtxmarketstechnologies, domain: xtxmarkets.com}
