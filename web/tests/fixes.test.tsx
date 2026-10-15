@@ -5,7 +5,7 @@ import RegionError from "@/app/[region]/error";
 import { FilterBar } from "@/components/FilterBar";
 import { JobList } from "@/components/JobList";
 import { lastPageRedirect, parseFilters } from "@/lib/filters";
-import { fetchCounts, fetchJobs } from "@/lib/jobs";
+import { fetchCounts, fetchGroupCounts, fetchJobs } from "@/lib/jobs";
 import { fakeClient } from "./fakeClient";
 import { makeJob } from "./fixtures";
 
@@ -45,6 +45,23 @@ describe("hero counts", () => {
     const { client, log } = fakeClient(() => ({ count: 1 }));
     await fetchCounts(client, "us", NOW);
     for (const calls of log) {
+      expect(calls).toContainEqual(["in", "visa_status", ["open", "unknown"]]);
+    }
+  });
+});
+
+describe("group counts", () => {
+  it("counts open jobs per group for the region's default view", async () => {
+    const { client, log } = fakeClient((calls) => {
+      const g = calls.find((c) => c[0] === "overlaps")?.[2] as string[];
+      return { count: g[0] === "quant" ? 7 : 0 };
+    });
+    const counts = await fetchGroupCounts(client, "us");
+    expect(counts.quant).toBe(7);
+    expect(counts.faang).toBe(0);
+    expect(Object.keys(counts)).toHaveLength(9);
+    for (const calls of log) {
+      expect(calls).toContainEqual(["in", "country", ["US", "BOTH", "UNKNOWN"]]);
       expect(calls).toContainEqual(["in", "visa_status", ["open", "unknown"]]);
     }
   });

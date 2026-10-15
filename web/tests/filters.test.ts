@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defaultVisa, parseFilters, sanitizeSearch, toQuery } from "@/lib/filters";
+import { defaultVisa, parseFilters, sanitizeSearch, toggleGroup, toQuery } from "@/lib/filters";
 
 describe("parseFilters", () => {
   it("uses region defaults", () => {
@@ -14,6 +14,7 @@ describe("parseFilters", () => {
       fresh: false,
       pay: false,
       remote: false,
+      group: [],
       sort: "new",
       page: 1,
     });
@@ -30,6 +31,7 @@ describe("parseFilters", () => {
       fresh: "1",
       pay: "1",
       remote: "1",
+      group: "quant,faang",
       sort: "pay",
       page: "3",
     });
@@ -42,6 +44,7 @@ describe("parseFilters", () => {
       fresh: true,
       pay: true,
       remote: true,
+      group: ["faang", "quant"],
       sort: "pay",
       page: 3,
     });
@@ -102,5 +105,25 @@ describe("defaultVisa", () => {
   it("hides blocked only in the US", () => {
     expect(defaultVisa("us")).toEqual(["open", "unknown"]);
     expect(defaultVisa("ca")).toEqual(["open", "unknown", "blocked"]);
+  });
+});
+
+describe("company group filter", () => {
+  it("keeps only known groups, in display order, without repeats", () => {
+    expect(parseFilters("us", { group: "quant,bogus,faang,quant" }).group).toEqual([
+      "faang",
+      "quant",
+    ]);
+  });
+
+  it("round-trips through the query string", () => {
+    const f = parseFilters("us", { group: "unicorn,quant", page: "2" });
+    expect(toQuery(f)).toBe("?group=quant%2Cunicorn&page=2");
+  });
+
+  it("toggles a group on and off and returns to page 1", () => {
+    const f = parseFilters("us", { group: "quant", page: "4" });
+    expect(toQuery(toggleGroup(f, "faang"))).toBe("?group=faang%2Cquant");
+    expect(toQuery(toggleGroup(f, "quant"))).toBe("");
   });
 });

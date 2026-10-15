@@ -10,6 +10,20 @@ export const CATEGORIES = [
   "IT/Security",
   "Other-tech",
 ] as const;
+/** Company groups, in display order (kept in step with scraper/groups.py). */
+export const GROUPS = [
+  ["faang", "FAANG+"],
+  ["big_tech", "Big tech"],
+  ["big_tech_adjacent", "Big-tech adjacent"],
+  ["quant", "Quant / trading"],
+  ["unicorn", "Unicorns"],
+  ["ai_labs", "AI labs"],
+  ["fintech", "Fintech"],
+  ["defense_hardware", "Defense / hardware"],
+  ["canadian", "Canadian"],
+] as const;
+export type Group = (typeof GROUPS)[number][0];
+export const GROUP_KEYS = GROUPS.map(([key]) => key) as Group[];
 export const WITHIN = ["1h", "24h", "7d", "all"] as const;
 export type Within = (typeof WITHIN)[number];
 export const PAGE_SIZE = 50;
@@ -29,6 +43,7 @@ export interface Filters {
   fresh: boolean;
   pay: boolean;
   remote: boolean;
+  group: Group[];
   sort: "new" | "pay";
   page: number;
 }
@@ -57,6 +72,7 @@ export function parseFilters(region: Region, params: SearchParams): Filters {
   const category = first(params.category) ?? "";
   const term = first(params.term) ?? "";
   const within = first(params.within) ?? "";
+  const wanted = (first(params.group) ?? "").split(",");
   const page = Number.parseInt(first(params.page) ?? "1", 10);
   return {
     region,
@@ -68,6 +84,7 @@ export function parseFilters(region: Region, params: SearchParams): Filters {
     fresh: first(params.fresh) === "1",
     pay: first(params.pay) === "1",
     remote: first(params.remote) === "1",
+    group: GROUP_KEYS.filter((g) => wanted.includes(g)),
     sort: first(params.sort) === "pay" ? "pay" : "new",
     page: Number.isFinite(page) && page >= 1 ? Math.min(page, MAX_PAGE) : 1,
   };
@@ -89,8 +106,16 @@ export function toQuery(f: Filters): string {
   if (f.fresh) p.set("fresh", "1");
   if (f.pay) p.set("pay", "1");
   if (f.remote) p.set("remote", "1");
+  if (f.group.length) p.set("group", f.group.join(","));
   if (f.sort !== "new") p.set("sort", f.sort);
   if (f.page !== 1) p.set("page", String(f.page));
   const s = p.toString();
   return s ? `?${s}` : "";
+}
+
+/** The filters with `group` switched on or off (and back on page 1). */
+export function toggleGroup(f: Filters, group: Group): Filters {
+  const on = f.group.includes(group);
+  const next = on ? f.group.filter((g) => g !== group) : [...f.group, group];
+  return { ...f, group: GROUP_KEYS.filter((g) => next.includes(g)), page: 1 };
 }

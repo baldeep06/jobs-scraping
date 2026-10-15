@@ -25,6 +25,9 @@ class Recorder implements FilterableQuery {
   not(c: string, o: string, v: unknown): this {
     return this.rec("not", [c, o, v]);
   }
+  overlaps(c: string, v: readonly unknown[]): this {
+    return this.rec("overlaps", [c, v]);
+  }
   or(f: string): this {
     return this.rec("or", [f]);
   }
@@ -64,6 +67,7 @@ describe("applyFilters", () => {
       fresh: "1",
       pay: "1",
       remote: "1",
+      group: "quant,faang",
       sort: "pay",
       page: "3",
     });
@@ -76,6 +80,7 @@ describe("applyFilters", () => {
       ["in", "freshness", ["fresh", "recurring"]],
       ["not", "pay_hourly_max", "is", null],
       ["eq", "work_mode", "remote"],
+      ["overlaps", "company_groups", ["faang", "quant"]],
       ["or", 'title.ilike."%data%",company_name.ilike."%data%"'],
       ["order", "pay_hourly_max", { ascending: false, nullsFirst: false }],
       ["order", "first_seen_at", { ascending: false }],

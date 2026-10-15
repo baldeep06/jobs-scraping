@@ -83,6 +83,9 @@ export function FilterBar({ filters, terms }: { filters: Filters; terms: string[
         <option value="new">Newest</option>
         <option value="pay">Highest pay</option>
       </select>
+      {filters.group.length > 0 && (
+        <input type="hidden" name="group" value={filters.group.join(",")} />
+      )}
       <Check name="fresh" label="Fresh only" checked={filters.fresh} />
       <Check name="pay" label="Pay listed" checked={filters.pay} />
       <Check name="remote" label="Remote" checked={filters.remote} />

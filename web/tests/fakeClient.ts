@@ -12,7 +12,7 @@ export function fakeClient(respond: (calls: Call[], head: boolean) => Result) {
       log.push(calls);
       let head = false;
       const builder: Record<string, unknown> = {};
-      for (const m of ["in", "eq", "ilike", "gte", "not", "or", "order", "range", "limit"]) {
+      for (const m of ["in", "eq", "ilike", "gte", "not", "overlaps", "or", "order", "range", "limit"]) {
         builder[m] = (...args: unknown[]) => {
           calls.push([m, ...args]);
           return builder;

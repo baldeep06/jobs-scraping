@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { FilterBar } from "@/components/FilterBar";
+import { GroupToggles } from "@/components/GroupToggles";
 import { JobList } from "@/components/JobList";
 import { Pagination } from "@/components/Pagination";
 import { RegionTabs } from "@/components/RegionTabs";
@@ -127,5 +128,32 @@ describe("company icon", () => {
     expect(html).not.toContain("favicons");
     expect(html).toContain('data-testid="company-initial"');
     expect(html).toContain(">Z<");
+  });
+});
+
+describe("GroupToggles", () => {
+  const counts = { faang: 12, quant: 0, unicorn: 40 };
+
+  it("renders a chip per group with its open-job count", () => {
+    const html = renderToStaticMarkup(<GroupToggles filters={US} counts={counts} />);
+    expect(html).toContain("FAANG+");
+    expect(html).toContain("Quant / trading");
+    expect(html).toMatch(/Unicorns[\s\S]*?40/);
+  });
+
+  it("links each chip to the URL with that group toggled", () => {
+    const f = parseFilters("us", { group: "quant", category: "SWE", page: "3" });
+    const html = renderToStaticMarkup(<GroupToggles filters={f} counts={counts} />);
+    expect(html).toContain('href="/us?category=SWE&amp;group=faang%2Cquant"');
+    expect(html).toContain('href="/us?category=SWE"'); // quant is on: clicking it removes it
+    expect(html).toMatch(/<a[^>]*aria-pressed="true"[^>]*>[^<]*Quant/);
+  });
+});
+
+describe("FilterBar groups", () => {
+  it("keeps the chosen groups when Apply is pressed", () => {
+    const f = parseFilters("us", { group: "faang,quant" });
+    const html = renderToStaticMarkup(<FilterBar filters={f} terms={[]} />);
+    expect(html).toMatch(/<input[^>]*type="hidden"[^>]*name="group"[^>]*value="faang,quant"/);
   });
 });

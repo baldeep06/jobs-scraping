@@ -17,6 +17,7 @@ from scraper.adapters import ADAPTERS
 from scraper.adapters.base import STATEFUL_ATS
 from scraper.discovery import discover
 from scraper.domains import resolve_domains
+from scraper.groups import GROUPS_FILE, apply_groups, load_groups
 from scraper.http import Fetcher
 from scraper.models import Company, CompanyOutcome
 from scraper.pipeline import poll
@@ -119,6 +120,12 @@ def cmd_domains(args: argparse.Namespace) -> int:
             return await resolve_domains(fetcher, conn, limit=args.limit)
 
     print(f"found {asyncio.run(go(_connect()))} company websites")
+    return 0
+
+
+def cmd_groups(args: argparse.Namespace) -> int:
+    n = apply_groups(_connect(), load_groups(args.file))
+    print(f"{n} companies in at least one group")
     return 0
 
 
@@ -296,6 +303,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     domains.add_argument("--limit", type=int, default=2000)
 
+    groups = sub.add_parser("groups", help="apply data/company_groups.yml to the companies")
+    groups.add_argument("--file", type=Path, default=GROUPS_FILE)
+
     run = sub.add_parser("run", help="poll companies and write jobs")
     run.add_argument("--tier", choices=["hot", "warm", "cold"])
     run.add_argument("--company", help="only this slug")
@@ -321,6 +331,7 @@ def main(argv: list[str] | None = None) -> int:
         "run": cmd_run,
         "discover": cmd_discover,
         "domains": cmd_domains,
+        "groups": cmd_groups,
         "maintenance": cmd_maintenance,
         "digest": cmd_digest,
     }

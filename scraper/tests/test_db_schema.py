@@ -18,6 +18,7 @@ def test_migrate_is_idempotent(conn):
         "20261013000000_domain_checked.sql",
         "20261014000000_gem.sql",
         "20261015000000_rippling.sql",
+        "20261016000000_company_groups.sql",
     ]
 
 

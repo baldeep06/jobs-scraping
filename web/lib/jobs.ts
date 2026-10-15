@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { defaultVisa, type Filters, PAGE_SIZE } from "@/lib/filters";
+import { defaultVisa, type Filters, GROUP_KEYS, type Group, PAGE_SIZE } from "@/lib/filters";
 import type { Country, JobRow, JobSource, Region } from "@/lib/types";
 
 export const REGION_COUNTRIES: Record<Region, Country[]> = {
@@ -15,6 +15,7 @@ export interface FilterableQuery {
   ilike(column: string, pattern: string): this;
   gte(column: string, value: string): this;
   not(column: string, operator: string, value: unknown): this;
+  overlaps(column: string, values: readonly unknown[]): this;
   or(filters: string): this;
   order(column: string, options: { ascending: boolean; nullsFirst?: boolean }): this;
   range(from: number, to: number): this;
@@ -31,6 +32,7 @@ function applyWhere<Q extends FilterableQuery>(query: Q, f: Filters, now: Date):
   if (f.fresh) q = q.in("freshness", ["fresh", "recurring"]);
   if (f.pay) q = q.not("pay_hourly_max", "is", null);
   if (f.remote) q = q.eq("work_mode", "remote");
+  if (f.group.length) q = q.overlaps("company_groups", f.group);
   if (f.q) {
     // f.q is sanitized by parseFilters (no quotes, commas, parens or %), so quoting is safe.
     q = q.or(`title.ilike."%${f.q}%",company_name.ilike."%${f.q}%"`);
@@ -115,6 +117,28 @@ export async function fetchCounts(
   ]);
   if (open.error || today.error) throw new Error("count query failed");
   return { open: open.count ?? 0, today: today.count ?? 0 };
+}
+
+/** Open jobs per company group, for the toggle chips (the region's default view). */
+export async function fetchGroupCounts(
+  client: SupabaseClient,
+  region: Region,
+): Promise<Record<Group, number>> {
+  const counts = await Promise.all(
+    GROUP_KEYS.map((g) =>
+      client
+        .from("jobs_feed")
+        .select("id", { count: "exact", head: true })
+        .in("country", REGION_COUNTRIES[region])
+        .in("visa_status", defaultVisa(region))
+        .overlaps("company_groups", [g]),
+    ),
+  );
+  if (counts.some((c) => c.error)) throw new Error("group count query failed");
+  return Object.fromEntries(GROUP_KEYS.map((g, i) => [g, counts[i].count ?? 0])) as Record<
+    Group,
+    number
+  >;
 }
 
 const SEASON_YEAR = /(Summer|Fall|Winter|Spring) (20\d\d)/;

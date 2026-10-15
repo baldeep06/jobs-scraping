@@ -1,11 +1,12 @@
 import { notFound, redirect } from "next/navigation";
 import { FilterBar } from "@/components/FilterBar";
+import { GroupToggles } from "@/components/GroupToggles";
 import { Hero } from "@/components/Hero";
 import { JobList } from "@/components/JobList";
 import { Pagination } from "@/components/Pagination";
 import { RegionTabs } from "@/components/RegionTabs";
 import { lastPageRedirect, parseFilters, type SearchParams } from "@/lib/filters";
-import { fetchCounts, fetchJobs, fetchSources, fetchTermOptions } from "@/lib/jobs";
+import { fetchCounts, fetchGroupCounts, fetchJobs, fetchSources, fetchTermOptions } from "@/lib/jobs";
 import { supabase } from "@/lib/supabase";
 import type { Region } from "@/lib/types";
 
@@ -23,10 +24,11 @@ export default async function RegionPage({
   const filters = parseFilters(region as Region, await searchParams);
   const now = new Date();
   const client = supabase();
-  const [{ rows, total }, counts, terms] = await Promise.all([
+  const [{ rows, total }, counts, terms, groupCounts] = await Promise.all([
     fetchJobs(client, filters, now),
     fetchCounts(client, filters.region, now),
     fetchTermOptions(client, filters.region),
+    fetchGroupCounts(client, filters.region),
   ]);
   const goTo = lastPageRedirect(filters, rows.length, total);
   if (goTo) redirect(goTo);
@@ -41,6 +43,7 @@ export default async function RegionPage({
       <main className="mx-auto max-w-[1280px] px-4 pb-16 md:px-8">
         <div className="pt-8">
           <RegionTabs filters={filters} />
+          <GroupToggles filters={filters} counts={groupCounts} />
           <FilterBar filters={filters} terms={terms} />
         </div>
         <p className="pb-3 text-[13px] text-slate">
