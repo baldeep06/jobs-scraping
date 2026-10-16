@@ -35,6 +35,8 @@ big_tech:
   - "TikTok"
   - "Tesla"
   - "AMD"
+  - "IBM"
+  - "SAP"
 
 big_tech_adjacent:
   - "Asana"
@@ -72,6 +74,7 @@ big_tech_adjacent:
   - "Atlassian"
   - "Waymo"
   - "Electronic Arts"
+  - "Activision Blizzard"
 
 quant:
   - "Anthelion Capital"
@@ -205,6 +208,11 @@ defense_hardware:
   - "CesiumAstro"
   - "United Launch Alliance"
   - "Huntington Ingalls Industries"
+  - "Lockheed Martin"
+  - "BAE Systems"
+  - "Leonardo DRS"
+  - "BWXT"
+  - "Redwire"
 
 canadian:
   - "1Password"

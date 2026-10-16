@@ -701,3 +701,86 @@
 - {ats: simplify, name: Zions Bank, slug: Zions Bank}
 - {ats: simplify, name: Zipline, slug: Zipline}
 - {ats: simplify, name: ZS, slug: ZS}
+
+# Backup: companies read from intern-list.com because no other source covers them.
+# slug = the company name as intern-list writes it. Keep off the hot tier (one shared,
+# rate-limited read of the lists per run).
+- {ats: internlist, name: Activision Blizzard, slug: Activision Blizzard}
+- {ats: internlist, name: ADM, slug: ADM}
+- {ats: internlist, name: AIG, slug: AIG}
+- {ats: internlist, name: Air Products, slug: Air Products}
+- {ats: internlist, name: Arevon, slug: Arevon}
+- {ats: internlist, name: ASM, slug: ASM}
+- {ats: internlist, name: AUMOVIO, slug: AUMOVIO}
+- {ats: internlist, name: BAE Systems, slug: BAE Systems}
+- {ats: internlist, name: Benchmark, slug: Benchmark}
+- {ats: internlist, name: Builders FirstSource, slug: Builders FirstSource}
+- {ats: internlist, name: BWXT, slug: BWXT}
+- {ats: internlist, name: Canadian Natural Resources Limited (CNRL), slug: Canadian Natural Resources Limited (CNRL)}
+- {ats: internlist, name: Canadian Solar Inc., slug: Canadian Solar Inc.}
+- {ats: internlist, name: Capgemini, slug: Capgemini}
+- {ats: internlist, name: CBIZ, slug: CBIZ}
+- {ats: internlist, name: CBRE, slug: CBRE}
+- {ats: internlist, name: Chubb, slug: Chubb}
+- {ats: internlist, name: CNH, slug: CNH}
+- {ats: internlist, name: Continental, slug: Continental}
+- {ats: internlist, name: Corteva Agriscience, slug: Corteva Agriscience}
+- {ats: internlist, name: Donaldson, slug: Donaldson}
+- {ats: internlist, name: Duquesne Light Company, slug: Duquesne Light Company}
+- {ats: internlist, name: Entergy, slug: Entergy}
+- {ats: internlist, name: Ericsson, slug: Ericsson}
+- {ats: internlist, name: First Solar, slug: First Solar}
+- {ats: internlist, name: FIS, slug: FIS}
+- {ats: internlist, name: Fortune Brands Innovations, slug: Fortune Brands Innovations}
+- {ats: internlist, name: Freeport-McMoRan, slug: Freeport-McMoRan}
+- {ats: internlist, name: Genworth, slug: Genworth}
+- {ats: internlist, name: Grainger, slug: Grainger}
+- {ats: internlist, name: Hubbell Incorporated, slug: Hubbell Incorporated}
+- {ats: internlist, name: Iberdrola, slug: Iberdrola}
+- {ats: internlist, name: IBM, slug: IBM}
+- {ats: internlist, name: Infineon Technologies, slug: Infineon Technologies}
+- {ats: internlist, name: Interactive Brokers, slug: Interactive Brokers}
+- {ats: internlist, name: James Hardie, slug: James Hardie}
+- {ats: internlist, name: Keurig Dr Pepper Inc., slug: Keurig Dr Pepper Inc.}
+- {ats: internlist, name: Klein Tools, slug: Klein Tools}
+- {ats: internlist, name: Leonardo DRS, slug: Leonardo DRS}
+- {ats: internlist, name: Lincoln Electric, slug: Lincoln Electric}
+- {ats: internlist, name: Littelfuse, slug: Littelfuse}
+- {ats: internlist, name: Loblaw Companies Limited, slug: Loblaw Companies Limited}
+- {ats: internlist, name: Lockheed Martin, slug: Lockheed Martin}
+- {ats: internlist, name: LPL Financial, slug: LPL Financial}
+- {ats: internlist, name: Mapfre, slug: Mapfre}
+- {ats: internlist, name: MiniMed, slug: MiniMed}
+- {ats: internlist, name: MKS Inc., slug: MKS Inc.}
+- {ats: internlist, name: Mohawk Industries, slug: Mohawk Industries}
+- {ats: internlist, name: Moody's Corporation, slug: Moody's Corporation}
+- {ats: internlist, name: Novo Nordisk, slug: Novo Nordisk}
+- {ats: internlist, name: Nucor Corporation, slug: Nucor Corporation}
+- {ats: internlist, name: Parkland Corporation, slug: Parkland Corporation}
+- {ats: internlist, name: Prudential Financial, slug: Prudential Financial}
+- {ats: internlist, name: Redwire, slug: Redwire}
+- {ats: internlist, name: Santander, slug: Santander}
+- {ats: internlist, name: SAP, slug: SAP}
+- {ats: internlist, name: Schneider Electric, slug: Schneider Electric}
+- {ats: internlist, name: Schroders, slug: Schroders}
+- {ats: internlist, name: Scotiabank, slug: Scotiabank}
+- {ats: internlist, name: Selective Insurance, slug: Selective Insurance}
+- {ats: internlist, name: Sonoco, slug: Sonoco}
+- {ats: internlist, name: SPX Technologies, slug: SPX Technologies}
+- {ats: internlist, name: Stellantis, slug: Stellantis}
+- {ats: internlist, name: Stifel Financial Corp., slug: Stifel Financial Corp.}
+- {ats: internlist, name: T. Rowe Price, slug: T. Rowe Price}
+- {ats: internlist, name: TE Connectivity, slug: TE Connectivity}
+- {ats: internlist, name: Teleflex, slug: Teleflex}
+- {ats: internlist, name: The Clorox Company, slug: The Clorox Company}
+- {ats: internlist, name: The Hanover Insurance Group, slug: The Hanover Insurance Group}
+- {ats: internlist, name: 'The TJX Companies, Inc.', slug: 'The TJX Companies, Inc.'}
+- {ats: internlist, name: Tokyo Electron US, slug: Tokyo Electron US}
+- {ats: internlist, name: Tractor Supply Company, slug: Tractor Supply Company}
+- {ats: internlist, name: Ulta Beauty, slug: Ulta Beauty}
+- {ats: internlist, name: United Airlines, slug: United Airlines}
+- {ats: internlist, name: Verizon, slug: Verizon}
+- {ats: internlist, name: Volvo Group, slug: Volvo Group}
+- {ats: internlist, name: Weyerhaeuser, slug: Weyerhaeuser}
+- {ats: internlist, name: Williams, slug: Williams}
+- {ats: internlist, name: Zoetis, slug: Zoetis}
