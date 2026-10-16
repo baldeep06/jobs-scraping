@@ -32,6 +32,7 @@ def test_seed_file_is_valid():
         "jobvite",
         "gem",
         "rippling",
+        "simplify",
     }
     keys = [(s["ats"], s["slug"]) for s in seeds]
     assert len(keys) == len(set(keys))

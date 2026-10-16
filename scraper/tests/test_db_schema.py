@@ -19,6 +19,7 @@ def test_migrate_is_idempotent(conn):
         "20261014000000_gem.sql",
         "20261015000000_rippling.sql",
         "20261016000000_company_groups.sql",
+        "20261017000000_simplify.sql",
     ]
 
 
@@ -66,7 +67,7 @@ def test_freshness_allows_existing_and_signal_columns_exist(conn):
 
 
 def test_bigtech_ats_values_are_accepted_and_junk_is_not(conn):
-    for ats in ("amazon", "microsoft", "apple", "google", "meta"):
+    for ats in ("amazon", "microsoft", "apple", "google", "meta", "simplify"):
         conn.execute("insert into companies (name, ats, slug) values (%s, %s, %s)", (ats, ats, ats))
     with pytest.raises(psycopg.errors.CheckViolation):
         conn.execute("insert into companies (name, ats, slug) values ('x','taleo','x')")

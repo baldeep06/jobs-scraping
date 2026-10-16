@@ -32,6 +32,9 @@ big_tech:
   - "Texas Instruments"
   - "Uber"
   - "Workday"
+  - "TikTok"
+  - "Tesla"
+  - "AMD"
 
 big_tech_adjacent:
   - "Asana"
@@ -66,6 +69,9 @@ big_tech_adjacent:
   - "Twitch"
   - "Unity"
   - "Zscaler"
+  - "Atlassian"
+  - "Waymo"
+  - "Electronic Arts"
 
 quant:
   - "Anthelion Capital"
@@ -124,6 +130,12 @@ quant:
   - "Headlands Technologies"
   - "Qube Research & Technologies"
   - "GSR"
+  - "Citadel"
+  - "Citadel Securities"
+  - "Hudson River Trading"
+  - "Two Sigma"
+  - "Quantbot Technologies"
+  - "Brevan Howard"
 
 ai_labs:
   - "Anthropic"
@@ -183,6 +195,16 @@ defense_hardware:
   - "Skydio"
   - "SpaceX"
   - "Varda Space"
+  - "L3Harris Technologies"
+  - "General Dynamics Mission Systems"
+  - "General Dynamics"
+  - "Johns Hopkins Applied Physics Laboratory"
+  - "Peraton"
+  - "Rivian"
+  - "Lunar Outpost"
+  - "CesiumAstro"
+  - "United Launch Alliance"
+  - "Huntington Ingalls Industries"
 
 canadian:
   - "1Password"

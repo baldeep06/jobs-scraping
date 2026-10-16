@@ -408,3 +408,296 @@
 - {name: Headlands Technologies, ats: greenhouse, slug: headlandstechnologiesllc, domain: headlandstech.com}
 - {name: Qube Research & Technologies, ats: greenhouse, slug: quberesearchandtechnologies, domain: qube-rt.com}
 - {name: GSR, ats: greenhouse, slug: gsrmarkets, domain: gsr.io}
+
+# Companies whose postings come from the SimplifyJobs list (their own sites block bots,
+# or use career sites we have no adapter for). slug = the company name as Simplify writes it.
+# Keep these off the hot tier: each poll reads the whole ~13 MB list.
+- {ats: simplify, name: AArete, slug: AArete}
+- {ats: simplify, name: AARP, slug: AARP}
+- {ats: simplify, name: ABEC, slug: ABEC}
+- {ats: simplify, name: Acadian Asset Management, slug: Acadian Asset Management}
+- {ats: simplify, name: Acuity, slug: Acuity}
+- {ats: simplify, name: ADT, slug: ADT}
+- {ats: simplify, name: Advanced Energy, slug: Advanced Energy}
+- {ats: simplify, name: Aerotech, slug: Aerotech}
+- {ats: simplify, name: AGCO, slug: AGCO}
+- {ats: simplify, name: Alliance Laundry Systems, slug: Alliance Laundry Systems}
+- {ats: simplify, name: Altamira Technologies, slug: Altamira Technologies}
+- {ats: simplify, name: AMD, slug: AMD}
+- {ats: simplify, name: American Enterprise Institute, slug: American Enterprise Institute}
+- {ats: simplify, name: American Equity, slug: American Equity}
+- {ats: simplify, name: American Express, slug: American Express}
+- {ats: simplify, name: American Heart Association, slug: American Heart Association}
+- {ats: simplify, name: AngloGold Ashanti, slug: AngloGold Ashanti}
+- {ats: simplify, name: Aon, slug: Aon}
+- {ats: simplify, name: Apogee Engineering, slug: Apogee Engineering}
+- {ats: simplify, name: Aramco Americas, slug: Aramco Americas}
+- {ats: simplify, name: Arcfield, slug: Arcfield}
+- {ats: simplify, name: Arconic, slug: Arconic}
+- {ats: simplify, name: Armstrong Fluid Technology, slug: Armstrong Fluid Technology}
+- {ats: simplify, name: Arthur J. Gallagher & Co., slug: Arthur J. Gallagher & Co.}
+- {ats: simplify, name: Ascension, slug: Ascension}
+- {ats: simplify, name: Atlassian, slug: Atlassian}
+- {ats: simplify, name: Atomic Semi, slug: Atomic Semi}
+- {ats: simplify, name: AutoZone, slug: AutoZone}
+- {ats: simplify, name: Awardco, slug: Awardco}
+- {ats: simplify, name: Axiomatic AI, slug: Axiomatic AI}
+- {ats: simplify, name: Bank of China USA, slug: Bank of China USA}
+- {ats: simplify, name: Belden, slug: Belden}
+- {ats: simplify, name: Benjamin Moore, slug: Benjamin Moore}
+- {ats: simplify, name: BGIS, slug: BGIS}
+- {ats: simplify, name: Bitmovin, slug: Bitmovin}
+- {ats: simplify, name: Black Cape, slug: Black Cape}
+- {ats: simplify, name: Blackhawk Network Holdings, slug: Blackhawk Network Holdings}
+- {ats: simplify, name: Blue Cross Blue Shield of Michigan, slug: Blue Cross Blue Shield of Michigan}
+- {ats: simplify, name: BNY, slug: BNY}
+- {ats: simplify, name: Boston Consulting Group, slug: Boston Consulting Group}
+- {ats: simplify, name: Boston Scientific, slug: Boston Scientific}
+- {ats: simplify, name: Brevan Howard, slug: Brevan Howard}
+- {ats: simplify, name: C3.ai, slug: C3.ai}
+- {ats: simplify, name: CalAmp, slug: CalAmp}
+- {ats: simplify, name: Calpion/Plutus Health, slug: Calpion/Plutus Health}
+- {ats: simplify, name: CesiumAstro, slug: CesiumAstro}
+- {ats: simplify, name: Charles Schwab, slug: Charles Schwab}
+- {ats: simplify, name: CHS, slug: CHS}
+- {ats: simplify, name: Citadel, slug: Citadel}
+- {ats: simplify, name: Citadel Securities, slug: Citadel Securities}
+- {ats: simplify, name: Citizens Financial Group, slug: Citizens Financial Group}
+- {ats: simplify, name: City of Virginia Beach, slug: City of Virginia Beach}
+- {ats: simplify, name: Clerkie, slug: Clerkie}
+- {ats: simplify, name: Clyde Companies, slug: Clyde Companies}
+- {ats: simplify, name: Cole Engineering Services, slug: Cole Engineering Services}
+- {ats: simplify, name: Commercial Metals, slug: Commercial Metals}
+- {ats: simplify, name: Constellation Energy, slug: Constellation Energy}
+- {ats: simplify, name: Cook Group, slug: Cook Group}
+- {ats: simplify, name: Cooper University Health Care, slug: Cooper University Health Care}
+- {ats: simplify, name: Corgan, slug: Corgan}
+- {ats: simplify, name: Corning, slug: Corning}
+- {ats: simplify, name: Cotiviti, slug: Cotiviti}
+- {ats: simplify, name: CSX, slug: CSX}
+- {ats: simplify, name: Cummins, slug: Cummins}
+- {ats: simplify, name: Cvent, slug: Cvent}
+- {ats: simplify, name: Dayton Freight Lines, slug: Dayton Freight Lines}
+- {ats: simplify, name: Definity Financial, slug: Definity Financial}
+- {ats: simplify, name: DEKA Research & Development Corp., slug: DEKA Research & Development Corp.}
+- {ats: simplify, name: Deloitte, slug: Deloitte}
+- {ats: simplify, name: Delta Air Lines, slug: Delta Air Lines}
+- {ats: simplify, name: Delta Dental of Iowa, slug: Delta Dental of Iowa}
+- {ats: simplify, name: Demco Products, slug: Demco Products}
+- {ats: simplify, name: Deutsche Bank, slug: Deutsche Bank}
+- {ats: simplify, name: DiligenceVault, slug: DiligenceVault}
+- {ats: simplify, name: Diversified Energy, slug: Diversified Energy}
+- {ats: simplify, name: Dominion Energy, slug: Dominion Energy}
+- {ats: simplify, name: Domino Data Lab, slug: Domino Data Lab}
+- {ats: simplify, name: DP World, slug: DP World}
+- {ats: simplify, name: DreamWorks Animation, slug: DreamWorks Animation}
+- {ats: simplify, name: DTCC, slug: DTCC}
+- {ats: simplify, name: Eaton, slug: Eaton}
+- {ats: simplify, name: Echelon Insights, slug: Echelon Insights}
+- {ats: simplify, name: Edison International, slug: Edison International}
+- {ats: simplify, name: Electronic Arts, slug: Electronic Arts}
+- {ats: simplify, name: Emerson Electric, slug: Emerson Electric}
+- {ats: simplify, name: Empirical Foods, slug: Empirical Foods}
+- {ats: simplify, name: Energy Transfer Partners, slug: Energy Transfer Partners}
+- {ats: simplify, name: Enterprise Holdings, slug: Enterprise Holdings}
+- {ats: simplify, name: Epiroc, slug: Epiroc}
+- {ats: simplify, name: EquipmentShare, slug: EquipmentShare}
+- {ats: simplify, name: Erie Insurance Group, slug: Erie Insurance Group}
+- {ats: simplify, name: Ernst & Young, slug: Ernst & Young}
+- {ats: simplify, name: ExxonMobil, slug: ExxonMobil}
+- {ats: simplify, name: Federated Insurance, slug: Federated Insurance}
+- {ats: simplify, name: First Citizens BancShares, slug: First Citizens BancShares}
+- {ats: simplify, name: Formlabs, slug: Formlabs}
+- {ats: simplify, name: Foundation Finance, slug: Foundation Finance}
+- {ats: simplify, name: Framatome, slug: Framatome}
+- {ats: simplify, name: Franklin Electric, slug: Franklin Electric}
+- {ats: simplify, name: Garmin, slug: Garmin}
+- {ats: simplify, name: Gemini, slug: Gemini}
+- {ats: simplify, name: General Dynamics, slug: General Dynamics}
+- {ats: simplify, name: General Dynamics Mission Systems, slug: General Dynamics Mission Systems}
+- {ats: simplify, name: Gensyn, slug: Gensyn}
+- {ats: simplify, name: Geo Owl, slug: Geo Owl}
+- {ats: simplify, name: GM financial, slug: GM financial}
+- {ats: simplify, name: Grass Valley, slug: Grass Valley}
+- {ats: simplify, name: Greenwood Village South, slug: Greenwood Village South}
+- {ats: simplify, name: Grow Financial Federal Credit Union, slug: Grow Financial Federal Credit Union}
+- {ats: simplify, name: GuideWell Mutual, slug: GuideWell Mutual}
+- {ats: simplify, name: H&R Block, slug: H&R Block}
+- {ats: simplify, name: HARMAN, slug: HARMAN}
+- {ats: simplify, name: Hays Electrical Services, slug: Hays Electrical Services}
+- {ats: simplify, name: Hearst, slug: Hearst}
+- {ats: simplify, name: Herzog Railroad Services, slug: Herzog Railroad Services}
+- {ats: simplify, name: Hexagon AB, slug: Hexagon AB}
+- {ats: simplify, name: HEXAWARE, slug: HEXAWARE}
+- {ats: simplify, name: HF Sinclair, slug: HF Sinclair}
+- {ats: simplify, name: Hiebing, slug: Hiebing}
+- {ats: simplify, name: Highgate, slug: Highgate}
+- {ats: simplify, name: Hilton Worldwide, slug: Hilton Worldwide}
+- {ats: simplify, name: Hitachi, slug: Hitachi}
+- {ats: simplify, name: Hoffman Construction, slug: Hoffman Construction}
+- {ats: simplify, name: Honeywell, slug: Honeywell}
+- {ats: simplify, name: Hormel Foods, slug: Hormel Foods}
+- {ats: simplify, name: Hudson River Trading, slug: Hudson River Trading}
+- {ats: simplify, name: Hunt Oil Company, slug: Hunt Oil Company}
+- {ats: simplify, name: Huntington Ingalls Industries, slug: Huntington Ingalls Industries}
+- {ats: simplify, name: IDeaS, slug: IDeaS}
+- {ats: simplify, name: IDEMIA, slug: IDEMIA}
+- {ats: simplify, name: Illinois Tool Works, slug: Illinois Tool Works}
+- {ats: simplify, name: Impulse Space, slug: Impulse Space}
+- {ats: simplify, name: InComm Payments, slug: InComm Payments}
+- {ats: simplify, name: Innovative Systems, slug: Innovative Systems}
+- {ats: simplify, name: IntelliGenesis, slug: IntelliGenesis}
+- {ats: simplify, name: Interplay, slug: Interplay}
+- {ats: simplify, name: Iridium Communications, slug: Iridium Communications}
+- {ats: simplify, name: ITT, slug: ITT}
+- {ats: simplify, name: IXL Learning, slug: IXL Learning}
+- {ats: simplify, name: John Deere, slug: John Deere}
+- {ats: simplify, name: Johns Hopkins Applied Physics Laboratory, slug: Johns Hopkins Applied Physics Laboratory}
+- {ats: simplify, name: JP Morgan Chase, slug: JP Morgan Chase}
+- {ats: simplify, name: K1, slug: K1}
+- {ats: simplify, name: Kaiser Permanente, slug: Kaiser Permanente}
+- {ats: simplify, name: Keysight Technologies, slug: Keysight Technologies}
+- {ats: simplify, name: Kinaxis, slug: Kinaxis}
+- {ats: simplify, name: Kinder Morgan, slug: Kinder Morgan}
+- {ats: simplify, name: KKR, slug: KKR}
+- {ats: simplify, name: Koch Industries, slug: Koch Industries}
+- {ats: simplify, name: KQED, slug: KQED}
+- {ats: simplify, name: L3Harris Technologies, slug: L3Harris Technologies}
+- {ats: simplify, name: Lazard, slug: Lazard}
+- {ats: simplify, name: Leggett & Platt, slug: Leggett & Platt}
+- {ats: simplify, name: Legrand, slug: Legrand}
+- {ats: simplify, name: Lennox International, slug: Lennox International}
+- {ats: simplify, name: Liberty Mutual, slug: Liberty Mutual}
+- {ats: simplify, name: Lunar Outpost, slug: Lunar Outpost}
+- {ats: simplify, name: Machina Labs, slug: Machina Labs}
+- {ats: simplify, name: Mackenzie Investments, slug: Mackenzie Investments}
+- {ats: simplify, name: Macy's, slug: Macy's}
+- {ats: simplify, name: Markem-Imaje, slug: Markem-Imaje}
+- {ats: simplify, name: MasterControl, slug: MasterControl}
+- {ats: simplify, name: Mayo Clinic, slug: Mayo Clinic}
+- {ats: simplify, name: Mechanize, slug: Mechanize}
+- {ats: simplify, name: Medpace, slug: Medpace}
+- {ats: simplify, name: 'Medpace, Inc.', slug: 'Medpace, Inc.'}
+- {ats: simplify, name: METECS, slug: METECS}
+- {ats: simplify, name: MetLife, slug: MetLife}
+- {ats: simplify, name: Metropolitan Transportation Authority, slug: Metropolitan Transportation Authority}
+- {ats: simplify, name: Mindsmith, slug: Mindsmith}
+- {ats: simplify, name: Mohawk, slug: Mohawk}
+- {ats: simplify, name: Montenson, slug: Montenson}
+- {ats: simplify, name: 'Montgomery Investment Technology, Inc.', slug: 'Montgomery Investment Technology, Inc.'}
+- {ats: simplify, name: MSA Safety, slug: MSA Safety}
+- {ats: simplify, name: Muru, slug: Muru}
+- {ats: simplify, name: MyEmployment, slug: MyEmployment}
+- {ats: simplify, name: Navy Federal, slug: Navy Federal}
+- {ats: simplify, name: Nebo, slug: Nebo}
+- {ats: simplify, name: Newham, slug: Newham}
+- {ats: simplify, name: Nexthop.ai, slug: Nexthop.ai}
+- {ats: simplify, name: NJ Department of Environmental Protection, slug: NJ Department of Environmental Protection}
+- {ats: simplify, name: Nokia, slug: Nokia}
+- {ats: simplify, name: North Atlantic Industries, slug: North Atlantic Industries}
+- {ats: simplify, name: NOV, slug: NOV}
+- {ats: simplify, name: Nova-Tech, slug: Nova-Tech}
+- {ats: simplify, name: Paccar, slug: Paccar}
+- {ats: simplify, name: Panasonic Holdings, slug: Panasonic Holdings}
+- {ats: simplify, name: Peak Energy, slug: Peak Energy}
+- {ats: simplify, name: Pella, slug: Pella}
+- {ats: simplify, name: Pennsylvania State University, slug: Pennsylvania State University}
+- {ats: simplify, name: Peraton, slug: Peraton}
+- {ats: simplify, name: Phillips 66, slug: Phillips 66}
+- {ats: simplify, name: Pomerleau, slug: Pomerleau}
+- {ats: simplify, name: Primetals Technologies, slug: Primetals Technologies}
+- {ats: simplify, name: Principal Financial Group, slug: Principal Financial Group}
+- {ats: simplify, name: PrizePicks, slug: PrizePicks}
+- {ats: simplify, name: Profound Medical, slug: Profound Medical}
+- {ats: simplify, name: Prospect Equities, slug: Prospect Equities}
+- {ats: simplify, name: Publicis Groupe, slug: Publicis Groupe}
+- {ats: simplify, name: Qorvo, slug: Qorvo}
+- {ats: simplify, name: Quantbot Technologies, slug: Quantbot Technologies}
+- {ats: simplify, name: Quantum Signal AI, slug: Quantum Signal AI}
+- {ats: simplify, name: Ragle Inc, slug: Ragle Inc}
+- {ats: simplify, name: Ralliant, slug: Ralliant}
+- {ats: simplify, name: Red Ventures, slug: Red Ventures}
+- {ats: simplify, name: Resonetics, slug: Resonetics}
+- {ats: simplify, name: Rivian, slug: Rivian}
+- {ats: simplify, name: RJ Lee Group, slug: RJ Lee Group}
+- {ats: simplify, name: Robert Bosch Venture Capital, slug: Robert Bosch Venture Capital}
+- {ats: simplify, name: Rockefeller Capital Management, slug: Rockefeller Capital Management}
+- {ats: simplify, name: Rodan Energy Solutions, slug: Rodan Energy Solutions}
+- {ats: simplify, name: RoviSys, slug: RoviSys}
+- {ats: simplify, name: Royal Caribbean Group, slug: Royal Caribbean Group}
+- {ats: simplify, name: S&C Electric Company, slug: S&C Electric Company}
+- {ats: simplify, name: SageSure, slug: SageSure}
+- {ats: simplify, name: Sandhills Global, slug: Sandhills Global}
+- {ats: simplify, name: SAS, slug: SAS}
+- {ats: simplify, name: SCOR, slug: SCOR}
+- {ats: simplify, name: SDSU Research Foundation, slug: SDSU Research Foundation}
+- {ats: simplify, name: SeatGeek, slug: SeatGeek}
+- {ats: simplify, name: Sentinel Technologies, slug: Sentinel Technologies}
+- {ats: simplify, name: Shure, slug: Shure}
+- {ats: simplify, name: Siemens, slug: Siemens}
+- {ats: simplify, name: Sikich, slug: Sikich}
+- {ats: simplify, name: SimIS, slug: SimIS}
+- {ats: simplify, name: SimonComputing, slug: SimonComputing}
+- {ats: simplify, name: SimVentions, slug: SimVentions}
+- {ats: simplify, name: Snap, slug: Snap}
+- {ats: simplify, name: SoundOff Signal, slug: SoundOff Signal}
+- {ats: simplify, name: Southern Star Central Gas Pipeline, slug: Southern Star Central Gas Pipeline}
+- {ats: simplify, name: Space Dynamics Laboratory, slug: Space Dynamics Laboratory}
+- {ats: simplify, name: Specter Aerospace, slug: Specter Aerospace}
+- {ats: simplify, name: Springs Window Fashions, slug: Springs Window Fashions}
+- {ats: simplify, name: Standard Aero, slug: Standard Aero}
+- {ats: simplify, name: Staples, slug: Staples}
+- {ats: simplify, name: Star Dental Partners, slug: Star Dental Partners}
+- {ats: simplify, name: State Farm, slug: State Farm}
+- {ats: simplify, name: Steel Dynamics, slug: Steel Dynamics}
+- {ats: simplify, name: Stellar Science, slug: Stellar Science}
+- {ats: simplify, name: StepStone Group, slug: StepStone Group}
+- {ats: simplify, name: Steven's Capital Management, slug: Steven's Capital Management}
+- {ats: simplify, name: Stoke Space, slug: Stoke Space}
+- {ats: simplify, name: Stryten, slug: Stryten}
+- {ats: simplify, name: Symphony, slug: Symphony}
+- {ats: simplify, name: Systems Planning and Analysis, slug: Systems Planning and Analysis}
+- {ats: simplify, name: TechInsights, slug: TechInsights}
+- {ats: simplify, name: Tesla, slug: Tesla}
+- {ats: simplify, name: Textron, slug: Textron}
+- {ats: simplify, name: The Cary Company, slug: The Cary Company}
+- {ats: simplify, name: TIFIN, slug: TIFIN}
+- {ats: simplify, name: TikTok, slug: TikTok}
+- {ats: simplify, name: Titan Materials Group, slug: Titan Materials Group}
+- {ats: simplify, name: Tradeweb, slug: Tradeweb}
+- {ats: simplify, name: Trane Technologies, slug: Trane Technologies}
+- {ats: simplify, name: Transcard Payments, slug: Transcard Payments}
+- {ats: simplify, name: TRC Companies, slug: TRC Companies}
+- {ats: simplify, name: Two Sigma, slug: Two Sigma}
+- {ats: simplify, name: Udig, slug: Udig}
+- {ats: simplify, name: UL Solutions, slug: UL Solutions}
+- {ats: simplify, name: United Launch Alliance, slug: United Launch Alliance}
+- {ats: simplify, name: Universal Health Services, slug: Universal Health Services}
+- {ats: simplify, name: University of St. Thomas, slug: University of St. Thomas}
+- {ats: simplify, name: Upstart, slug: Upstart}
+- {ats: simplify, name: URBN, slug: URBN}
+- {ats: simplify, name: V2X, slug: V2X}
+- {ats: simplify, name: VaynerMedia, slug: VaynerMedia}
+- {ats: simplify, name: Veeam Software, slug: Veeam Software}
+- {ats: simplify, name: VersaDesk, slug: VersaDesk}
+- {ats: simplify, name: VetsEZ, slug: VetsEZ}
+- {ats: simplify, name: W.R. Berkley, slug: W.R. Berkley}
+- {ats: simplify, name: W.W. Grainger, slug: W.W. Grainger}
+- {ats: simplify, name: Walgreens, slug: Walgreens}
+- {ats: simplify, name: Waymo, slug: Waymo}
+- {ats: simplify, name: WEC Energy Group, slug: WEC Energy Group}
+- {ats: simplify, name: Werfen, slug: Werfen}
+- {ats: simplify, name: West Bend Insurance, slug: West Bend Insurance}
+- {ats: simplify, name: West Monroe, slug: West Monroe}
+- {ats: simplify, name: Western & Southern Financial Group, slug: Western & Southern Financial Group}
+- {ats: simplify, name: Western National Insurance, slug: Western National Insurance}
+- {ats: simplify, name: Westinghouse Electric Company, slug: Westinghouse Electric Company}
+- {ats: simplify, name: WhatNot, slug: WhatNot}
+- {ats: simplify, name: William Blair, slug: William Blair}
+- {ats: simplify, name: Windstar Cruises, slug: Windstar Cruises}
+- {ats: simplify, name: WTW, slug: WTW}
+- {ats: simplify, name: X Development, slug: X Development}
+- {ats: simplify, name: Zimmer Biomet Holdings, slug: Zimmer Biomet Holdings}
+- {ats: simplify, name: Zions Bank, slug: Zions Bank}
+- {ats: simplify, name: Zipline, slug: Zipline}
+- {ats: simplify, name: ZS, slug: ZS}

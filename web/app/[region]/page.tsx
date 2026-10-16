@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { CheckDirectly } from "@/components/CheckDirectly";
 import { FilterBar } from "@/components/FilterBar";
 import { GroupToggles } from "@/components/GroupToggles";
 import { Hero } from "@/components/Hero";
@@ -49,6 +50,7 @@ export default async function RegionPage({
         <p className="pb-3 text-[13px] text-slate">
           {total.toLocaleString("en-US")} {total === 1 ? "internship" : "internships"}
         </p>
+        <CheckDirectly />
         <JobList rows={rows} sources={sources} now={now} filters={filters} />
         <Pagination filters={filters} total={total} />
       </main>

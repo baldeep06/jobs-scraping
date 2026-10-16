@@ -1,10 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { CheckDirectly } from "@/components/CheckDirectly";
 import { FilterBar } from "@/components/FilterBar";
 import { GroupToggles } from "@/components/GroupToggles";
 import { JobList } from "@/components/JobList";
 import { Pagination } from "@/components/Pagination";
 import { RegionTabs } from "@/components/RegionTabs";
+import { DIRECT_COMPANIES } from "@/lib/direct";
 import { parseFilters } from "@/lib/filters";
 import { makeJob } from "./fixtures";
 
@@ -155,5 +157,15 @@ describe("FilterBar groups", () => {
     const f = parseFilters("us", { group: "faang,quant" });
     const html = renderToStaticMarkup(<FilterBar filters={f} terms={[]} />);
     expect(html).toMatch(/<input[^>]*type="hidden"[^>]*name="group"[^>]*value="faang,quant"/);
+  });
+});
+
+describe("CheckDirectly", () => {
+  it("lists the companies we cannot scrape, linking to their career pages", () => {
+    const html = renderToStaticMarkup(<CheckDirectly />);
+    expect(html).toContain("<details");
+    expect(html).toContain('href="https://www.deshaw.com/careers"');
+    expect(html).toMatch(/<a[^>]*target="_blank"[^>]*rel="noopener noreferrer"/);
+    for (const c of DIRECT_COMPANIES) expect(html).toContain(c.name);
   });
 });
