@@ -408,6 +408,7 @@
 - {name: Headlands Technologies, ats: greenhouse, slug: headlandstechnologiesllc, domain: headlandstech.com}
 - {name: Qube Research & Technologies, ats: greenhouse, slug: quberesearchandtechnologies, domain: qube-rt.com}
 - {name: GSR, ats: greenhouse, slug: gsrmarkets, domain: gsr.io}
+- {name: Hudson River Trading, ats: greenhouse, slug: wehrtyou, domain: hudsonrivertrading.com, hot: true}
 
 # Companies whose postings come from the SimplifyJobs list (their own sites block bots,
 # or use career sites we have no adapter for). slug = the company name as Simplify writes it.
@@ -537,7 +538,6 @@
 - {ats: simplify, name: Hoffman Construction, slug: Hoffman Construction}
 - {ats: simplify, name: Honeywell, slug: Honeywell}
 - {ats: simplify, name: Hormel Foods, slug: Hormel Foods}
-- {ats: simplify, name: Hudson River Trading, slug: Hudson River Trading}
 - {ats: simplify, name: Hunt Oil Company, slug: Hunt Oil Company}
 - {ats: simplify, name: Huntington Ingalls Industries, slug: Huntington Ingalls Industries}
 - {ats: simplify, name: IDeaS, slug: IDeaS}
