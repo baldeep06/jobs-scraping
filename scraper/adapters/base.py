@@ -20,16 +20,8 @@ STATEFUL_ATS = {"meta", "internlist"}
 # get the 5-minute heavy lane even when curated; one-request boards get the 2-minute fast lane.
 AGGREGATOR_ATS = {"simplify", "internlist"}
 BIGTECH_ATS = {"amazon", "apple", "google", "meta", "microsoft"}
-FAST_ATS = {
-    "greenhouse",
-    "lever",
-    "lever_eu",
-    "ashby",
-    "gem",
-    "rippling",
-    "workable",
-    "smartrecruiters",
-}
+# (Workable is not here: its API answers HTTP 429 to polls every 2 minutes.)
+FAST_ATS = {"greenhouse", "lever", "lever_eu", "ashby", "gem", "rippling", "smartrecruiters"}
 
 
 def as_id(value: Any) -> str:

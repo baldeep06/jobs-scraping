@@ -586,17 +586,64 @@ _LANE_WHERE = {
 }
 
 
+# Workday has blocked GitHub's runners before: each tenant at most every 15 minutes, which also
+# spreads the tenants evenly over the 5-minute heavy passes.
+WORKDAY_MIN_INTERVAL = "15 minutes"
+COOLDOWN_FIRST = 1800  # seconds an ATS rests the first time it mostly blocks us
+COOLDOWN_MAX = 6 * 3600  # doubling each time it keeps blocking, up to this
+
+
+def ats_cooldowns(conn: psycopg.Connection, now: datetime) -> set[str]:
+    """ATSes resting after blocking us (see record_ats_health)."""
+    return {
+        r["source"].removeprefix("ats:")
+        for r in conn.execute(
+            "select source from source_state where source like 'ats:%%' and cooldown_until > %s",
+            (now,),
+        )
+    }
+
+
+def record_ats_health(
+    conn: psycopg.Connection, *, blocked: set[str], healthy: set[str], now: datetime
+) -> None:
+    """Rest a blocking ATS (30 min, then doubling up to 6 h); reset one that answered fine."""
+    for ats in sorted(blocked):
+        conn.execute(
+            """insert into source_state (source, backoff_seconds, cooldown_until)
+               values (%(src)s, %(first)s, %(now)s + make_interval(secs => %(first)s))
+               on conflict (source) do update set
+                 backoff_seconds = least(greatest(source_state.backoff_seconds * 2, %(first)s),
+                                         %(max)s),
+                 cooldown_until = %(now)s + make_interval(
+                   secs => least(greatest(source_state.backoff_seconds * 2, %(first)s), %(max)s))""",
+            {"src": f"ats:{ats}", "first": COOLDOWN_FIRST, "max": COOLDOWN_MAX, "now": now},
+        )
+    if healthy:
+        conn.execute(
+            """update source_state set backoff_seconds = 0, cooldown_until = null
+               where source = any(%s)""",
+            ([f"ats:{a}" for a in sorted(healthy)],),
+        )
+
+
 def get_lane_companies(
-    conn: psycopg.Connection, *, lane: str, ats: list[str], limit: int = 2000
+    conn: psycopg.Connection, *, lane: str, ats: list[str], now: datetime, limit: int = 2000
 ) -> list[Company]:
     rows = conn.execute(
         f"""select id, name, ats, slug, job_ids_hash, workday_host, workday_site from companies
             where ats = any(%(ats)s) and tier = 'hot' and fail_count < %(failing)s
-              and ats <> all(%(aggregators)s) and ({_LANE_WHERE[lane]})
+              and ats <> all(%(aggregators)s) and ats <> all(%(cooling)s)
+              and (ats <> 'workday' or last_polled_at is null
+                   or last_polled_at <= %(now)s - %(workday_every)s::interval)
+              and ({_LANE_WHERE[lane]})
             order by last_polled_at nulls first, id
             limit %(limit)s""",
         {
             "ats": ats,
+            "now": now,
+            "workday_every": WORKDAY_MIN_INTERVAL,
+            "cooling": sorted(ats_cooldowns(conn, now)),
             "failing": FAILING_AFTER,
             "aggregators": sorted(AGGREGATOR_ATS),
             "bigtech": sorted(BIGTECH_ATS),
@@ -614,7 +661,7 @@ def get_sweep_companies(
     companies that keep failing (they return to their lane once a poll succeeds)."""
     rows = conn.execute(
         """select id, name, ats, slug, job_ids_hash, workday_host, workday_site from companies
-           where ats = any(%(ats)s)
+           where ats = any(%(ats)s) and ats <> all(%(cooling)s)
              and (tier = 'warm'
                   or (tier = 'cold' and (last_polled_at is null
                                          or last_polled_at < %(now)s - %(repoll)s::interval))
@@ -625,6 +672,7 @@ def get_sweep_companies(
         {
             "ats": ats,
             "now": now,
+            "cooling": sorted(ats_cooldowns(conn, now)),
             "repoll": COLD_REPOLL,
             "aggregators": sorted(AGGREGATOR_ATS),
             "failing": FAILING_AFTER,

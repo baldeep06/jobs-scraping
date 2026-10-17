@@ -34,10 +34,13 @@ discovered from the SimplifyJobs lists (checked whenever that repo has a new com
 `inactive` (board gone). Hot companies are polled in three lanes, each its own workflow:
 `scrape-express` every minute (curated companies), `scrape-fast` every 2 minutes (other hot companies
 on one-request boards: Greenhouse, Lever, Ashby, ...) and `scrape-heavy` every 5 minutes (Workday,
-Oracle, Eightfold and the big-tech sites). `scrape-sweep` polls warm companies, cold ones every 6 h,
+Workable, Oracle, Eightfold and the big-tech sites). `scrape-sweep` polls warm companies, cold ones every 6 h,
 the Simplify and intern-list aggregators, and any company that failed 3 times in a row, every 30
-minutes. Requests are capped at 5 per host and 20 per vendor (all Workday tenants share one cap), and
-a `Retry-After` longer than a minute drops the request instead of stalling the pass. The weekly `maintenance` workflow re-tiers, prunes old run logs and
+minutes. Requests are capped at 5 per host and 20 per vendor (8 for Workday, whose tenants share one
+cap; each Workday tenant is polled at most every 15 minutes), and a `Retry-After` longer than a minute
+drops the request instead of stalling the pass. A vendor that mostly answers 403/429 or non-JSON pages
+in a pass is left alone for the rest of it, and its ATS rests (30 minutes, doubling up to 6 hours
+while the blocking lasts; reset once it answers normally). The weekly `maintenance` workflow re-tiers, prunes old run logs and
 commits `STATS.md`, which also keeps GitHub from disabling the schedules.
 
 **Fresh vs repost:** a posting is `fresh` only if it appeared after we started watching its company.

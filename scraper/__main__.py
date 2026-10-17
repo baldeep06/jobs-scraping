@@ -18,7 +18,7 @@ from scraper.adapters.base import STATEFUL_ATS
 from scraper.discovery import discover
 from scraper.domains import resolve_domains
 from scraper.groups import GROUPS_FILE, apply_groups, load_groups
-from scraper.http import Fetcher
+from scraper.http import BLOCKED_STATUSES, BREAKER_TRIPS, Fetcher
 from scraper.models import Company, CompanyOutcome
 from scraper.pipeline import poll
 
@@ -174,6 +174,27 @@ def cmd_digest(args: argparse.Namespace) -> int:
     return 0
 
 
+def _looks_blocked(o: CompanyOutcome) -> bool:
+    error = o.error or ""
+    return o.status in BLOCKED_STATUSES or "invalid JSON" in error or "keeps blocking us" in error
+
+
+def _ats_health(outcomes: list[CompanyOutcome]) -> tuple[set[str], set[str]]:
+    """(ATSes that mostly blocked us this pass, ATSes that answered fine): same rule as the
+    per-pass breaker in scraper.http."""
+    by_ats: dict[str, list[CompanyOutcome]] = {}
+    for o in outcomes:
+        by_ats.setdefault(o.company.ats, []).append(o)
+    blocked, healthy = set(), set()
+    for ats, group in by_ats.items():
+        bad = sum(_looks_blocked(o) for o in group)
+        if bad >= BREAKER_TRIPS and bad * 2 >= len(group):
+            blocked.add(ats)
+        elif any(o.ok for o in group):
+            healthy.add(ats)
+    return blocked, healthy
+
+
 def _print_slowest(outcomes: list[CompanyOutcome], n: int = 5) -> None:
     slowest = sorted(outcomes, key=lambda o: o.seconds, reverse=True)[:n]
     print(
@@ -201,7 +222,9 @@ def _poll_and_write(conn: psycopg.Connection, args: argparse.Namespace, started:
     if args.sweep:
         companies = db.get_sweep_companies(conn, ats=ats, now=started, limit=args.limit)
     elif args.lane:
-        companies = db.get_lane_companies(conn, lane=args.lane, ats=ats, limit=args.limit)
+        companies = db.get_lane_companies(
+            conn, lane=args.lane, ats=ats, now=started, limit=args.limit
+        )
     else:
         companies = db.get_companies(
             conn, ats=ats, tier=args.tier, slug=args.company, limit=args.limit
@@ -227,6 +250,10 @@ def _poll_and_write(conn: psycopg.Connection, args: argparse.Namespace, started:
         if not o.ok:
             errors.append({"company": o.company.slug, "error": o.error})
 
+    blocked, healthy = _ats_health(outcomes)
+    db.record_ats_health(conn, blocked=blocked, healthy=healthy, now=datetime.now(UTC))
+    for a in sorted(blocked):
+        print(f"  ⏸ {a} is mostly blocking us: resting it (30 min, doubling while it lasts)")
     db.record_run(
         conn,
         workflow="scrape-sweep" if args.sweep else f"scrape-{args.lane or args.tier or 'manual'}",
