@@ -216,7 +216,7 @@ async def test_workday_pages_by_20_up_to_total():
         if body["searchText"] == "intern":
             offsets.append(n)
         posts = [
-            {"title": "Account Executive", "externalPath": f"/job/x/y_{n + i}",
+            {"title": "Sales Intern", "externalPath": f"/job/x/y_{n + i}",
              "bulletFields": [f"R{n + i}"], "locationsText": "US"}
             for i in range(20)
         ]  # fmt: skip
@@ -228,6 +228,41 @@ async def test_workday_pages_by_20_up_to_total():
         result = await workday.fetch(f, wd_company())
     assert offsets == [0, 20, 40]
     assert len(result.jobs) == 60
+
+
+def _paged(searched, intern_pages):
+    """Workday ranks by relevance: `intern_pages` pages of intern titles, then other jobs."""
+
+    def handler(request):
+        if request.method == "GET":
+            return httpx.Response(404)  # posting details don't matter here
+        body = json.loads(request.content)
+        n, q = body["offset"], body["searchText"]
+        searched.append((q, n))
+        title = "Data Intern" if n // 20 < intern_pages else "Internal Auditor"
+        posts = [
+            {"title": title, "externalPath": f"/job/x/{q}_{n + i}",
+             "bulletFields": [f"{q}{n + i}"], "locationsText": "US"}
+            for i in range(20)
+        ]  # fmt: skip
+        return httpx.Response(200, json={"total": 300 if n == 0 else 0, "jobPostings": posts})
+
+    return handler
+
+
+async def test_workday_intern_search_stops_after_two_pages_without_interns():
+    searched = []
+    async with make_fetcher(_paged(searched, intern_pages=2)) as f:
+        await workday.fetch(f, wd_company())
+    assert [n for q, n in searched if q == "intern"] == [0, 20, 40, 60]
+
+
+async def test_workday_coop_search_reads_every_page():
+    # Co-op hits are scattered through the ranking (Workday matches "co-op" loosely).
+    searched = []
+    async with make_fetcher(_paged(searched, intern_pages=1)) as f:
+        await workday.fetch(f, wd_company())
+    assert len([n for q, n in searched if q == "co-op"]) == workday.MAX_PAGES
 
 
 async def test_workday_ids_are_scoped_to_tenant_and_site():

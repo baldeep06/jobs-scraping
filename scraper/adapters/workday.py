@@ -2,6 +2,7 @@ import re
 from typing import Any
 
 from scraper.adapters.base import dedupe_by, fetch_details, validate, wanted
+from scraper.enrich.category import is_intern_title
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company, FetchResult
 from scraper.text import html_to_text
@@ -10,6 +11,10 @@ SOURCE = "workday"
 PAGE = 20  # Workday rejects a larger limit with HTTP 400
 MAX_PAGES = 15
 QUERIES = ("intern", "co-op")  # a title search for "intern" never returns Canadian co-ops
+# Workday ranks by relevance, so "intern" titles come first and the tail is "internal",
+# "international", ... Stop after this many pages in a row without one (big global tenants
+# otherwise cost 15 pages a query). "co-op" hits are scattered, so that search reads every page.
+DRY_PAGES_TO_STOP = 2
 
 # Workday writes "US, CA, Santa Clara" = country, region, city (CA is California here).
 _COUNTRY_REGION_CITY = re.compile(r"^([A-Z]{2}), ([A-Z]{2,3}), (.+)$")
@@ -49,6 +54,7 @@ def _record(host: str, scope: str, item: dict[str, Any], info: dict[str, Any]) -
 async def _search(fetcher: Fetcher, api: str, query: str) -> tuple[list[dict[str, Any]], int]:
     items: list[dict[str, Any]] = []
     total = 0
+    dry = 0
     for page_no in range(MAX_PAGES):
         body = {"appliedFacets": {}, "limit": PAGE, "offset": page_no * PAGE, "searchText": query}
         data = await fetcher.json("POST", f"{api}/jobs", json=body)
@@ -59,6 +65,11 @@ async def _search(fetcher: Fetcher, api: str, query: str) -> tuple[list[dict[str
         items.extend(data["jobPostings"])
         if not data["jobPostings"] or len(items) >= total:
             break
+        if query == "intern":
+            hits = any(is_intern_title(str(p.get("title") or "")) for p in data["jobPostings"])
+            dry = 0 if hits else dry + 1
+            if dry >= DRY_PAGES_TO_STOP:
+                break
     return items, total
 
 

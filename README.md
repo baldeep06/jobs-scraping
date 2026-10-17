@@ -30,9 +30,14 @@ metacareers.com, add `disabled: true` to the `meta` line in `data/companies.seed
 alone changes nothing; `seed` never deletes companies.) New boards are
 discovered from the SimplifyJobs lists (checked whenever that repo has a new commit).
 
-**Tiers:** `hot` (curated, or an internship seen in the last 30 days; polled every 5 minutes by
-`scrape-hot`), `warm` and `cold` (polled in a 30-minute sweep by `scrape-sweep`; cold only every 6 h),
-`inactive` (board gone). The weekly `maintenance` workflow re-tiers, prunes old run logs and
+**Tiers:** `hot` (curated, or an internship seen in the last 30 days), `warm`, `cold` and
+`inactive` (board gone). Hot companies are polled in three lanes, each its own workflow:
+`scrape-express` every minute (curated companies), `scrape-fast` every 2 minutes (other hot companies
+on one-request boards: Greenhouse, Lever, Ashby, ...) and `scrape-heavy` every 5 minutes (Workday,
+Oracle, Eightfold and the big-tech sites). `scrape-sweep` polls warm companies, cold ones every 6 h,
+the Simplify and intern-list aggregators, and any company that failed 3 times in a row, every 30
+minutes. Requests are capped at 5 per host and 20 per vendor (all Workday tenants share one cap), and
+a `Retry-After` longer than a minute drops the request instead of stalling the pass. The weekly `maintenance` workflow re-tiers, prunes old run logs and
 commits `STATS.md`, which also keeps GitHub from disabling the schedules.
 
 **Fresh vs repost:** a posting is `fresh` only if it appeared after we started watching its company.
@@ -54,4 +59,4 @@ workflow runs it daily at 12:17 UTC. It needs the repository secrets `RESEND_API
 (optionally `DIGEST_FROM`; set `DIGEST_TRANSPORT=smtp` with `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD`
 to use SMTP instead). `--dry-run --out digest.html` previews it without sending. The website's
 `/status` page shows the same health check: a workflow is degraded if it has not finished a run within
-60 minutes (`scrape-hot`) or 120 minutes (`scrape-sweep`).
+10, 15, 30 or 120 minutes (`scrape-express`, `scrape-fast`, `scrape-heavy`, `scrape-sweep`).
