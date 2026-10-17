@@ -9,7 +9,25 @@ USER_AGENT = "intern-job-scraper (+https://github.com/baldeep06/jobs-scraping)"
 TIMEOUT = httpx.Timeout(15.0)
 MAX_RETRIES = 3
 PER_HOST_LIMIT = 5
+# Multi-tenant vendors (every Workday tenant is its own host) get one shared cap, so a pass over
+# hundreds of tenants never hits one provider with hundreds of requests at once.
+VENDOR_LIMIT = 20
 RETRY_STATUSES = frozenset({429, 500, 502, 503, 504})
+# A server asking us to wait longer than this gets the request dropped for this pass (the
+# company counts a failure and backs off) instead of stalling everyone else.
+MAX_RETRY_AFTER = 60.0
+
+
+def vendor(host: str) -> str:
+    """The registrable domain: nvidia.wd5.myworkdayjobs.com -> myworkdayjobs.com."""
+    return ".".join(host.split(".")[-2:])
+
+
+def _retry_after(resp: httpx.Response) -> float | None:
+    try:
+        return float(resp.headers["Retry-After"])
+    except (KeyError, ValueError):
+        return None
 
 
 class FetchError(Exception):
@@ -27,6 +45,7 @@ class Fetcher:
         )
         self._base_delay = base_delay
         self._limits: dict[str, asyncio.Semaphore] = {}
+        self._vendors: dict[str, asyncio.Semaphore] = {}
 
     async def __aenter__(self) -> "Fetcher":
         return self
@@ -37,18 +56,24 @@ class Fetcher:
     async def _request(self, method: str, url: str, **kwargs: Any) -> httpx.Response:
         host = urlsplit(url).hostname or ""
         limit = self._limits.setdefault(host, asyncio.Semaphore(PER_HOST_LIMIT))
+        shared = self._vendors.setdefault(vendor(host), asyncio.Semaphore(VENDOR_LIMIT))
         last: FetchError | None = None
+        wait: float | None = None
         for attempt in range(MAX_RETRIES + 1):
             if attempt:
-                await asyncio.sleep(self._base_delay * 2 ** (attempt - 1) * (1 + random.random()))
+                backoff = self._base_delay * 2 ** (attempt - 1) * (1 + random.random())
+                await asyncio.sleep(backoff if wait is None else wait)
             try:
-                async with limit:
+                async with shared, limit:
                     resp = await self._client.request(method, url, **kwargs)
             except httpx.TransportError as e:
                 last = FetchError(f"{type(e).__name__}: {e}")
                 continue
             if resp.status_code in RETRY_STATUSES:
                 last = FetchError(f"HTTP {resp.status_code}", resp.status_code)
+                wait = _retry_after(resp)
+                if wait is not None and wait > MAX_RETRY_AFTER:
+                    raise last
                 continue
             if resp.status_code >= 400:
                 raise FetchError(f"HTTP {resp.status_code}", resp.status_code)

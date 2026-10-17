@@ -7,6 +7,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
+from scraper.adapters.base import AGGREGATOR_ATS, BIGTECH_ATS, FAST_ATS
 from scraper.dedupe import (
     REPOST_WINDOW,
     ClosurePlan,
@@ -572,17 +573,63 @@ def retier(conn: psycopg.Connection, now: datetime) -> None:
     )
 
 
+LANES = ("express", "fast", "heavy")
+FAILING_AFTER = 3  # failures in a row before a company drops to the sweep until it recovers
+
+_LANE_WHERE = {
+    # curated companies every minute (except big-tech sites)
+    "express": "curated_hot and ats <> all(%(bigtech)s)",
+    # other hot companies on one-request boards every 2 minutes
+    "fast": "not curated_hot and ats = any(%(fast)s)",
+    # everything else that is hot every 5 minutes
+    "heavy": "(not curated_hot and ats <> all(%(fast)s)) or (curated_hot and ats = any(%(bigtech)s))",
+}
+
+
+def get_lane_companies(
+    conn: psycopg.Connection, *, lane: str, ats: list[str], limit: int = 2000
+) -> list[Company]:
+    rows = conn.execute(
+        f"""select id, name, ats, slug, job_ids_hash, workday_host, workday_site from companies
+            where ats = any(%(ats)s) and tier = 'hot' and fail_count < %(failing)s
+              and ats <> all(%(aggregators)s) and ({_LANE_WHERE[lane]})
+            order by last_polled_at nulls first, id
+            limit %(limit)s""",
+        {
+            "ats": ats,
+            "failing": FAILING_AFTER,
+            "aggregators": sorted(AGGREGATOR_ATS),
+            "bigtech": sorted(BIGTECH_ATS),
+            "fast": sorted(FAST_ATS),
+            "limit": limit,
+        },
+    ).fetchall()
+    return [Company(**r) for r in rows]
+
+
 def get_sweep_companies(
     conn: psycopg.Connection, *, ats: list[str], now: datetime, limit: int = 500
 ) -> list[Company]:
+    """Warm companies, cold ones due a re-poll, and the hot ones no lane takes: aggregators and
+    companies that keep failing (they return to their lane once a poll succeeds)."""
     rows = conn.execute(
         """select id, name, ats, slug, job_ids_hash, workday_host, workday_site from companies
-           where ats = any(%(ats)s) and tier in ('warm', 'cold')
-             and (tier = 'warm' or last_polled_at is null
-                  or last_polled_at < %(now)s - %(repoll)s::interval)
+           where ats = any(%(ats)s)
+             and (tier = 'warm'
+                  or (tier = 'cold' and (last_polled_at is null
+                                         or last_polled_at < %(now)s - %(repoll)s::interval))
+                  or (tier = 'hot' and (ats = any(%(aggregators)s)
+                                        or fail_count >= %(failing)s)))
            order by last_polled_at nulls first, id
            limit %(limit)s""",
-        {"ats": ats, "now": now, "repoll": COLD_REPOLL, "limit": limit},
+        {
+            "ats": ats,
+            "now": now,
+            "repoll": COLD_REPOLL,
+            "aggregators": sorted(AGGREGATOR_ATS),
+            "failing": FAILING_AFTER,
+            "limit": limit,
+        },
     ).fetchall()
     return [Company(**r) for r in rows]
 
@@ -621,7 +668,8 @@ def stats(conn: psycopg.Connection, now: datetime) -> dict[str, Any]:
     }
 
 
-HEALTH_WINDOWS = {"scrape-hot": 60, "scrape-sweep": 120}  # minutes without a run => degraded
+# Minutes without a successful run => degraded (same as web/lib/health.ts).
+HEALTH_WINDOWS = {"scrape-express": 10, "scrape-fast": 15, "scrape-heavy": 30, "scrape-sweep": 120}
 
 
 def health(conn: psycopg.Connection, now: datetime) -> list[dict[str, Any]]:

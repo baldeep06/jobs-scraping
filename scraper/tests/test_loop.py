@@ -96,7 +96,12 @@ def test_missing_database_url_fails_fast_without_looping(monkeypatch):
 
 @pytest.mark.parametrize(
     ("name", "args", "every"),
-    [("scrape-hot", "--tier hot", 300), ("scrape-sweep", "--sweep", 1800)],
+    [
+        ("scrape-express", "--lane express", 60),
+        ("scrape-fast", "--lane fast", 120),
+        ("scrape-heavy", "--lane heavy", 300),
+        ("scrape-sweep", "--sweep", 1800),
+    ],
 )
 def test_workflows_loop_and_start_their_successor(name, args, every):
     wf = yaml.safe_load((ROOT / f".github/workflows/{name}.yml").read_text())
@@ -107,3 +112,8 @@ def test_workflows_loop_and_start_their_successor(name, args, every):
     nxt = steps[-1]
     assert f"gh workflow run {name}.yml" in nxt["run"] and nxt["if"] == "success()"
     assert nxt["env"]["GH_TOKEN"] == "${{ github.token }}"
+
+
+def test_the_old_hot_workflow_is_gone():
+    # Its successor would otherwise poll the whole hot tier alongside the lanes.
+    assert not (ROOT / ".github/workflows/scrape-hot.yml").exists()

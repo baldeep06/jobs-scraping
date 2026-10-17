@@ -93,3 +93,69 @@ async def test_text_raises_on_client_errors():
         with pytest.raises(FetchError) as exc:
             await f.text("GET", "https://x.test/missing")
     assert exc.value.status == 404
+
+
+async def test_requests_to_one_vendor_are_capped_across_its_subdomains(monkeypatch):
+    import asyncio
+
+    from scraper import http
+
+    monkeypatch.setattr(http, "VENDOR_LIMIT", 2)
+    active = peak = 0
+
+    async def handler(request):
+        nonlocal active, peak
+        active += 1
+        peak = max(peak, active)
+        await asyncio.sleep(0.01)
+        active -= 1
+        return httpx.Response(200, json={})
+
+    async with fetcher_for(handler) as f:
+        await asyncio.gather(
+            *(f.json("GET", f"https://t{i}.wd5.myworkdayjobs.com/x") for i in range(8))
+        )
+    assert peak == 2
+
+
+def test_vendor_is_the_registrable_domain():
+    from scraper.http import vendor
+
+    assert vendor("nvidia.wd5.myworkdayjobs.com") == "myworkdayjobs.com"
+    assert vendor("boards-api.greenhouse.io") == "greenhouse.io"
+    assert vendor("localhost") == "localhost"
+
+
+async def test_retry_after_is_honoured(monkeypatch):
+    from scraper import http
+
+    waits = []
+
+    async def fake_sleep(seconds):
+        waits.append(seconds)
+
+    monkeypatch.setattr(http.asyncio, "sleep", fake_sleep)
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        if len(calls) == 1:
+            return httpx.Response(429, headers={"Retry-After": "7"})
+        return httpx.Response(200, json={"ok": True})
+
+    async with fetcher_for(handler) as f:
+        assert await f.json("GET", "https://api.example.com/x") == {"ok": True}
+    assert 7 in waits
+
+
+async def test_a_long_retry_after_gives_up_at_once_instead_of_stalling_the_pass():
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        return httpx.Response(429, headers={"Retry-After": "3600"})
+
+    async with fetcher_for(handler) as f:
+        with pytest.raises(FetchError) as e:
+            await f.json("GET", "https://api.example.com/x")
+    assert e.value.status == 429 and len(calls) == 1

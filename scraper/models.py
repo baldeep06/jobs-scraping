@@ -144,3 +144,4 @@ class CompanyOutcome:
     truncated: bool = False
     error: str | None = None
     status: int | None = None
+    seconds: float = 0.0  # how long the poll took (the run log lists the slowest)

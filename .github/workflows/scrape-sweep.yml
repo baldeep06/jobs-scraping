@@ -1,5 +1,5 @@
 name: scrape-sweep
-# Like scrape-hot: polls on its own clock (every 30 minutes for ~55) and starts its successor.
+# Like the scrape-express/fast/heavy lanes: polls on its own clock (every 30 minutes for ~55) and starts its successor.
 on:
   schedule:
     - cron: "7,37 * * * *"

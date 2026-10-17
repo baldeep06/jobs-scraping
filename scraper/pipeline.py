@@ -1,3 +1,4 @@
+import time
 from collections import Counter
 
 from scraper.adapters import ADAPTERS
@@ -68,9 +69,12 @@ async def poll(
     fetcher: Fetcher, company: Company, adapters: dict[str, Adapter] = ADAPTERS
 ) -> CompanyOutcome:
     """Fetch + process one company. Never raises: failures become ok=False outcomes."""
+    started = time.monotonic()
     try:
-        return process(company, await adapters[company.ats](fetcher, company))
+        outcome = process(company, await adapters[company.ats](fetcher, company))
     except FetchError as e:
-        return CompanyOutcome(company=company, ok=False, error=str(e), status=e.status)
+        outcome = CompanyOutcome(company=company, ok=False, error=str(e), status=e.status)
     except Exception as e:  # adapter bug or surprise payload shape — isolate to this company
-        return CompanyOutcome(company=company, ok=False, error=f"{type(e).__name__}: {e}")
+        outcome = CompanyOutcome(company=company, ok=False, error=f"{type(e).__name__}: {e}")
+    outcome.seconds = time.monotonic() - started
+    return outcome

@@ -174,6 +174,14 @@ def cmd_digest(args: argparse.Namespace) -> int:
     return 0
 
 
+def _print_slowest(outcomes: list[CompanyOutcome], n: int = 5) -> None:
+    slowest = sorted(outcomes, key=lambda o: o.seconds, reverse=True)[:n]
+    print(
+        "slowest: "
+        + ", ".join(f"{o.company.ats}/{o.company.slug} {o.seconds:.1f}s" for o in slowest)
+    )
+
+
 def _run_once(args: argparse.Namespace) -> int:
     started = datetime.now(UTC)
     if args.dry_run and args.company and args.ats:
@@ -191,7 +199,9 @@ def _run_once(args: argparse.Namespace) -> int:
 def _poll_and_write(conn: psycopg.Connection, args: argparse.Namespace, started: datetime) -> int:
     ats = [args.ats] if args.ats else list(ADAPTERS)
     if args.sweep:
-        companies = db.get_sweep_companies(conn, ats=ats, now=started, limit=min(args.limit, 500))
+        companies = db.get_sweep_companies(conn, ats=ats, now=started, limit=args.limit)
+    elif args.lane:
+        companies = db.get_lane_companies(conn, lane=args.lane, ats=ats, limit=args.limit)
     else:
         companies = db.get_companies(
             conn, ats=ats, tier=args.tier, slug=args.company, limit=args.limit
@@ -202,6 +212,7 @@ def _poll_and_write(conn: psycopg.Connection, args: argparse.Namespace, started:
     outcomes = asyncio.run(_poll_all(companies))
     if args.dry_run:
         _print_outcomes(outcomes)
+        _print_slowest(outcomes)
         return 0
 
     new = closed = seen = 0
@@ -218,7 +229,7 @@ def _poll_and_write(conn: psycopg.Connection, args: argparse.Namespace, started:
 
     db.record_run(
         conn,
-        workflow="scrape-sweep" if args.sweep else f"scrape-{args.tier or 'manual'}",
+        workflow="scrape-sweep" if args.sweep else f"scrape-{args.lane or args.tier or 'manual'}",
         source="ats",
         started_at=started,
         finished_at=datetime.now(UTC),
@@ -230,6 +241,11 @@ def _poll_and_write(conn: psycopg.Connection, args: argparse.Namespace, started:
         error_samples=errors,
     )
     print(f"polled={len(outcomes)} seen={seen} new={new} closed={closed} errors={len(errors)}")
+    slowest = sorted(outcomes, key=lambda o: o.seconds, reverse=True)[:5]
+    print(
+        "slowest: "
+        + ", ".join(f"{o.company.ats}/{o.company.slug} {o.seconds:.1f}s" for o in slowest)
+    )
     for e in errors[:10]:
         print(f"  ✗ {e['company']}: {e['error']}")
     # Fail the workflow only when everything failed (systemic problem, e.g. DB or network down).
@@ -308,16 +324,19 @@ def main(argv: list[str] | None = None) -> int:
 
     run = sub.add_parser("run", help="poll companies and write jobs")
     run.add_argument("--tier", choices=["hot", "warm", "cold"])
+    run.add_argument("--lane", choices=db.LANES, help="poll one lane of the hot tier")
     run.add_argument("--company", help="only this slug")
     run.add_argument(
-        "--sweep", action="store_true", help="poll the least-recently-polled warm/cold companies"
+        "--sweep",
+        action="store_true",
+        help="poll warm/cold companies, aggregators and failing hot companies",
     )
     run.add_argument(
         "--loop-minutes", type=int, help="keep polling every --every-seconds for this long"
     )
     run.add_argument("--every-seconds", type=int, default=300)
     run.add_argument("--ats", choices=sorted(ADAPTERS))
-    run.add_argument("--limit", type=int, default=1000)
+    run.add_argument("--limit", type=int, default=2000)
     run.add_argument(
         "--dry-run",
         action="store_true",

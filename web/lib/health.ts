@@ -1,4 +1,10 @@
-export const HEALTH_WINDOWS: Record<string, number> = { "scrape-hot": 60, "scrape-sweep": 120 };
+// Minutes without a successful run before a workflow counts as degraded (same as scraper/db.py).
+export const HEALTH_WINDOWS: Record<string, number> = {
+  "scrape-express": 10,
+  "scrape-fast": 15,
+  "scrape-heavy": 30,
+  "scrape-sweep": 120,
+};
 
 export interface RunRow {
   workflow: string;

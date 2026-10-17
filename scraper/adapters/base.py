@@ -15,6 +15,22 @@ Adapter = Callable[[Fetcher, Company], Awaitable[FetchResult]]
 # Sites that need one request per posting remember what they have already opened.
 STATEFUL_ATS = {"meta", "internlist"}
 
+# Polling lanes (see db.get_lane_companies). Aggregators change a few times a day, so they
+# only ever get the 30-minute sweep; big-tech career sites run their own bot defences, so they
+# get the 5-minute heavy lane even when curated; one-request boards get the 2-minute fast lane.
+AGGREGATOR_ATS = {"simplify", "internlist"}
+BIGTECH_ATS = {"amazon", "apple", "google", "meta", "microsoft"}
+FAST_ATS = {
+    "greenhouse",
+    "lever",
+    "lever_eu",
+    "ashby",
+    "gem",
+    "rippling",
+    "workable",
+    "smartrecruiters",
+}
+
 
 def as_id(value: Any) -> str:
     return "" if value is None else str(value)
