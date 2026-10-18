@@ -1,14 +1,14 @@
 # Intern Radar stats
 
-Updated 2026-10-11 (weekly by the maintenance workflow, which also keeps GitHub from disabling the schedules). Last scrape: scrape-hot at 2026-10-11 14:24 UTC
+Updated 2026-10-18 (weekly by the maintenance workflow, which also keeps GitHub from disabling the schedules). Last scrape: scrape-express at 2026-10-18 12:14 UTC
 
 ## Companies by tier
 
 | | Count |
 |---|---|
-| hot | 902 |
-| inactive | 5 |
-| warm | 405 |
+| hot | 1330 |
+| inactive | 8 |
+| warm | 457 |
 
 ## Companies by ATS
 
@@ -16,31 +16,33 @@ Updated 2026-10-11 (weekly by the maintenance workflow, which also keeps GitHub 
 |---|---|
 | amazon | 1 |
 | apple | 1 |
-| ashby | 262 |
+| ashby | 271 |
 | eightfold | 6 |
 | eightfold_v2 | 2 |
 | gem | 3 |
 | google | 1 |
-| greenhouse | 315 |
+| greenhouse | 350 |
 | icims | 3 |
-| jibe | 4 |
+| internlist | 79 |
+| jibe | 5 |
 | jobvite | 4 |
-| lever | 66 |
+| lever | 77 |
 | lever_eu | 2 |
 | meta | 1 |
 | microsoft | 1 |
 | oraclehcm | 6 |
-| rippling | 16 |
-| smartrecruiters | 63 |
+| rippling | 17 |
+| simplify | 288 |
+| smartrecruiters | 67 |
 | talentbrew | 3 |
-| workable | 31 |
-| workday | 521 |
+| workable | 35 |
+| workday | 572 |
 
 ## Open internships by country
 
 | | Count |
 |---|---|
-| BOTH | 12 |
-| CA | 317 |
-| UNKNOWN | 514 |
-| US | 4203 |
+| BOTH | 15 |
+| CA | 412 |
+| UNKNOWN | 558 |
+| US | 5517 |
