@@ -1,7 +1,7 @@
 name: digest
 on:
   schedule:
-    - cron: "17 12 * * *"
+    - cron: "17 13 * * *"  # 08:17 Toronto in winter, 09:17 in summer (after quiet hours)
   workflow_dispatch:
 
 concurrency:

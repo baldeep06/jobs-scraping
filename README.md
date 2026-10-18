@@ -58,14 +58,15 @@ WIP
 
 **Priority alerts:** every scrape pass also emails new SWE internships at FAANG+, big-tech,
 big-tech-adjacent, unicorn and AI-lab companies (company groups in `data/company_groups.yml`) within
-minutes of finding them: fresh postings only (no reposts or backlog), first seen in the last 6 hours,
+minutes of finding them (never between midnight and 8 am Toronto time; those go out at 8): fresh
+postings only (no reposts or backlog), first seen in the last 12 hours,
 visa-blocked US roles skipped, at most 20 jobs an hour, each job once. It uses the digest's email
 settings (`RESEND_API_KEY`, `DIGEST_TO`); without them it does nothing. Rules live in
 `scraper/digest/alerts.py`.
 
 `python -m scraper digest` emails new internships from the last 24 hours (`digest.config.yml` picks
 categories, hides blocked visas, keeps fresh postings only) and ends with a health line. A GitHub
-workflow runs it daily at 12:17 UTC. It needs the repository secrets `RESEND_API_KEY` and `DIGEST_TO`
+workflow runs it daily at 13:17 UTC (08:17 Toronto in winter, 09:17 in summer). It needs the repository secrets `RESEND_API_KEY` and `DIGEST_TO`
 (optionally `DIGEST_FROM`; set `DIGEST_TRANSPORT=smtp` with `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD`
 to use SMTP instead). `--dry-run --out digest.html` previews it without sending. The website's
 `/status` page shows the same health check: a workflow is degraded if it has not finished a run within

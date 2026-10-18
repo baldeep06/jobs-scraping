@@ -1,4 +1,5 @@
-"""Priority alerts: an email minutes after a new SWE internship appears at a big name.
+"""Priority alerts: an email minutes after a new SWE internship appears at a big name (never
+between midnight and 8 am Toronto time: those wait for the morning).
 
 Each scrape pass calls send_due() after writing its jobs. Jobs are claimed with one atomic
 UPDATE (so two lanes finishing together never email the same job), then sent; a failed send
@@ -9,6 +10,7 @@ import html as htmllib
 from collections.abc import Callable, Mapping
 from datetime import datetime
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import psycopg
 
@@ -17,8 +19,16 @@ from scraper.digest.send import SendError, send_email
 
 PRIORITY_GROUPS = ("faang", "big_tech", "big_tech_adjacent", "unicorn", "ai_labs")
 CATEGORIES = ("SWE",)
-WINDOW = "6 hours"  # only jobs first seen this recently: never the backlog
+# Only jobs first seen this recently: never the backlog. Longer than the quiet hours, so a job
+# found at 00:05 still goes out at 08:00.
+WINDOW = "12 hours"
+TIMEZONE = ZoneInfo("America/Toronto")
+QUIET_FROM, QUIET_UNTIL = 0, 8  # no emails from midnight to 8 am (local time)
 MAX_PER_HOUR = 20  # a company posting 50 roles at once still means a few emails, not 50
+
+
+def is_quiet(now: datetime) -> bool:
+    return QUIET_FROM <= now.astimezone(TIMEZONE).hour < QUIET_UNTIL
 
 
 def claim(conn: psycopg.Connection, now: datetime) -> list[dict[str, Any]]:
@@ -106,6 +116,8 @@ def send_due(
     if not env.get("DIGEST_TO") or not (
         env.get("RESEND_API_KEY") or env.get("DIGEST_TRANSPORT") == "smtp"
     ):
+        return 0
+    if is_quiet(now):  # jobs wait, unclaimed, for the morning
         return 0
     rows = claim(conn, now)
     if not rows:

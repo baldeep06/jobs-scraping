@@ -38,7 +38,7 @@ def test_only_new_priority_swe_internships_are_claimed(conn):
     job(conn, shop)  # not a priority company
     job(conn, stripe, title="Data Science Intern", category="Data/ML")
     job(conn, stripe, title="Backlog Intern", freshness="existing")  # was open before we watched
-    job(conn, stripe, title="Old Intern", age=timedelta(hours=7))
+    job(conn, stripe, title="Old Intern", age=timedelta(hours=13))
     job(conn, stripe, title="Citizens Only Intern", visa="blocked")  # US role you cannot take
     got = {r["id"] for r in alerts.claim(conn, NOW)}
     assert got == {want, ca_blocked}
@@ -123,3 +123,61 @@ def test_each_scrape_pass_sends_due_alerts(conn, monkeypatch):
     monkeypatch.setattr(cli, "send_alerts", lambda c, env, now: called.append(now) or 0)
     cli.main(["run", "--lane", "express"])
     assert len(called) == 1
+
+
+# --- quiet hours (midnight to 8 am, Toronto) ----------------------------------------------------
+
+from zoneinfo import ZoneInfo  # noqa: E402
+
+TORONTO = ZoneInfo("America/Toronto")
+
+
+def at(day, hour, minute=0):
+    return datetime(2026, *day, hour, minute, tzinfo=TORONTO).astimezone(UTC)
+
+
+@pytest.mark.parametrize(
+    ("when", "quiet"),
+    [
+        (at((10, 18), 0, 0), True),
+        (at((10, 18), 3, 0), True),
+        (at((10, 18), 7, 59), True),
+        (at((10, 18), 8, 0), False),
+        (at((10, 18), 23, 59), False),
+        (at((1, 15), 7, 30), True),  # winter (EST) too
+        (at((1, 15), 8, 30), False),
+    ],
+)
+def test_quiet_hours_are_midnight_to_8am_toronto(when, quiet):
+    assert alerts.is_quiet(when) is quiet
+
+
+def test_nothing_is_sent_or_claimed_during_quiet_hours(conn):
+    job(conn, company(conn, "Stripe"))
+    sent = []
+    night = at((10, 18), 3, 0)
+    assert alerts.send_due(conn, ENV, night, send=lambda *a, **k: sent.append(a)) == 0
+    assert sent == []
+    assert len(alerts.claim(conn, NOW)) == 1  # still waiting for the morning
+
+
+def test_jobs_found_overnight_go_out_at_8am(conn):
+    cid = company(conn, "Stripe")
+    morning = at((10, 18), 8, 0)
+    conn.execute(
+        """insert into jobs (company_id, title, normalized_title, category, country, visa_status,
+                             fingerprint, best_url, freshness, first_seen_at)
+           values (%s, 'SWE Intern', 'swe intern', 'SWE', 'US', 'open', 'fp-night', 'https://x/1',
+                   'fresh', %s)""",
+        (cid, at((10, 18), 0, 5)),
+    )
+    sent = []
+    assert alerts.send_due(conn, ENV, morning, send=lambda *a, **k: sent.append(a)) == 1
+
+
+def test_the_daily_digest_runs_after_8am_toronto_all_year():
+    wf = yaml.safe_load((ROOT / ".github/workflows/digest.yml").read_text())
+    minute, hour = wf[True]["schedule"][0]["cron"].split()[:2]
+    for month in (1, 7):  # EST and EDT
+        utc = datetime(2026, month, 15, int(hour), int(minute), tzinfo=UTC)
+        assert not alerts.is_quiet(utc)
