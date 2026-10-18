@@ -15,6 +15,7 @@ from scraper import db
 from scraper import stats as stats_report
 from scraper.adapters import ADAPTERS
 from scraper.adapters.base import STATEFUL_ATS
+from scraper.digest.alerts import send_due as send_alerts
 from scraper.discovery import discover
 from scraper.domains import resolve_domains
 from scraper.groups import GROUPS_FILE, apply_groups, load_groups
@@ -268,6 +269,11 @@ def _poll_and_write(conn: psycopg.Connection, args: argparse.Namespace, started:
         error_samples=errors,
     )
     print(f"polled={len(outcomes)} seen={seen} new={new} closed={closed} errors={len(errors)}")
+    try:
+        if alerted := send_alerts(conn, os.environ, datetime.now(UTC)):
+            print(f"🔔 priority alert sent for {alerted} job(s)")
+    except psycopg.Error as e:  # alerts must never fail the scrape
+        print(f"priority alerts skipped ({type(e).__name__})")
     slowest = sorted(outcomes, key=lambda o: o.seconds, reverse=True)[:5]
     print(
         "slowest: "

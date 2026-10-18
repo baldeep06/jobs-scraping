@@ -29,6 +29,9 @@ jobs:
         run: uv run python -m scraper run --lane heavy --loop-minutes 55 --every-seconds 300
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_TO: ${{ secrets.DIGEST_TO }}
+          DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
       - name: Start the next run
         if: success()
         run: gh workflow run scrape-heavy.yml

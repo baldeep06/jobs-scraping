@@ -56,6 +56,13 @@ WIP
 
 ## Daily digest and status
 
+**Priority alerts:** every scrape pass also emails new SWE internships at FAANG+, big-tech,
+big-tech-adjacent, unicorn and AI-lab companies (company groups in `data/company_groups.yml`) within
+minutes of finding them: fresh postings only (no reposts or backlog), first seen in the last 6 hours,
+visa-blocked US roles skipped, at most 20 jobs an hour, each job once. It uses the digest's email
+settings (`RESEND_API_KEY`, `DIGEST_TO`); without them it does nothing. Rules live in
+`scraper/digest/alerts.py`.
+
 `python -m scraper digest` emails new internships from the last 24 hours (`digest.config.yml` picks
 categories, hides blocked visas, keeps fresh postings only) and ends with a health line. A GitHub
 workflow runs it daily at 12:17 UTC. It needs the repository secrets `RESEND_API_KEY` and `DIGEST_TO`

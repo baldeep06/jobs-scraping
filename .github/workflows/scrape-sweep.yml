@@ -32,6 +32,9 @@ jobs:
         run: uv run python -m scraper run --sweep --loop-minutes 55 --every-seconds 1800
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_TO: ${{ secrets.DIGEST_TO }}
+          DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
       - name: Start the next run
         if: success()
         run: gh workflow run scrape-sweep.yml

@@ -21,6 +21,7 @@ def test_migrate_is_idempotent(conn):
         "20261016000000_company_groups.sql",
         "20261017000000_simplify.sql",
         "20261018000000_internlist.sql",
+        "20261019000000_alerts.sql",
     ]
 
 
