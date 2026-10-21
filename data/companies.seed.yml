@@ -413,6 +413,190 @@
 - {name: GSR, ats: greenhouse, slug: gsrmarkets, domain: gsr.io}
 - {name: Hudson River Trading, ats: greenhouse, slug: wehrtyou, domain: hudsonrivertrading.com, hot: true}
 
+# High-resume-value companies found 2026-10-20: boards taken from SimplifyJobs' intern and
+# new-grad posting URLs, by probing public ATS APIs, and from links on careers pages.
+- {name: Morgan Stanley, ats: workday, slug: ms/External, workday_host: ms.wd5.myworkdayjobs.com, workday_site: External, domain: morganstanley.com}
+- {name: Bank of America, ats: workday, slug: ghr/us-emplsv, workday_host: ghr.wd1.myworkdayjobs.com, workday_site: us-emplsv, domain: bankofamerica.com}
+- {name: State Street, ats: workday, slug: statestreet/Global, workday_host: statestreet.wd1.myworkdayjobs.com, workday_site: Global, domain: statestreet.com}
+- {name: Wellington Management, ats: workday, slug: wellington/external, workday_host: wellington.wd5.myworkdayjobs.com, workday_site: external, domain: wellington.com}
+- {name: PGIM, ats: workday, slug: pru/pgim_careers, workday_host: pru.wd5.myworkdayjobs.com, workday_site: pgim_careers, domain: pgim.com}
+- {name: Apollo Global Management, ats: workday, slug: athene/Apollo_Careers, workday_host: athene.wd5.myworkdayjobs.com, workday_site: Apollo_Careers, domain: apollo.com}
+- {name: PEAK6, ats: workday, slug: peak6group/CapMan, workday_host: peak6group.wd1.myworkdayjobs.com, workday_site: CapMan, domain: peak6.com}
+- {name: Trumid, ats: greenhouse, slug: trumid, domain: trumid.com}
+- {name: DriveWealth, ats: greenhouse, slug: drivewealth, domain: drivewealth.com}
+- {name: Apex Fintech Solutions, ats: workday, slug: peak6group/apexfintechsolutions, workday_host: peak6group.wd1.myworkdayjobs.com, workday_site: apexfintechsolutions, domain: apexfintechsolutions.com}
+- {name: Raymond James, ats: workday, slug: raymondjames/RaymondJamesCareers, workday_host: raymondjames.wd1.myworkdayjobs.com, workday_site: RaymondJamesCareers, domain: raymondjames.com}
+- {name: FIS, ats: workday, slug: fis/searchjobs, workday_host: fis.wd5.myworkdayjobs.com, workday_site: searchjobs, domain: fisglobal.com}
+- {name: Fiserv, ats: workday, slug: fiserv/ext, workday_host: fiserv.wd5.myworkdayjobs.com, workday_site: ext, domain: fiserv.com}
+- {name: FINRA, ats: workday, slug: finra/FINRA, workday_host: finra.wd1.myworkdayjobs.com, workday_site: FINRA, domain: finra.org}
+- {name: Ontario Teachers' Pension Plan, ats: workday, slug: otppb/OntarioTeachers_Careers, workday_host: otppb.wd3.myworkdayjobs.com, workday_site: OntarioTeachers_Careers, domain: otpp.com}
+- {name: BCI, ats: workday, slug: bci/BCI_Careers, workday_host: bci.wd10.myworkdayjobs.com, workday_site: BCI_Careers, domain: bci.ca}
+- {name: OMERS, ats: workday, slug: omers/omers_external, workday_host: omers.wd3.myworkdayjobs.com, workday_site: omers_external, domain: omers.com}
+- {name: AIMCo, ats: workday, slug: aimco/AIMCoCareers, workday_host: aimco.wd10.myworkdayjobs.com, workday_site: AIMCoCareers, domain: aimco.ca}
+- {name: TMX Group, ats: workday, slug: tmx/TMX_Careers, workday_host: tmx.wd3.myworkdayjobs.com, workday_site: TMX_Careers, domain: tmx.com}
+- {name: Samsung Research America, ats: greenhouse, slug: samsungresearchamericainternship, domain: sra.samsung.com}
+- {name: Sony, ats: workday, slug: sonyglobal/SonyGlobalCareers, workday_host: sonyglobal.wd1.myworkdayjobs.com, workday_site: SonyGlobalCareers, domain: sony.com}
+- {name: Sony Pictures Entertainment, ats: workday, slug: spe/SonyPicturesEntertainment, workday_host: spe.wd1.myworkdayjobs.com, workday_site: SonyPicturesEntertainment, domain: sonypictures.com}
+- {name: LG Electronics, ats: greenhouse, slug: lgelectronics, domain: lg.com}
+- {name: ASML, ats: workday, slug: asml/asmlext1, workday_host: asml.wd3.myworkdayjobs.com, workday_site: asmlext1, domain: asml.com}
+- {name: Sandisk, ats: smartrecruiters, slug: Sandisk, domain: sandisk.com}
+- {name: Kioxia, ats: smartrecruiters, slug: Kioxia, domain: kioxia.com}
+- {name: Proofpoint, ats: workday, slug: proofpoint/proofpointcareers, workday_host: proofpoint.wd5.myworkdayjobs.com, workday_site: proofpointcareers, domain: proofpoint.com}
+- {name: Guidewire, ats: workday, slug: guidewire/external, workday_host: guidewire.wd5.myworkdayjobs.com, workday_site: external, domain: guidewire.com}
+- {name: Equinix, ats: workday, slug: equinix/External, workday_host: equinix.wd1.myworkdayjobs.com, workday_site: External, domain: equinix.com}
+- {name: Cohesity, ats: workday, slug: cohesity/Cohesity_Careers, workday_host: cohesity.wd5.myworkdayjobs.com, workday_site: Cohesity_Careers, domain: cohesity.com}
+- {name: The Trade Desk, ats: greenhouse, slug: thetradedesk, domain: thetradedesk.com}
+- {name: Udemy, ats: greenhouse, slug: udemybedi, domain: udemy.com}
+- {name: Hudl, ats: greenhouse, slug: hudl, domain: hudl.com}
+- {name: AllTrails, ats: lever, slug: alltrails, domain: alltrails.com}
+- {name: Everlaw, ats: greenhouse, slug: everlaw, domain: everlaw.com}
+- {name: Kong, ats: ashby, slug: kong, domain: konghq.com}
+- {name: Warner Bros., ats: workday, slug: warnerbros/global, workday_host: warnerbros.wd5.myworkdayjobs.com, workday_site: global, domain: wbd.com}
+- {name: Trend Micro, ats: workday, slug: trendmicro/External, workday_host: trendmicro.wd3.myworkdayjobs.com, workday_site: External, domain: trendmicro.com}
+- {name: d-Matrix, ats: ashby, slug: d-matrix, domain: d-matrix.ai}
+- {name: Quadric, ats: workable, slug: quadric-dot-i-o-inc, domain: quadric.io}
+- {name: Lila Sciences, ats: greenhouse, slug: lilasciences, domain: lila.ai}
+- {name: Boston Dynamics, ats: workday, slug: bostondynamics/Boston_Dynamics, workday_host: bostondynamics.wd1.myworkdayjobs.com, workday_site: Boston_Dynamics, domain: bostondynamics.com}
+- {name: Apptronik, ats: greenhouse, slug: apptronik, domain: apptronik.com}
+- {name: Lucid Motors, ats: greenhouse, slug: lucidmotors, domain: lucidmotors.com}
+- {name: Torc Robotics, ats: greenhouse, slug: torcrobotics, domain: torc.ai}
+- {name: Aurora Innovation, ats: ashby, slug: aurora-operations-inc, domain: aurora.tech}
+- {name: Latitude AI, ats: greenhouse, slug: latitude, domain: lat.ai}
+- {name: Avride, ats: greenhouse, slug: avride, domain: avride.ai}
+- {name: Scout Motors, ats: greenhouse, slug: scoutmotors, domain: scoutmotors.com}
+- {name: True Anomaly, ats: greenhouse, slug: trueanomalyinc, domain: trueanomaly.space}
+- {name: Terran Orbital, ats: greenhouse, slug: terranorbitalcorporation, domain: terranorbital.com}
+- {name: Sierra Space, ats: workday, slug: sierraspace/Sierra_Space_External_Career_Site, workday_host: sierraspace.wd1.myworkdayjobs.com, workday_site: Sierra_Space_External_Career_Site, domain: sierraspace.com}
+- {name: Voyager Technologies, ats: greenhouse, slug: voyagertechnologiesinc, domain: voyagertechnologies.com}
+- {name: Hawk-Eye Innovations, ats: ashby, slug: hawkeyeinnovations, domain: hawkeyeinnovations.com}
+- {name: Williams Racing, ats: smartrecruiters, slug: WilliamsRacing, domain: williamsf1.com}
+- {name: Deliveroo, ats: ashby, slug: deliveroo, domain: deliveroo.com}
+- {name: Retell AI, ats: ashby, slug: retell-ai, domain: retellai.com}
+- {name: Dyna Robotics, ats: ashby, slug: dyna-robotics, domain: dyna.co}
+- {name: Genesis Molecular AI, ats: ashby, slug: genesis-molecular-ai, domain: genesis.ml}
+- {name: Xaira Therapeutics, ats: greenhouse, slug: xairatherapeutics, domain: xaira.com}
+- {name: Parallel Systems, ats: greenhouse, slug: parallel, domain: moveparallel.com}
+- {name: Truveta, ats: greenhouse, slug: truveta, domain: truveta.com}
+- {name: BillionToOne, ats: greenhouse, slug: billiontoone, domain: billiontoone.com}
+- {name: Solid Power, ats: greenhouse, slug: solidpower, domain: solidpowerbattery.com}
+- {name: Octopus Energy, ats: lever, slug: octoenergy, domain: octopusenergy.com}
+- {name: HRL Laboratories, ats: lever, slug: dodmg, domain: hrl.com}
+- {name: McMaster-Carr, ats: greenhouse, slug: mcmastercarr, domain: mcmaster.com}
+- {name: PlusAI, ats: lever, slug: plus-2, domain: plus.ai}
+- {name: BlackBerry, ats: workday, slug: bb/blackberry, workday_host: bb.wd3.myworkdayjobs.com, workday_site: blackberry, domain: blackberry.com}
+- {name: BlackBerry QNX, ats: workday, slug: bb/QNX, workday_host: bb.wd3.myworkdayjobs.com, workday_site: QNX, domain: blackberry.com}
+- {name: Harris Computer, ats: workday, slug: harriscomputer/1, workday_host: harriscomputer.wd3.myworkdayjobs.com, workday_site: '1', domain: harriscomputer.com}
+- {name: Jonas Software, ats: workday, slug: talentmanagementsolution/JonasSoftwareCanada, workday_host: talentmanagementsolution.wd3.myworkdayjobs.com, workday_site: JonasSoftwareCanada, domain: jonassoftware.com}
+- {name: League, ats: greenhouse, slug: leagueinc, domain: league.com}
+- {name: Achievers, ats: lever, slug: achievers, domain: achievers.com}
+- {name: GeoComply, ats: lever, slug: geocomply-2, domain: geocomply.com}
+- {name: AltaML, ats: lever, slug: altaml, domain: altaml.com}
+- {name: Cozey, ats: rippling, slug: cozey-internships, domain: cozey.ca}
+- {name: NAV CANADA, ats: workday, slug: navcanada/NAV_Careers, workday_host: navcanada.wd10.myworkdayjobs.com, workday_site: NAV_Careers, domain: navcanada.ca}
+- {name: Enbridge, ats: workday, slug: enbridge/enbridge_careers, workday_host: enbridge.wd3.myworkdayjobs.com, workday_site: enbridge_careers, domain: enbridge.com}
+- {name: Suncor, ats: workday, slug: suncor/Suncor_External, workday_host: suncor.wd1.myworkdayjobs.com, workday_site: Suncor_External, domain: suncor.com}
+- {name: PwC, ats: workday, slug: pwc/Global_Campus_Careers, workday_host: pwc.wd3.myworkdayjobs.com, workday_site: Global_Campus_Careers, domain: pwc.com}
+- {name: Brookhaven National Laboratory, ats: workday, slug: bnl/externa, workday_host: bnl.wd1.myworkdayjobs.com, workday_site: externa, domain: bnl.gov}
+- {name: Fermilab, ats: workday, slug: fermilab/FermilabCareers, workday_host: fermilab.wd5.myworkdayjobs.com, workday_site: FermilabCareers, domain: fnal.gov}
+- {name: Lambda, ats: ashby, slug: lambda, domain: lambda.ai}
+- {name: SpecterOps, ats: greenhouse, slug: specterops, domain: specterops.io}
+- {name: Two Six Technologies, ats: greenhouse, slug: twosixtechnologies, domain: twosixtech.com}
+- {name: Hayden AI, ats: ashby, slug: haydenai, domain: hayden.ai}
+- {name: Mercury, ats: greenhouse, slug: mercury, domain: mercury.com}
+- {name: Wells Fargo, ats: workday, slug: wf/WellsFargoJobs, workday_host: wf.wd1.myworkdayjobs.com, workday_site: WellsFargoJobs, domain: wellsfargo.com}
+- {name: Ticketmaster, ats: workday, slug: livenation/TMExternalSite, workday_host: livenation.wd503.myworkdayjobs.com, workday_site: TMExternalSite, domain: ticketmaster.com}
+- {name: Zoom, ats: workday, slug: zoom/zoom, workday_host: zoom.wd5.myworkdayjobs.com, workday_site: zoom, domain: zoom.com}
+- {name: eBay, ats: workday, slug: ebay/apply, workday_host: ebay.wd5.myworkdayjobs.com, workday_site: apply, domain: ebay.com}
+- {name: Chewy, ats: workday, slug: chewy/External, workday_host: chewy.wd5.myworkdayjobs.com, workday_site: External, domain: chewy.com}
+- {name: Zendesk, ats: workday, slug: zendesk/zendesk, workday_host: zendesk.wd1.myworkdayjobs.com, workday_site: zendesk, domain: zendesk.com}
+- {name: Arctic Wolf, ats: workday, slug: arcticwolf/External, workday_host: arcticwolf.wd1.myworkdayjobs.com, workday_site: External, domain: arcticwolf.com}
+- {name: ApplyBoard, ats: workday, slug: applyboard/ApplyBoardNH, workday_host: applyboard.wd3.myworkdayjobs.com, workday_site: ApplyBoardNH, domain: applyboard.com}
+- {name: Firefly Aerospace, ats: workday, slug: fireflyspace/Firefly, workday_host: fireflyspace.wd115.myworkdayjobs.com, workday_site: Firefly, domain: fireflyspace.com}
+- {name: Bloomberg Industry Group, ats: workday, slug: bloomberg/Bloombergindustrygroup_External_Career_Site, workday_host: bloomberg.wd1.myworkdayjobs.com, workday_site: Bloombergindustrygroup_External_Career_Site, domain: bloombergindustry.com}
+- {name: LinkedIn, ats: smartrecruiters, slug: LinkedIn3, domain: linkedin.com}
+- {name: Ubisoft, ats: smartrecruiters, slug: Ubisoft2, domain: ubisoft.com}
+- {name: Intercontinental Exchange, ats: icims, slug: ice, workday_host: careers-ice.icims.com, workday_site: "-", domain: ice.com}
+- {name: HERE Technologies, ats: icims, slug: here, workday_host: careers-here.icims.com, workday_site: "-", domain: here.com}
+- {name: SRI International, ats: icims, slug: sri, workday_host: careers-sri.icims.com, workday_site: "-", domain: sri.com}
+- {name: Joby Aviation, ats: icims, slug: jobyaviation, workday_host: careers-jobyaviation.icims.com, workday_site: "-", domain: jobyaviation.com}
+- {name: Yelp, ats: jibe, slug: yelp, workday_host: yelp.jibeapply.com, workday_site: "-", domain: yelp.com}
+- {name: Dolby, ats: eightfold, slug: dolby, workday_host: dolby.eightfold.ai, workday_site: dolby.com, domain: dolby.com}
+- {name: Ford Motor Company, ats: oraclehcm, slug: ford, workday_host: efds.fa.em5.oraclecloud.com, workday_site: CX_1, domain: ford.com}
+- {name: Akamai, ats: oraclehcm, slug: akamai, workday_host: fa-extu-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1, domain: akamai.com}
+- {name: Seaspan, ats: oraclehcm, slug: seaspan, workday_host: hckz.fa.us2.oraclecloud.com, workday_site: CX_1, domain: seaspanship.com}
+- {name: Savannah River National Laboratory, ats: oraclehcm, slug: srnl, workday_host: ewvl.fa.us8.oraclecloud.com, workday_site: CX_1, domain: srnl.gov}
+- {name: Nintendo, ats: greenhouse, slug: nintendo, domain: nintendo.com}
+- {name: Zynga, ats: greenhouse, slug: zyngacareers, domain: zynga.com}
+- {name: Take-Two Interactive, ats: greenhouse, slug: taketwo, domain: take2games.com}
+- {name: Konrad Group, ats: greenhouse, slug: konradgroup, domain: konrad.com}
+- {name: Qualtrics, ats: greenhouse, slug: qualtrics, domain: qualtrics.com}
+- {name: Oscar Health, ats: greenhouse, slug: oscar, domain: hioscar.com}
+- {name: Flatiron Health, ats: greenhouse, slug: flatironhealth, domain: flatiron.com}
+- {name: Squarespace, ats: greenhouse, slug: squarespace, domain: squarespace.com}
+- {name: Mixpanel, ats: greenhouse, slug: mixpanel, domain: mixpanel.com}
+- {name: Nextdoor, ats: greenhouse, slug: nextdoor, domain: nextdoor.com}
+- {name: Tripadvisor, ats: greenhouse, slug: tripadvisor, domain: tripadvisor.com}
+- {name: Peloton, ats: greenhouse, slug: peloton, domain: onepeloton.com}
+- {name: Geotab, ats: greenhouse, slug: geotab, domain: geotab.com}
+- {name: Tailscale, ats: greenhouse, slug: tailscale, domain: tailscale.com}
+- {name: Tenstorrent, ats: greenhouse, slug: tenstorrent, domain: tenstorrent.com}
+- {name: Isomorphic Labs, ats: greenhouse, slug: isomorphiclabs, domain: isomorphiclabs.com}
+- {name: Coupang, ats: greenhouse, slug: coupang, domain: coupang.com}
+- {name: Nebius, ats: greenhouse, slug: nebius, domain: nebius.com}
+- {name: Global Relay, ats: greenhouse, slug: globalrelay, domain: globalrelay.com}
+- {name: D2L, ats: greenhouse, slug: d2l, domain: d2l.com}
+- {name: Hootsuite, ats: greenhouse, slug: hootsuite, domain: hootsuite.com}
+- {name: DigitalOcean, ats: greenhouse, slug: digitalocean98, domain: digitalocean.com}
+- {name: Esri, ats: greenhouse, slug: esri, domain: esri.com}
+- {name: Agility Robotics, ats: greenhouse, slug: agilityrobotics, domain: agilityrobotics.com}
+- {name: Bridgewater Associates, ats: greenhouse, slug: bridgewater89, domain: bridgewater.com}
+- {name: Da Vinci, ats: greenhouse, slug: davinciderivatives, domain: davincitrading.com}
+- {name: Speechmatics, ats: greenhouse, slug: speechmatics, domain: speechmatics.com}
+- {name: StubHub, ats: greenhouse, slug: stubhubinc, domain: stubhub.com}
+- {name: Sourcegraph, ats: greenhouse, slug: sourcegraph91, domain: sourcegraph.com}
+- {name: Vatic Labs, ats: greenhouse, slug: vaticlabs, domain: vaticlabs.com}
+- {name: Airtable, ats: greenhouse, slug: airtable, domain: airtable.com}
+- {name: Calendly, ats: greenhouse, slug: calendly, domain: calendly.com}
+- {name: Lattice, ats: greenhouse, slug: lattice, domain: lattice.com}
+- {name: PlanetScale, ats: greenhouse, slug: planetscale, domain: planetscale.com}
+- {name: Stability AI, ats: greenhouse, slug: stabilityai, domain: stability.ai}
+- {name: Cursor, ats: ashby, slug: cursor, domain: cursor.com}
+- {name: Thinking Machines Lab, ats: ashby, slug: thinkingmachines, domain: thinkingmachines.ai}
+- {name: Magic, ats: ashby, slug: magic.dev, domain: magic.dev}
+- {name: Hebbia, ats: ashby, slug: hebbia-ai, domain: hebbia.com}
+- {name: Kraken, ats: ashby, slug: kraken.com, domain: kraken.com}
+- {name: Deel, ats: ashby, slug: deel, domain: deel.com}
+- {name: Character.AI, ats: ashby, slug: character, domain: character.ai}
+- {name: LangChain, ats: ashby, slug: langchain, domain: langchain.com}
+- {name: Pinecone, ats: ashby, slug: pinecone, domain: pinecone.io}
+- {name: Midjourney, ats: ashby, slug: midjourney, domain: midjourney.com}
+- {name: Neo Financial, ats: ashby, slug: neofinancial, domain: neofinancial.com}
+- {name: Jobber, ats: ashby, slug: jobber, domain: getjobber.com}
+- {name: KOHO, ats: ashby, slug: koho, domain: koho.ca}
+- {name: Wealthsimple, ats: ashby, slug: wealthsimple, domain: wealthsimple.com}
+- {name: Benevity, ats: ashby, slug: benevity, domain: benevity.com}
+- {name: Klue, ats: ashby, slug: klue, domain: klue.com}
+- {name: Thinkific, ats: ashby, slug: thinkific, domain: thinkific.com}
+- {name: Hex, ats: ashby, slug: hex, domain: hex.tech}
+- {name: Watershed, ats: ashby, slug: watershed, domain: watershed.com}
+- {name: Drata, ats: ashby, slug: drata, domain: drata.com}
+- {name: Strava, ats: ashby, slug: strava, domain: strava.com}
+- {name: Quora, ats: ashby, slug: quora, domain: quora.com}
+- {name: Suno, ats: ashby, slug: suno, domain: suno.com}
+- {name: Cartesia, ats: ashby, slug: cartesia, domain: cartesia.ai}
+- {name: Chai Discovery, ats: ashby, slug: chaidiscovery, domain: chaidiscovery.com}
+- {name: Periodic Labs, ats: ashby, slug: periodic-labs, domain: periodic.com}
+- {name: World Labs, ats: ashby, slug: worldlabs, domain: worldlabs.ai}
+- {name: Render, ats: ashby, slug: render, domain: render.com}
+- {name: Warp, ats: ashby, slug: warp, domain: warp.dev}
+- {name: Railway, ats: ashby, slug: railway, domain: railway.com}
+- {name: Wattpad, ats: lever, slug: wattpad, domain: wattpad.com}
+- {name: Formic, ats: greenhouse, slug: formic, domain: formic.co}
+- {name: Groq, ats: gem, slug: groq, domain: groq.com}
+- {name: FreshBooks, ats: gem, slug: freshbooks, domain: freshbooks.com}
+- {name: Nominal, ats: gem, slug: nominal, domain: nominal.io}
+- {name: Kraken Robotics, ats: rippling, slug: kraken-robotics-inc, domain: krakenrobotics.com}
+
 # Companies whose postings come from the SimplifyJobs list (their own sites block bots,
 # or use career sites we have no adapter for). slug = the company name as Simplify writes it.
 # Keep these off the hot tier: each poll reads the whole ~13 MB list.
@@ -704,6 +888,14 @@
 - {ats: simplify, name: Zimmer Biomet Holdings, slug: Zimmer Biomet Holdings}
 - {ats: simplify, name: Zions Bank, slug: Zions Bank}
 - {ats: simplify, name: Zipline, slug: Zipline}
+# Career sites we have no adapter for (higher.gs.com, Avature, SuccessFactors, ...).
+- {name: Goldman Sachs, ats: simplify, slug: Goldman Sachs}
+- {name: Shopify, ats: simplify, slug: Shopify}
+- {name: National Bank of Canada, ats: simplify, slug: National Bank of Canada}
+- {name: Paramount Global, ats: simplify, slug: Paramount Global}
+- {name: Skyscanner, ats: simplify, slug: Skyscanner}
+- {name: Carbon Robotics, ats: simplify, slug: Carbon Robotics}
+- {name: Seagate Technology, ats: simplify, slug: 'Seagate Technology '}
 - {ats: simplify, name: ZS, slug: ZS}
 
 # Backup: companies read from intern-list.com because no other source covers them.
