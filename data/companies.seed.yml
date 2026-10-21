@@ -29,6 +29,9 @@
 - {name: Okta, ats: greenhouse, slug: okta, domain: okta.com, hot: true}
 - {name: Elastic, ats: greenhouse, slug: elastic, domain: elastic.co, hot: true}
 - {name: Vercel, ats: greenhouse, slug: vercel, domain: vercel.com, hot: true}
+- {name: Gemini, ats: greenhouse, slug: gemini, domain: gemini.com, hot: true}
+# HubSpot's careers site (hubspot.com/careers/jobs) reads this board through its own GraphQL proxy.
+- {name: HubSpot, ats: greenhouse, slug: hubspotjobs, domain: hubspot.com, hot: true}
 - {name: Palantir, ats: lever, slug: palantir, domain: palantir.com, hot: true}
 - {name: Spotify, ats: lever, slug: spotify, domain: spotify.com, hot: true}
 - {name: OpenAI, ats: ashby, slug: openai, domain: openai.com, hot: true}
@@ -513,7 +516,8 @@
 - {ats: simplify, name: Framatome, slug: Framatome}
 - {ats: simplify, name: Franklin Electric, slug: Franklin Electric}
 - {ats: simplify, name: Garmin, slug: Garmin}
-- {ats: simplify, name: Gemini, slug: Gemini}
+# Gemini now comes from its own Greenhouse board (curated list above).
+- {ats: simplify, name: Gemini, slug: Gemini, disabled: true}
 - {ats: simplify, name: General Dynamics, slug: General Dynamics}
 - {ats: simplify, name: General Dynamics Mission Systems, slug: General Dynamics Mission Systems}
 - {ats: simplify, name: Gensyn, slug: Gensyn}
