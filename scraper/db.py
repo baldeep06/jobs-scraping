@@ -64,7 +64,15 @@ def upsert_companies(conn: psycopg.Connection, seeds: list[dict[str, Any]]) -> i
                            case when %(disabled)s then 'inactive'
                                 when %(hot)s then 'hot' else 'warm' end)
                    on conflict (ats, slug) do update set
-                     name = excluded.name, domain = excluded.domain,
+                     name = excluded.name,
+                     -- a seed line without a website keeps the one the lookup found
+                     domain = coalesce(excluded.domain, companies.domain),
+                     has_logo = case when excluded.domain is distinct from companies.domain
+                                      and excluded.domain is not null then null
+                                     else companies.has_logo end,
+                     logo_host = case when excluded.domain is distinct from companies.domain
+                                       and excluded.domain is not null then null
+                                      else companies.logo_host end,
                      workday_host = excluded.workday_host,
                      workday_site = excluded.workday_site,
                      curated_hot = excluded.curated_hot,

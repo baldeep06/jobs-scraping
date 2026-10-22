@@ -118,6 +118,19 @@ describe("company icon", () => {
     expect(html).toContain("favicons?domain=stripe.com");
   });
 
+  it("shows the company's favicon when it has a domain", () => {
+    const html = renderToStaticMarkup(
+      <JobList
+        rows={[makeJob({ company_domain: "stripe.com", company_name: "Stripe" })]}
+        sources={{}}
+        now={NOW}
+        filters={US}
+      />,
+    );
+    expect(html).toContain("https://www.google.com/s2/favicons?domain=stripe.com&amp;sz=64");
+    expect(html).not.toContain('data-testid="company-initial"');
+  });
+
   it("falls back to a letter tile for a company without a domain", () => {
     const html = renderToStaticMarkup(
       <JobList
@@ -164,7 +177,7 @@ describe("CheckDirectly", () => {
   it("lists the companies we cannot scrape, linking to their career pages", () => {
     const html = renderToStaticMarkup(<CheckDirectly />);
     expect(html).toContain("<details");
-    expect(html).toContain('href="https://www.deshaw.com/careers"');
+    expect(html).toContain('href="https://www.mlp.com/careers/"');
     expect(html).toMatch(/<a[^>]*target="_blank"[^>]*rel="noopener noreferrer"/);
     for (const c of DIRECT_COMPANIES) expect(html).toContain(c.name);
   });
