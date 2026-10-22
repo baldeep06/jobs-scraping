@@ -28,7 +28,7 @@ DEFAULT_SEED = Path("data/companies.seed.yml")
 # Multi-tenant systems whose tenant host and site live in workday_host / workday_site.
 HOSTED_ATS = {
     "workday", "eightfold", "eightfold_v2", "oraclehcm", "icims", "jibe", "talentbrew", "avature",
-    "successfactors",
+    "successfactors", "phenom",
 }  # fmt: skip
 
 
