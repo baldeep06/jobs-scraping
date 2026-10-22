@@ -14,9 +14,14 @@ from scraper.text import html_to_text
 # host is kept in `workday_host`. The keyword search is full text and some sites render results
 # with JavaScript, but every site publishes /sitemap.xml with one URL per open posting, and the
 # URL spells out the title ("/job/Toronto-Student-Intern%2C-Test-Development-ON/1439151233/").
-# So: one sitemap request, then only the internship pages are opened.
+# So: one sitemap request, then only the internship pages are opened. The "sitemap" is a urlset,
+# an RSS job feed (Corning, ExxonMobil, Rogers: <item><link>), or an index of per-language
+# sitemaps (SAP, Gulfstream), whose English ones are read.
 SOURCE = "successfactors"
-_JOB = re.compile(r"<loc>\s*(https?://[^<\s]+/job/([^<\s/]+)/(\d+)/?)\s*</loc>")
+MAX_SITEMAPS = 6
+_JOB = re.compile(r"<(loc|link)>\s*(https?://[^<\s]+/job/([^<\s/]+)/(\d+)/?)\s*</\1>")
+_CHILD = re.compile(r"<sitemap>\s*<loc>\s*([^<\s]+)\s*</loc>")
+_LANG = re.compile(r"^https?://[^/]+/([a-z]{2}(?:_[A-Z]{2})?)/")
 # Some sites print the place as "Mississauga, ON, CAN, L5S 1W1" (or "Colon, QUE, MEX, 76270")
 # instead of tagging it.
 _PLACE = re.compile(r"^[A-Z][\w .'-]+, [A-Z]{2,3}, ([A-Z]{2,3})\b")
@@ -30,15 +35,38 @@ def _host(company: Company) -> str:
 
 
 def slug_title(slug: str) -> str:
-    return " ".join(unquote(slug).replace("&amp;", "&").replace("-", " ").split())
+    text = " ".join(unquote(slug).replace("&amp;", "&").replace("-", " ").split())
+    return re.sub(r"(?i)\b(co) (op)\b", r"\1-\2", text)  # the dash went with the others
 
 
 def parse_sitemap(xml: str) -> list[dict[str, str]]:
-    if "<urlset" not in xml:
+    if "<urlset" not in xml and "<rss" not in xml:
         raise FetchError("unexpected SuccessFactors sitemap")
     rows = {}
-    for url, slug, job_id in _JOB.findall(xml):
+    for _, url, slug, job_id in _JOB.findall(xml):
         rows.setdefault(job_id, {"id": job_id, "url": url.replace("&amp;", "&"), "slug": slug})
+    return list(rows.values())
+
+
+def english_sitemaps(index: str) -> list[str]:
+    """The children of a sitemap index worth reading: English ones (or unlocalized) only."""
+    children = [u.replace("&amp;", "&") for u in _CHILD.findall(index)]
+    langs = {u: (m.group(1) if (m := _LANG.match(u)) else "") for u in children}
+    return [u for u in children if langs[u] in ("", "en") or langs[u].startswith("en_")][
+        :MAX_SITEMAPS
+    ]
+
+
+async def _postings(fetcher: Fetcher, host: str) -> list[dict[str, str]]:
+    xml = await fetcher.text("GET", f"https://{host}/sitemap.xml")
+    if "<sitemapindex" not in xml:
+        return parse_sitemap(xml)
+    rows: dict[str, dict[str, str]] = {}
+    for child in english_sitemaps(xml):
+        body = await fetcher.text("GET", child)
+        if "<urlset" in body or "<rss" in body:
+            for r in parse_sitemap(body):
+                rows.setdefault(r["id"], r)
     return list(rows.values())
 
 
@@ -94,7 +122,7 @@ def parse_page(html: str, slug: str) -> dict[str, Any]:
 
 async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
     host = _host(company)
-    rows = parse_sitemap(await fetcher.text("GET", f"https://{host}/sitemap.xml"))
+    rows = await _postings(fetcher, host)
 
     def key(row: dict[str, str]) -> str:
         return f"{host}:{row['id']}"

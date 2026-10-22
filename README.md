@@ -34,7 +34,8 @@ discovered from the SimplifyJobs lists (checked whenever that repo has a new com
 `inactive` (board gone). Hot companies are polled in three lanes, each its own workflow:
 `scrape-express` every minute (curated companies), `scrape-fast` every 2 minutes (other hot companies
 on one-request boards: Greenhouse, Lever, Ashby, Pinpoint, ...) and `scrape-heavy` every 5 minutes (Workday,
-Workable, Oracle, Eightfold, Avature, SuccessFactors, D. E. Shaw, Shopify and the big-tech sites). `scrape-sweep` polls warm companies, cold ones every 6 h,
+Workable, Oracle, Eightfold, Avature, SuccessFactors, Phenom, D. E. Shaw, Shopify and the big-tech sites,
+TikTok included). `scrape-sweep` polls warm companies, cold ones every 6 h,
 the Simplify and intern-list aggregators, and any company that failed 3 times in a row, every 30
 minutes. Requests are capped at 5 per host and 20 per vendor (8 for Workday, whose tenants share one
 cap; each Workday tenant is polled at most every 15 minutes), and a `Retry-After` longer than a minute

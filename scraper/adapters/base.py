@@ -19,7 +19,7 @@ STATEFUL_ATS = {"meta", "internlist"}
 # only ever get the 30-minute sweep; big-tech career sites run their own bot defences, so they
 # get the 5-minute heavy lane even when curated; one-request boards get the 2-minute fast lane.
 AGGREGATOR_ATS = {"simplify", "internlist"}
-BIGTECH_ATS = {"amazon", "apple", "google", "meta", "microsoft"}
+BIGTECH_ATS = {"amazon", "apple", "google", "meta", "microsoft", "tiktok"}
 # (Workable is not here: its API answers HTTP 429 to polls every 2 minutes.)
 FAST_ATS = {
     "greenhouse", "lever", "lever_eu", "ashby", "gem", "rippling", "smartrecruiters", "pinpoint",

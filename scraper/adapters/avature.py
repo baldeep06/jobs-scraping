@@ -11,10 +11,11 @@ from scraper.models import Company, FetchResult
 from scraper.text import html_to_text
 
 # Avature career portals (Bloomberg, Epic, National Bank of Canada). `workday_host` holds the
-# portal base: host plus portal path, e.g. "bloomberg.avature.net/careers". There is no API: the
-# search page is HTML (12-20 rows a page, paged by jobOffset or folderOffset) and the RSS feed
-# only ever shows the 20 newest postings. The search is full text, so "intern" also matches
-# "internal"; titles are filtered before any posting page is opened.
+# portal base: host plus portal path, e.g. "bloomberg.avature.net/careers"; `workday_site` names
+# the search page where a portal renames it (Two Sigma's "OpenRoles"; "-" = SearchJobs). There
+# is no API: the search page is HTML (12-20 rows a page, paged by jobOffset or folderOffset) and
+# the RSS feed only ever shows the 20 newest postings. The search is full text, so "intern" also
+# matches "internal"; titles are filtered before any posting page is opened.
 SOURCE = "avature"
 QUERIES = ("intern", "co-op")
 MAX_PAGES = 25
@@ -108,11 +109,18 @@ def slug_location(url: str, title: str) -> str:
     return ""
 
 
-async def _search(fetcher: Fetcher, base: str, query: str) -> tuple[list[dict[str, str]], bool]:
+def _search_page(company: Company) -> str:
+    site = (company.workday_site or "").strip("/ ")
+    return site if site and site != "-" else "SearchJobs"
+
+
+async def _search(
+    fetcher: Fetcher, base: str, page: str, query: str
+) -> tuple[list[dict[str, str]], bool]:
     rows: list[dict[str, str]] = []
     param, offset = "jobOffset", 0
     for _ in range(MAX_PAGES):
-        url = f"https://{base}/SearchJobs/?search={quote(query)}&{param}={offset}"
+        url = f"https://{base}/{page}/?search={quote(query)}&{param}={offset}"
         found, following = parse_list(await fetcher.text("GET", url), offset)
         rows.extend(found)
         if not found or following is None:
@@ -127,7 +135,7 @@ async def fetch(fetcher: Fetcher, company: Company) -> FetchResult:
     found: list[dict[str, str]] = []
     truncated = False
     for query in QUERIES:
-        rows, capped = await _search(fetcher, base, query)
+        rows, capped = await _search(fetcher, base, _search_page(company), query)
         found.extend(rows)
         truncated = truncated or capped
     items = dedupe_by(found, lambda r: r["id"])

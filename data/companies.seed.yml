@@ -66,6 +66,7 @@
 - {name: Meta, ats: meta, slug: meta, domain: meta.com, hot: true}
 - {name: D. E. Shaw, ats: deshaw, slug: deshaw, domain: deshaw.com}
 - {name: Shopify, ats: shopify, slug: shopify, domain: shopify.com}
+- {name: TikTok, ats: tiktok, slug: tiktok, domain: tiktok.com, hot: true}
 
 
 # US public tech companies >= $1B market cap (from US_Tech_Companies_by_Market_Cap.xlsx), found by probing public ATS endpoints.
@@ -611,57 +612,564 @@
 - {name: Nominal, ats: gem, slug: nominal, domain: nominal.io}
 - {name: Kraken Robotics, ats: rippling, slug: kraken-robotics-inc, domain: krakenrobotics.com}
 
+# Found 2026-10-22 in a sweep of where students get hired: SimplifyJobs (2024-2027 seasons),
+# vanshb03, the NUFT quant list, Canadian internship lists, zapply, dreamwork, Canada's Top
+# Employers for Young People, CB Insights unicorns and US public tech companies. Boards were read
+# from posting URLs, careers pages and ATS probes. Companies that were only read through
+# SimplifyJobs or InternList now come from their own sites (their list lines are disabled).
+- {name: L3Harris Technologies, ats: successfactors, slug: l3harristechnologies, workday_host: jobs.l3harris.com, workday_site: '-'}
+- {name: Nokia, ats: oraclehcm, slug: nokia, workday_host: fa-evmr-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1}
+- {name: General Dynamics Mission Systems, ats: icims, slug: generaldynamicsmissi, workday_host: careers-gdms.icims.com, workday_site: '-'}
+- {name: JP Morgan Chase, ats: oraclehcm, slug: jpmorganchase, workday_host: jpmc.fa.oraclecloud.com, workday_site: CX_1001}
+- {name: AMD, ats: jibe, slug: amd, workday_host: careers.amd.com, workday_site: '-'}
+- {name: Keysight Technologies, ats: jibe, slug: keysighttechnologies, workday_host: jobs.keysight.com, workday_site: '-'}
+- {name: Rivian, ats: jibe, slug: rivian, workday_host: careers.rivian.com, workday_site: '-'}
+- {name: American Express, ats: oraclehcm, slug: americanexpress, workday_host: egug.fa.us2.oraclecloud.com, workday_site: CX_1}
+- {name: Johns Hopkins Applied Physics Laboratory, ats: jibe, slug: johnshopkinsappliedp, workday_host: careers.jhuapl.edu, workday_site: '-'}
+- {name: Emerson Electric, ats: oraclehcm, slug: emersonelectric, workday_host: hdjq.fa.us2.oraclecloud.com, workday_site: CX_1}
+- {name: Electronic Arts, ats: avature, slug: electronicarts, workday_host: jobs.ea.com/en_US/careers, workday_site: '-'}
+- {name: Peraton, ats: icims, slug: peraton, workday_host: careers-peraton.icims.com, workday_site: '-'}
+- {name: Deloitte, ats: avature, slug: deloitte, workday_host: apply.deloitte.com/en_US/careers, workday_site: '-'}
+- {name: Qorvo, ats: successfactors, slug: qorvo, workday_host: careers.qorvo.com, workday_site: '-'}
+- {name: Cummins, ats: oraclehcm, slug: cummins, workday_host: fa-espx-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1}
+- {name: Garmin, ats: jibe, slug: garmin, workday_host: careers.garmin.com, workday_site: '-'}
+- {name: John Deere, ats: eightfold, slug: johndeere, workday_host: johndeere.eightfold.ai, workday_site: johndeere.com}
+- {name: Santander, ats: workday, slug: santander/SantanderCareers, workday_host: santander.wd3.myworkdayjobs.com, workday_site: SantanderCareers}
+- {name: Shure, ats: icims, slug: shure, workday_host: careersus-shure.icims.com, workday_site: '-'}
+- {name: Westinghouse Electric Company, ats: successfactors, slug: westinghouseelectric, workday_host: careers.westinghousenuclear.com, workday_site: '-'}
+- {name: Honeywell, ats: oraclehcm, slug: honeywell, workday_host: ibqbjb.fa.ocs.oraclecloud.com, workday_site: Honeywell}
+- {name: Huntington Ingalls Industries, ats: successfactors, slug: huntingtoningallsind, workday_host: careers.huntingtoningalls.com, workday_site: '-'}
+- {name: Metropolitan Transportation Authority, ats: jobvite, slug: metropolitantransportationauthority}
+- {name: Navy Federal, ats: oraclehcm, slug: navyfederal, workday_host: fa-etbx-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: nfcu}
+- {name: ADT, ats: oraclehcm, slug: adt, workday_host: fa-erqb-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1}
+- {name: GM Financial, ats: oraclehcm, slug: gmfinancial, workday_host: fa-exvu-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1}
+- {name: BNY, ats: oraclehcm, slug: bny, workday_host: eofe.fa.us2.oraclecloud.com, workday_site: CX_1001}
+- {name: Charles Schwab, ats: icims, slug: charlesschwab, workday_host: career-schwab.icims.com, workday_site: '-'}
+- {name: Boston Scientific, ats: eightfold, slug: bostonscientific, workday_host: bostonscientific.eightfold.ai, workday_site: bostonscientific.com}
+- {name: General Dynamics, ats: icims, slug: generaldynamics, workday_host: careers-gdeb.icims.com, workday_site: '-'}
+- {name: Tradeweb, ats: oraclehcm, slug: tradeweb, workday_host: ecnf.fa.us2.oraclecloud.com, workday_site: CX}
+- {name: Eaton, ats: eightfold, slug: eaton, workday_host: eaton.eightfold.ai, workday_site: eaton.com}
+- {name: Definity Financial, ats: oraclehcm, slug: definityfinancial, workday_host: hdks.fa.ca2.oraclecloud.com, workday_site: CX_1}
+- {name: Mackenzie Investments, ats: icims, slug: mackenzieinvestments, workday_host: careersen-mackenzieinvestments.icims.com, workday_site: '-'}
+- {name: Medpace, ats: jibe, slug: medpace, workday_host: careers.medpace.com, workday_site: '-'}
+- {name: Cotiviti, ats: icims, slug: cotiviti, workday_host: careers-cotiviti.icims.com, workday_site: '-'}
+- {name: LPL Financial, ats: workday, slug: lplfinancial/university, workday_host: lplfinancial.wd1.myworkdayjobs.com, workday_site: university}
+- {name: Snap, ats: workday, slug: snapchat/snap, workday_host: snapchat.wd1.myworkdayjobs.com, workday_site: snap}
+- {name: T. Rowe Price, ats: workday, slug: troweprice/TRowePrice, workday_host: troweprice.wd5.myworkdayjobs.com, workday_site: TRowePrice}
+- {name: HARMAN, ats: workday, slug: harman/HARMAN, workday_host: harman.wd3.myworkdayjobs.com, workday_site: HARMAN}
+- {name: Acuity, ats: successfactors, slug: acuity, workday_host: careers.acuityinc.com, workday_site: '-'}
+- {name: AIG, ats: workday, slug: aig/early_careers, workday_host: aig.wd1.myworkdayjobs.com, workday_site: early_careers}
+- {name: Primetals Technologies, ats: successfactors, slug: primetalstechnologie, workday_host: mhicareers.com, workday_site: '-'}
+- {name: UL Solutions, ats: oraclehcm, slug: ulsolutions, workday_host: fa-eups-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: ULSolutionsCareers}
+- {name: Lennox International, ats: icims, slug: lennoxinternational, workday_host: uscareers-lennox.icims.com, workday_site: '-'}
+- {name: W.R. Berkley, ats: icims, slug: wrberkley, workday_host: careers-berkley.icims.com, workday_site: '-'}
+- {name: Capgemini, ats: successfactors, slug: capgemini, workday_host: careers.capgemini.com, workday_site: '-'}
+- {name: Deutsche Bank, ats: workday, slug: db/DBWebsite, workday_host: db.wd3.myworkdayjobs.com, workday_site: DBWebsite}
+- {name: V2X, ats: jibe, slug: v2x, workday_host: careers.gov2x.com, workday_site: '-'}
+- {name: DTCC, ats: oraclehcm, slug: dtcc, workday_host: ebxr.fa.us2.oraclecloud.com, workday_site: CX_1}
+- {name: Hearst, ats: oraclehcm, slug: hearst, workday_host: eevd.fa.us6.oraclecloud.com, workday_site: CX_1}
+- {name: Publicis Groupe, ats: jibe, slug: publicisgroupe, workday_host: careers.publicisgroupe.com, workday_site: '-'}
+- {name: Koch Industries, ats: avature, slug: kochindustries, workday_host: koch.avature.net/en_US/careers, workday_site: '-'}
+- {name: Werfen, ats: icims, slug: werfen, workday_host: careers-werfen.icims.com, workday_site: '-'}
+- {name: Western & Southern Financial Group, ats: icims, slug: westernsouthernfinan, workday_host: careers-westernsouthern.icims.com, workday_site: '-'}
+- {name: Pomerleau, ats: avature, slug: pomerleau, workday_host: pomerleau.avature.net/en_US/Jobs, workday_site: '-'}
+- {name: WTW, ats: oraclehcm, slug: wtw, workday_host: eedu.fa.em3.oraclecloud.com, workday_site: CX_1003}
+- {name: United Launch Alliance, ats: successfactors, slug: unitedlaunchalliance, workday_host: jobs.ulalaunch.com, workday_site: '-'}
+- {name: Arcfield, ats: jibe, slug: arcfield, workday_host: careers.arcfield.com, workday_site: '-'}
+- {name: Siemens, ats: avature, slug: siemens, workday_host: siemens.avature.net/en_US/externaljobs, workday_site: '-'}
+- {name: First Solar, ats: oraclehcm, slug: firstsolar, workday_host: fa-esbv-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: jobsearch}
+- {name: Iridium Communications, ats: icims, slug: iridiumcommunication, workday_host: careers-iridium.icims.com, workday_site: '-'}
+- {name: Constellation Energy, ats: jibe, slug: constellationenergy, workday_host: jobs.constellationenergy.com, workday_site: '-'}
+- {name: Panasonic Holdings, ats: jibe, slug: panasonicholdings, workday_host: careers.na.panasonic.com, workday_site: '-'}
+- {name: MSA Safety, ats: jibe, slug: msasafety, workday_host: careers.msasafety.com, workday_site: '-'}
+- {name: State Farm, ats: jibe, slug: statefarm, workday_host: jobs.statefarm.com, workday_site: '-'}
+- {name: Hexagon AB, ats: icims, slug: hexagonab, workday_host: careers-hexagonpositioning.icims.com, workday_site: '-'}
+- {name: Steven's Capital Management, ats: greenhouse, slug: scm}
+- {name: Littelfuse, ats: workday, slug: littelfuse/Littelfuse-Careers, workday_host: littelfuse.wd1.myworkdayjobs.com, workday_site: Littelfuse-Careers}
+- {name: Altamira Technologies, ats: jobvite, slug: altamiracorps}
+- {name: Aon, ats: jibe, slug: aon, workday_host: jobs.aon.com, workday_site: '-'}
+- {name: RoviSys, ats: icims, slug: rovisys, workday_host: careers-rovisys.icims.com, workday_site: '-'}
+- {name: Nucor Corporation, ats: successfactors, slug: nucorcorporation, workday_host: jobs.nucor.com, workday_site: '-'}
+- {name: Ralliant, ats: oraclehcm, slug: ralliant, workday_host: ibwujb.fa.ocs.oraclecloud.com, workday_site: CX_1001}
+- {name: Systems Planning and Analysis, ats: jibe, slug: systemsplanningandan, workday_host: spa.jibeapply.com, workday_site: '-'}
+- {name: C3.ai, ats: greenhouse, slug: c3iot}
+- {name: The Clorox Company, ats: workday, slug: clorox/Clorox, workday_host: clorox.wd1.myworkdayjobs.com, workday_site: Clorox}
+- {name: Liberty Mutual, ats: icims, slug: libertymutual, workday_host: careers-libertymutual.icims.com, workday_site: '-'}
+- {name: S&C Electric Company, ats: oraclehcm, slug: scelectriccompany, workday_host: ejia.fa.us6.oraclecloud.com, workday_site: CX_1001}
+- {name: Symphony, ats: smartrecruiters, slug: SymphonyCorp1}
+- {name: ZS, ats: jibe, slug: zs, workday_host: jobs.zs.com, workday_site: '-'}
+- {name: TRC Companies, ats: jibe, slug: trccompanies, workday_host: careers.trccompanies.com, workday_site: '-'}
+- {name: SAS, ats: icims, slug: sas, workday_host: careers-sas.icims.com, workday_site: '-'}
+- {name: Framatome, ats: icims, slug: framatome, workday_host: careers-framatome.icims.com, workday_site: '-'}
+- {name: NOV, ats: oraclehcm, slug: nov, workday_host: egay.fa.us6.oraclecloud.com, workday_site: CX_4001}
+- {name: Schroders, ats: oraclehcm, slug: schroders, workday_host: ekbq.fa.em2.oraclecloud.com, workday_site: CX_2}
+- {name: Blackhawk Network Holdings, ats: icims, slug: blackhawknetworkhold, workday_host: careers-blackhawknetwork.icims.com, workday_site: '-'}
+- {name: Edison International, ats: successfactors, slug: edisoninternational, workday_host: apply.edisoncareers.com, workday_site: '-'}
+- {name: Principal Financial Group, ats: jibe, slug: principalfinancialgr, workday_host: careers.principal.com, workday_site: '-'}
+- {name: Brevan Howard, ats: workday, slug: brevanhoward/BH_ExternalCareers, workday_host: brevanhoward.wd3.myworkdayjobs.com, workday_site: BH_ExternalCareers}
+- {name: Continental, ats: smartrecruiters, slug: Continental}
+- {name: SCOR, ats: oraclehcm, slug: scor, workday_host: fa-errt-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_2001}
+- {name: IDEMIA, ats: icims, slug: idemia, workday_host: uscareers-idemia.icims.com, workday_site: '-'}
+- {name: Arconic, ats: oraclehcm, slug: arconic, workday_host: hdnn.fa.us6.oraclecloud.com, workday_site: CX}
+- {name: Blue Cross Blue Shield of Michigan, ats: oraclehcm, slug: bluecrossblueshieldo, workday_host: ejko.fa.us2.oraclecloud.com, workday_site: CX_3}
+- {name: Staples, ats: oraclehcm, slug: staples, workday_host: fa-exhh-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: StaplesInc}
+- {name: W.W. Grainger, ats: successfactors, slug: wwgrainger, workday_host: jobs.grainger.com, workday_site: '-'}
+- {name: Lazard, ats: oraclehcm, slug: lazard, workday_host: icbpjb.fa.ocs.oraclecloud.com, workday_site: LazardProfessionalCareers}
+- {name: Chubb, ats: oraclehcm, slug: chubb, workday_host: fa-ewgu-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_2001}
+- {name: H&R Block, ats: icims, slug: hrblock, workday_host: careers-hrblock.icims.com, workday_site: '-'}
+- {name: Macy's, ats: oraclehcm, slug: macys, workday_host: ebwh.fa.us2.oraclecloud.com, workday_site: CX_1001}
+- {name: HF Sinclair, ats: successfactors, slug: hfsinclair, workday_host: careers.hfsinclair.com, workday_site: '-'}
+- {name: ITT, ats: icims, slug: itt, workday_host: careersenus-itt-inc.icims.com, workday_site: '-'}
+- {name: Mayo Clinic, ats: oraclehcm, slug: mayoclinic, workday_host: fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1}
+- {name: Belden, ats: successfactors, slug: belden, workday_host: careers.belden.com, workday_site: '-'}
+- {name: Cook Group, ats: icims, slug: cookgroup, workday_host: americas-cookmedical.icims.com, workday_site: '-'}
+- {name: Rockefeller Capital Management, ats: icims, slug: rockefellercapitalma, workday_host: careers-rcm.icims.com, workday_site: '-'}
+- {name: First Citizens BancShares, ats: jibe, slug: firstcitizensbancsha, workday_host: firstcitizens.jibeapply.com, workday_site: '-'}
+- {name: AutoZone, ats: oraclehcm, slug: autozone, workday_host: egud.fa.us2.oraclecloud.com, workday_site: CX_1}
+- {name: WEC Energy Group, ats: successfactors, slug: wecenergygroup, workday_host: careers.wecenergygroup.com, workday_site: '-'}
+- {name: DP World, ats: oraclehcm, slug: dpworld, workday_host: ehpv.fa.em2.oraclecloud.com, workday_site: CX_1}
+- {name: Standard Aero, ats: oraclehcm, slug: standardaero, workday_host: cva.fa.us1.oraclecloud.com, workday_site: CX_3}
+- {name: Epiroc, ats: successfactors, slug: epiroc, workday_host: www.careerprofile.epiroc.com, workday_site: '-'}
+- {name: CSX, ats: oraclehcm, slug: csx, workday_host: fa-eowa-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CSXCareers}
+- {name: BGIS, ats: oraclehcm, slug: bgis, workday_host: fa-evcg-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1}
+- {name: Arevon, ats: greenhouse, slug: arevonenergyimpltest}
+- {name: GuideWell Mutual, ats: oraclehcm, slug: guidewellmutual, workday_host: fa-etum-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1}
+- {name: Franklin Electric, ats: pinpoint, slug: franklin-electric}
+- {name: CHS, ats: successfactors, slug: chs, workday_host: careers.chsinc.com, workday_site: '-'}
+- {name: Phillips 66, ats: successfactors, slug: phillips66, workday_host: careers.phillips66.com, workday_site: '-'}
+- {name: IDeaS, ats: icims, slug: ideas, workday_host: ideas-sas.icims.com, workday_site: '-'}
+- {name: CNH, ats: icims, slug: cnh, workday_host: careers-cnhind.icims.com, workday_site: '-'}
+- {name: HEXAWARE, ats: oraclehcm, slug: hexaware, workday_host: fa-etqo-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1}
+- {name: Iberdrola, ats: workday, slug: iberdrola/iberdrola, workday_host: iberdrola.wd3.myworkdayjobs.com, workday_site: iberdrola}
+- {name: AArete, ats: jobvite, slug: aarete}
+- {name: Hilton Worldwide, ats: oraclehcm, slug: hiltonworldwide, workday_host: efet.fa.us2.oraclecloud.com, workday_site: CX_1009}
+- {name: Erie Insurance Group, ats: successfactors, slug: erieinsurancegroup, workday_host: jobs.erieinsurance.com, workday_site: '-'}
+- {name: Kinder Morgan, ats: jibe, slug: kindermorgan, workday_host: careers.kindermorgan.com, workday_site: '-'}
+- {name: Enterprise Holdings, ats: icims, slug: enterpriseholdings, workday_host: us-erac.icims.com, workday_site: '-'}
+- {name: Air Products, ats: workday, slug: airproducts/AP0001, workday_host: airproducts.wd5.myworkdayjobs.com, workday_site: AP0001}
+- {name: Royal Caribbean Group, ats: successfactors, slug: royalcaribbeangroup, workday_host: jobs.royalcaribbeangroup.com, workday_site: '-'}
+- {name: Williams, ats: workday, slug: williams/External, workday_host: williams.wd5.myworkdayjobs.com, workday_site: External}
+- {name: Cvent, ats: jibe, slug: cvent, workday_host: careers.cvent.com, workday_site: '-'}
+- {name: Sonoco, ats: workday, slug: sonoco/CorporateCareers, workday_host: sonoco.wd1.myworkdayjobs.com, workday_site: CorporateCareers}
+- {name: Commercial Metals, ats: successfactors, slug: commercialmetals, workday_host: jobs.cmc.com, workday_site: '-'}
+- {name: InComm Payments, ats: jibe, slug: incommpayments, workday_host: jobs.incommpayments.com, workday_site: '-'}
+- {name: MetLife, ats: avature, slug: metlife, workday_host: metlife.avature.net/en_US/ml, workday_site: '-'}
+- {name: Bungie, ats: greenhouse, slug: bungie}
+- {name: GitHub, ats: jibe, slug: github, workday_host: githubinc.jibeapply.com, workday_site: '-'}
+- {name: SoundCloud, ats: greenhouse, slug: soundcloud71}
+- {name: Netlify, ats: greenhouse, slug: netlify}
+- {name: Neo4j, ats: greenhouse, slug: neo4j}
+- {name: Redis, ats: ashby, slug: redis}
+- {name: JetBrains, ats: greenhouse, slug: jetbrains}
+- {name: Weaviate, ats: ashby, slug: weaviate}
+- {name: Skild AI, ats: greenhouse, slug: skildai-careers}
+- {name: Imbue, ats: greenhouse, slug: imbue}
+- {name: Liquid AI, ats: ashby, slug: liquid-ai}
+- {name: Extropic, ats: ashby, slug: extropic}
+- {name: Ambience Healthcare, ats: ashby, slug: ambiencehealthcare}
+- {name: Writer, ats: ashby, slug: writer}
+- {name: Typeface, ats: greenhouse, slug: typeface}
+- {name: Rogo, ats: ashby, slug: rogo}
+- {name: Turing, ats: greenhouse, slug: turing}
+- {name: Invisible Technologies, ats: smartrecruiters, slug: invisibletechnologies}
+- {name: Surge AI, ats: ashby, slug: surge-ai}
+- {name: Labelbox, ats: greenhouse, slug: labelbox}
+- {name: Arize AI, ats: greenhouse, slug: arizeai}
+- {name: Anyscale, ats: ashby, slug: anyscale}
+- {name: Vapi, ats: ashby, slug: vapi}
+- {name: Bland AI, ats: ashby, slug: bland}
+- {name: Deepgram, ats: ashby, slug: deepgram}
+- {name: AssemblyAI, ats: greenhouse, slug: assemblyai}
+- {name: Krea, ats: ashby, slug: krea}
+- {name: Ideogram, ats: ashby, slug: ideogram}
+- {name: Descript, ats: greenhouse, slug: descript}
+- {name: Gamma, ats: ashby, slug: gamma}
+- {name: StackBlitz, ats: greenhouse, slug: stackblitz}
+- {name: Factory, ats: ashby, slug: factory}
+- {name: Graphite, ats: ashby, slug: graphite}
+- {name: CodeRabbit, ats: ashby, slug: coderabbit}
+- {name: Greptile, ats: ashby, slug: greptile}
+- {name: Mintlify, ats: ashby, slug: mintlify}
+- {name: Browserbase, ats: ashby, slug: browserbase}
+- {name: E2B, ats: ashby, slug: e2b}
+- {name: Sesame, ats: ashby, slug: sesame}
+- {name: Tavus, ats: ashby, slug: tavus}
+- {name: Hume AI, ats: greenhouse, slug: humeai}
+- {name: Generate Biomedicines, ats: ashby, slug: generate}
+- {name: Inceptive, ats: greenhouse, slug: inceptive}
+- {name: Prime Intellect, ats: ashby, slug: primeintellect}
+- {name: Nous Research, ats: ashby, slug: nousresearch}
+- {name: Goodfire, ats: greenhouse, slug: goodfire}
+- {name: Apollo Research, ats: lever, slug: apolloresearch}
+- {name: Redwood Research, ats: ashby, slug: redwoodresearch}
+- {name: FAR AI, ats: lever, slug: far-ai}
+- {name: Epoch AI, ats: lever, slug: epoch-ai}
+- {name: Anchorage Digital, ats: lever, slug: anchorage}
+- {name: Paxos, ats: ashby, slug: paxos}
+- {name: Addepar, ats: greenhouse, slug: addepar1}
+- {name: Betterment, ats: greenhouse, slug: betterment}
+- {name: Wealthfront, ats: lever, slug: wealthfront}
+- {name: Acorns, ats: ashby, slug: acorns}
+- {name: Modern Treasury, ats: ashby, slug: moderntreasury}
+- {name: Alloy, ats: greenhouse, slug: alloy}
+- {name: Sardine, ats: ashby, slug: sardine}
+- {name: Lithic, ats: greenhouse, slug: lithic}
+- {name: Highnote, ats: greenhouse, slug: highnote}
+- {name: Checkout.com, ats: ashby, slug: checkout.com}
+- {name: Adyen, ats: greenhouse, slug: adyen}
+- {name: dLocal, ats: lever, slug: dlocal}
+- {name: Payoneer, ats: greenhouse, slug: payoneer}
+- {name: Melio, ats: greenhouse, slug: melio}
+- {name: Pagaya, ats: greenhouse, slug: pagaya}
+- {name: LendingClub, ats: workday, slug: lendingclub/external, workday_host: lendingclub.wd1.myworkdayjobs.com, workday_site: external}
+- {name: Greenlight, ats: lever, slug: greenlight}
+- {name: Paradigm, ats: ashby, slug: paradigm}
+- {name: a16z, ats: greenhouse, slug: a16z}
+- {name: Y Combinator, ats: ashby, slug: ycombinator}
+- {name: Uniswap Labs, ats: ashby, slug: uniswap}
+- {name: Wintermute, ats: lever, slug: wintermute-trading}
+- {name: Bitgo, ats: greenhouse, slug: bitgo}
+- {name: Valkyrie Trading, ats: lever, slug: valkyrietrading}
+- {name: Teza Technologies, ats: ashby, slug: teza-technologies}
+- {name: Simplex Trading, ats: greenhouse, slug: simplextrading}
+- {name: Jefferies, ats: oraclehcm, slug: jefferies, workday_host: hdid.fa.us2.oraclecloud.com, workday_site: CX_1}
+- {name: PJT Partners, ats: workday, slug: pjtpartners/Careers, workday_host: pjtpartners.wd1.myworkdayjobs.com, workday_site: Careers}
+- {name: Piper Sandler, ats: workday, slug: pipersandler/Piper_Sandler_Careers, workday_host: pipersandler.wd501.myworkdayjobs.com, workday_site: Piper_Sandler_Careers}
+- {name: LionTree, ats: greenhouse, slug: liontree}
+- {name: TPG, ats: greenhouse, slug: tpgcareers}
+- {name: Bain Capital, ats: workday, slug: baincapital/External_Public, workday_host: baincapital.wd1.myworkdayjobs.com, workday_site: External_Public}
+- {name: Ares Management, ats: workday, slug: aresmgmt/External, workday_host: aresmgmt.wd1.myworkdayjobs.com, workday_site: External}
+- {name: Franklin Templeton, ats: workday, slug: franklintempleton/invitation-only, workday_host: franklintempleton.wd5.myworkdayjobs.com, workday_site: invitation-only}
+- {name: CDPQ, ats: workday, slug: cdpq/CDPQ, workday_host: cdpq.wd10.myworkdayjobs.com, workday_site: CDPQ}
+- {name: Morningstar, ats: workday, slug: morningstar/Americas, workday_host: morningstar.wd5.myworkdayjobs.com, workday_site: Americas}
+- {name: Regions, ats: workday, slug: regions/regions_careers, workday_host: regions.wd5.myworkdayjobs.com, workday_site: regions_careers}
+- {name: M&T Bank, ats: workday, slug: mtb/Campus, workday_host: mtb.wd5.myworkdayjobs.com, workday_site: Campus}
+- {name: ING, ats: workday, slug: ing/icsgblcor, workday_host: ing.wd3.myworkdayjobs.com, workday_site: icsgblcor}
+- {name: Desjardins, ats: workday, slug: desjardins/Desjardins, workday_host: desjardins.wd10.myworkdayjobs.com, workday_site: Desjardins}
+- {name: Geico, ats: workday, slug: geico/External, workday_host: geico.wd1.myworkdayjobs.com, workday_site: External}
+- {name: Lemonade, ats: ashby, slug: lemonade}
+- {name: KPMG, ats: jibe, slug: kpmg, workday_host: careers.kpmg.ca, workday_site: '-'}
+- {name: Roland Berger, ats: smartrecruiters, slug: rolandberger}
+- {name: Analysis Group, ats: icims, slug: analysisgroup, workday_host: analystcareers-analysisgroup.icims.com, workday_site: '-'}
+- {name: Charles River Associates, ats: greenhouse, slug: charlesriverassociates}
+- {name: Huron, ats: workday, slug: huron/huroncareers, workday_host: huron.wd1.myworkdayjobs.com, workday_site: huroncareers}
+- {name: Guidehouse, ats: workday, slug: guidehouse/external, workday_host: guidehouse.wd1.myworkdayjobs.com, workday_site: external}
+- {name: FTI Consulting, ats: workday, slug: fticonsulting/FTIConsultingCareersPrivate, workday_host: fticonsulting.wd108.myworkdayjobs.com, workday_site: FTIConsultingCareersPrivate}
+- {name: Thoughtworks, ats: greenhouse, slug: thoughtworksreferral}
+- {name: Protiviti, ats: workday, slug: roberthalf/ProtivitiNA, workday_host: roberthalf.wd1.myworkdayjobs.com, workday_site: ProtivitiNA}
+- {name: Grant Thornton, ats: oraclehcm, slug: grantthornton, workday_host: ehzq.fa.us2.oraclecloud.com, workday_site: CX_1}
+- {name: Baker Tilly, ats: workday, slug: bakertilly/BTCareers, workday_host: bakertilly.wd5.myworkdayjobs.com, workday_site: BTCareers}
+- {name: Nielsen, ats: smartrecruiters, slug: TheNielsenCompany}
+- {name: Kantar, ats: workday, slug: kantar/kantar, workday_host: kantar.wd3.myworkdayjobs.com, workday_site: kantar}
+- {name: Ipsos, ats: oraclehcm, slug: ipsos, workday_host: ecqf.fa.em2.oraclecloud.com, workday_site: jobsearch}
+- {name: Spire Global, ats: greenhouse, slug: spire}
+- {name: Vast, ats: greenhouse, slug: vast}
+- {name: Epirus, ats: greenhouse, slug: epirus}
+- {name: Chaos Industries, ats: greenhouse, slug: chaosindustries}
+- {name: Motional, ats: greenhouse, slug: motional}
+- {name: SAIC, ats: oraclehcm, slug: saic, workday_host: eihu.fa.us8.oraclecloud.com, workday_site: CX}
+- {name: Pacific Northwest National Laboratory, ats: jibe, slug: pacificnorthwestnati, workday_host: careers.pnnl.gov, workday_site: '-'}
+- {name: Safran, ats: successfactors, slug: safran, workday_host: careers.safran-dsi.com, workday_site: '-'}
+- {name: Oklo, ats: greenhouse, slug: oklo}
+- {name: X-energy, ats: workday, slug: xenergy/X-energyUS, workday_host: xenergy.wd5.myworkdayjobs.com, workday_site: X-energyUS}
+- {name: Kairos Power, ats: greenhouse, slug: kairospower}
+- {name: Fervo Energy, ats: greenhouse, slug: fervoenergy}
+- {name: Form Energy, ats: ashby, slug: formenergy}
+- {name: Lyten, ats: workday, slug: lyten/Lyten_External_Career_Site, workday_host: lyten.wd503.myworkdayjobs.com, workday_site: Lyten_External_Career_Site}
+- {name: Twelve, ats: ashby, slug: twelve}
+- {name: Antora Energy, ats: greenhouse, slug: antora}
+- {name: Bloom Energy, ats: workday, slug: bloomenergy/bloomenergycareers, workday_host: bloomenergy.wd1.myworkdayjobs.com, workday_site: bloomenergycareers}
+- {name: Plug Power, ats: workday, slug: plugpower/Plug_Power_Inc, workday_host: plugpower.wd5.myworkdayjobs.com, workday_site: Plug_Power_Inc}
+- {name: ChargePoint, ats: greenhouse, slug: chargepoint}
+- {name: Markforged, ats: greenhouse, slug: markforged}
+- {name: Bright Machines, ats: lever, slug: brightmachines}
+- {name: Path Robotics, ats: greenhouse, slug: pathrobotics}
+- {name: Dexterity, ats: lever, slug: dexterity}
+- {name: Collaborative Robotics, ats: ashby, slug: cobot}
+- {name: Mujin, ats: lever, slug: mujininc}
+- {name: Intrinsic, ats: greenhouse, slug: intrinsicrobotics}
+- {name: Nimble Robotics, ats: greenhouse, slug: nimblerobotics}
+- {name: Pickle Robot, ats: lever, slug: picklerobot}
+- {name: ANYbotics, ats: lever, slug: anybotics}
+- {name: Ada, ats: greenhouse, slug: ada18}
+- {name: Docebo, ats: ashby, slug: docebo}
+- {name: Sonatype, ats: lever, slug: sonatype}
+- {name: Wave Financial, ats: lever, slug: waveapps}
+- {name: Clearco, ats: ashby, slug: clearco}
+- {name: AlayaCare, ats: greenhouse, slug: alayacare}
+- {name: Flipp, ats: greenhouse, slug: flipp}
+- {name: Rewind, ats: ashby, slug: rewind}
+- {name: Shakepay, ats: greenhouse, slug: shakepay}
+- {name: Hut 8, ats: greenhouse, slug: hut8}
+- {name: Trulioo, ats: ashby, slug: trulioo}
+- {name: Visier, ats: ashby, slug: visier}
+- {name: Loblaw Digital, ats: smartrecruiters, slug: loblawdigital}
+- {name: Videotron, ats: smartrecruiters, slug: videotron}
+- {name: Telesat, ats: lever, slug: telesat}
+- {name: BDC, ats: workday, slug: bdc/BDC_Careers, workday_host: bdc.wd10.myworkdayjobs.com, workday_site: BDC_Careers}
+- {name: OPTrust, ats: workday, slug: optrust/OPTrust, workday_host: optrust.wd3.myworkdayjobs.com, workday_site: OPTrust}
+- {name: Miovision, ats: ashby, slug: miovision}
+- {name: Procurify, ats: ashby, slug: procurify}
+- {name: Dapper Labs, ats: ashby, slug: dapper}
+- {name: AbCellera, ats: greenhouse, slug: abcellera}
+- {name: Aritzia, ats: workday, slug: aritzia/External, workday_host: aritzia.wd3.myworkdayjobs.com, workday_site: External}
+- {name: WSP, ats: oraclehcm, slug: wsp, workday_host: emit.fa.ca3.oraclecloud.com, workday_site: CX_2001}
+- {name: Stantec, ats: oraclehcm, slug: stantec, workday_host: hdhl.fa.us6.oraclecloud.com, workday_site: CX_1}
+- {name: Illumio, ats: ashby, slug: illumio}
+- {name: Smartsheet, ats: greenhouse, slug: smartsheet}
+- {name: Xometry, ats: greenhouse, slug: xometry}
+- {name: Wing, ats: greenhouse, slug: wing}
+- {name: Dexcom, ats: workday, slug: dexcom/Dexcom, workday_host: dexcom.wd1.myworkdayjobs.com, workday_site: Dexcom}
+- {name: MarketAxess, ats: greenhouse, slug: marketaxesscorporation}
+- {name: FanDuel, ats: greenhouse, slug: fanduel}
+- {name: MiQ, ats: workday, slug: miqdigital/MiQ_Careers, workday_host: miqdigital.wd3.myworkdayjobs.com, workday_site: MiQ_Careers}
+- {name: Rocket Lawyer, ats: greenhouse, slug: rocketlawyer}
+- {name: Nordstrom, ats: workday, slug: nordstrom/nordstrom_careers, workday_host: nordstrom.wd501.myworkdayjobs.com, workday_site: nordstrom_careers}
+- {name: EarnIn, ats: greenhouse, slug: earnin}
+- {name: Best Buy, ats: workday, slug: bestbuycanada/BestBuyCA_Career, workday_host: bestbuycanada.wd3.myworkdayjobs.com, workday_site: BestBuyCA_Career}
+- {name: Remitly, ats: workday, slug: remitly/Remitly_Careers, workday_host: remitly.wd5.myworkdayjobs.com, workday_site: Remitly_Careers}
+- {name: AVEVA, ats: workday, slug: aveva/AVEVA_careers, workday_host: aveva.wd3.myworkdayjobs.com, workday_site: AVEVA_careers}
+- {name: NCR Voyix, ats: workday, slug: ncr/ext_us, workday_host: ncr.wd1.myworkdayjobs.com, workday_site: ext_us}
+- {name: Yahoo, ats: workday, slug: ouryahoo/careers, workday_host: ouryahoo.wd5.myworkdayjobs.com, workday_site: careers}
+- {name: Tatari, ats: greenhouse, slug: tatari}
+- {name: Blockhouse, ats: ashby, slug: blockhouse}
+- {name: CertiK, ats: lever, slug: certik}
+- {name: Recursion Pharmaceuticals, ats: greenhouse, slug: recursionpharmaceuticals}
+- {name: Cambridge Mobile Telematics, ats: greenhouse, slug: cmt}
+- {name: Mark43, ats: greenhouse, slug: mark43}
+- {name: NinjaTrader, ats: greenhouse, slug: ninjatrader}
+- {name: Yext, ats: greenhouse, slug: yext}
+- {name: Match Group, ats: lever, slug: matchgroup}
+- {name: Taboola, ats: greenhouse, slug: taboola}
+- {name: Recorded Future, ats: greenhouse, slug: recordedfuture}
+- {name: Broadridge, ats: workday, slug: broadridge/careers, workday_host: broadridge.wd5.myworkdayjobs.com, workday_site: careers}
+- {name: Artisan Partners, ats: greenhouse, slug: artisanpartners}
+- {name: NextEra Energy, ats: successfactors, slug: nexteraenergy, workday_host: jobs.nexteraenergy.com, workday_site: '-'}
+- {name: Kabam, ats: lever, slug: kabam}
+- {name: Fullscript, ats: lever, slug: fullscript}
+- {name: Unisys, ats: workday, slug: unisys/External, workday_host: unisys.wd5.myworkdayjobs.com, workday_site: External}
+- {name: Mozilla, ats: greenhouse, slug: mozilla}
+- {name: Woven by Toyota, ats: lever, slug: woven-by-toyota}
+- {name: Global Payments, ats: workday, slug: tsys/TSYS, workday_host: tsys.wd1.myworkdayjobs.com, workday_site: TSYS}
+- {name: Sia Partners, ats: smartrecruiters, slug: Sia}
+- {name: Sabre, ats: workday, slug: sabre/SabreJobs, workday_host: sabre.wd1.myworkdayjobs.com, workday_site: SabreJobs}
+- {name: Skyryse, ats: greenhouse, slug: skyryse}
+- {name: Dialpad, ats: greenhouse, slug: dialpad}
+- {name: Citco, ats: oraclehcm, slug: citco, workday_host: fa-euxc-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1}
+- {name: Viasat, ats: jibe, slug: viasat, workday_host: careers.viasat.com, workday_site: '-'}
+- {name: Sony Pictures Imageworks, ats: greenhouse, slug: sonypicturesimageworks}
+- {name: Worldpay, ats: workday, slug: worldpay/Worldpay_External_Careers_Site, workday_host: worldpay.wd5.myworkdayjobs.com, workday_site: Worldpay_External_Careers_Site}
+- {name: Milwaukee Tool, ats: workday, slug: tti/Milwaukee, workday_host: tti.wd1.myworkdayjobs.com, workday_site: Milwaukee}
+- {name: Vantage Data Centers, ats: workday, slug: vantagedc/Vantage, workday_host: vantagedc.wd1.myworkdayjobs.com, workday_site: Vantage}
+- {name: Voya Financial, ats: workday, slug: godirect/voya_jobs, workday_host: godirect.wd5.myworkdayjobs.com, workday_site: voya_jobs}
+- {name: Domino's, ats: smartrecruiters, slug: Dominos}
+- {name: Calix, ats: workday, slug: calix/External, workday_host: calix.wd1.myworkdayjobs.com, workday_site: External}
+- {name: Moloco, ats: greenhouse, slug: moloco}
+- {name: Target, ats: workday, slug: target/targetcareers, workday_host: target.wd5.myworkdayjobs.com, workday_site: targetcareers}
+- {name: Canonical, ats: greenhouse, slug: canonical}
+- {name: GRAIL, ats: lever, slug: grailbio}
+- {name: BambooHR, ats: greenhouse, slug: bamboohr17}
+- {name: Simons Foundation, ats: workday, slug: simonsfoundation/simonsfoundationcareers, workday_host: simonsfoundation.wd1.myworkdayjobs.com, workday_site: simonsfoundationcareers}
+- {name: Chan Zuckerberg Initiative, ats: greenhouse, slug: chanzuckerberginitiative}
+- {name: Exiger, ats: greenhouse, slug: exiger}
+- {name: Beam Therapeutics, ats: greenhouse, slug: beamtherapeutics}
+- {name: Veracode, ats: greenhouse, slug: veracode}
+- {name: Docker, ats: ashby, slug: docker}
+- {name: Boom Supersonic, ats: rippling, slug: boom-supersonic}
+- {name: PepsiCo, ats: icims, slug: pepsico, workday_host: uscareers-pepsico.icims.com, workday_site: '-'}
+- {name: SentiLink, ats: ashby, slug: sentilink}
+- {name: NatWest, ats: workday, slug: rbs/rbs, workday_host: rbs.wd3.myworkdayjobs.com, workday_site: rbs}
+- {name: MRI Software, ats: workday, slug: mrisoftware/External_CareerSite, workday_host: mrisoftware.wd501.myworkdayjobs.com, workday_site: External_CareerSite}
+- {name: Tubi, ats: greenhouse, slug: tubitv}
+- {name: KAYAK, ats: greenhouse, slug: kayak}
+- {name: Weiss Asset Management, ats: greenhouse, slug: weissassetmanagement}
+- {name: Genesys, ats: workday, slug: genesys/Genesys, workday_host: genesys.wd1.myworkdayjobs.com, workday_site: Genesys}
+- {name: Cerence, ats: workday, slug: cerence/Cerence, workday_host: cerence.wd5.myworkdayjobs.com, workday_site: Cerence}
+- {name: NICE, ats: greenhouse, slug: nice}
+- {name: Verisk, ats: oraclehcm, slug: verisk, workday_host: fa-ewmy-saasfaprod1.fa.ocs.oraclecloud.com, workday_site: CX_1}
+- {name: StoneX, ats: icims, slug: stonex, workday_host: careers-stonex.icims.com, workday_site: '-'}
+- {name: ACI Worldwide, ats: oraclehcm, slug: aciworldwide, workday_host: ebwg.fa.us2.oraclecloud.com, workday_site: CX}
+- {name: Databento, ats: greenhouse, slug: databento}
+- {name: Sezzle, ats: greenhouse, slug: sezzle}
+- {name: QuantCo, ats: lever, slug: quantco-}
+- {name: Nasuni, ats: greenhouse, slug: nasuni}
+- {name: Live Oak Bank, ats: workday, slug: liveoakbancshares/Live_Oak, workday_host: liveoakbancshares.wd1.myworkdayjobs.com, workday_site: Live_Oak}
+- {name: SimpliSafe, ats: greenhouse, slug: simplisafe}
+- {name: Sophos, ats: lever, slug: sophos}
+- {name: Anaplan, ats: greenhouse, slug: anaplan}
+- {name: Astronomer, ats: ashby, slug: astronomer}
+- {name: Olo, ats: lever, slug: olo}
+- {name: May Mobility, ats: greenhouse, slug: maymobility}
+- {name: Novartis, ats: workday, slug: novartis/Novartis_Careers, workday_host: novartis.wd3.myworkdayjobs.com, workday_site: Novartis_Careers}
+- {name: RA Capital Management, ats: greenhouse, slug: racapitalmanagementllc}
+- {name: Ambi Robotics, ats: lever, slug: ambirobotics}
+- {name: Zocdoc, ats: greenhouse, slug: zocdoc}
+- {name: GPTZero, ats: ashby, slug: gptzero}
+- {name: LegalZoom, ats: jobvite, slug: legalzoom}
+- {name: PitchBook, ats: greenhouse, slug: pitchbookdata}
+- {name: FM Global, ats: icims, slug: fmglobal, workday_host: jobs-fmglobal.icims.com, workday_site: '-'}
+- {name: Integral Ad Science, ats: workday, slug: integralads/IAScareers, workday_host: integralads.wd1.myworkdayjobs.com, workday_site: IAScareers}
+- {name: TRUMPF, ats: workday, slug: trumpf/TRUMPF_Students, workday_host: trumpf.wd3.myworkdayjobs.com, workday_site: TRUMPF_Students}
+- {name: Mars, ats: workday, slug: mars/external, workday_host: mars.wd3.myworkdayjobs.com, workday_site: external}
+- {name: Coherent, ats: oraclehcm, slug: coherent, workday_host: hcwp.fa.us2.oraclecloud.com, workday_site: CX_1}
+- {name: Waters Corporation, ats: icims, slug: waterscorporation, workday_host: uscareers-waters.icims.com, workday_site: '-'}
+- {name: CircleCI, ats: greenhouse, slug: circleci}
+- {name: Metaview, ats: ashby, slug: metaview}
+- {name: Colossal Biosciences, ats: greenhouse, slug: colossalbiosciences}
+- {name: Flock Safety, ats: ashby, slug: flock%20safety}
+- {name: Dataminr, ats: workday, slug: dataminr/Dataminr, workday_host: dataminr.wd12.myworkdayjobs.com, workday_site: Dataminr}
+- {name: Guild Education, ats: greenhouse, slug: guild}
+- {name: Indigo Ag, ats: ashby, slug: indigo}
+- {name: Recursive Superintelligence, ats: ashby, slug: recursive-superintelligence}
+- {name: Color Health, ats: ashby, slug: color-health}
+- {name: Digital Realty, ats: oraclehcm, slug: digitalrealty, workday_host: hdep.fa.us2.oraclecloud.com, workday_site: CX}
+- {name: TD Synnex, ats: workday, slug: synnex/tdsynnexcareers, workday_host: synnex.wd5.myworkdayjobs.com, workday_site: tdsynnexcareers}
+- {name: SS&C Technologies, ats: workday, slug: ssctech/ssctechnologies, workday_host: ssctech.wd1.myworkdayjobs.com, workday_site: ssctechnologies}
+- {name: Arrow Electronics, ats: workday, slug: arrow/ac, workday_host: arrow.wd1.myworkdayjobs.com, workday_site: ac}
+- {name: MaxLinear, ats: icims, slug: maxlinear, workday_host: careersus-maxlinear.icims.com, workday_site: '-'}
+- {name: Avnet, ats: workday, slug: avnet/External, workday_host: avnet.wd1.myworkdayjobs.com, workday_site: External}
+- {name: AppFolio, ats: ashby, slug: appfolio}
+- {name: Navitas Semiconductor, ats: smartrecruiters, slug: navitas}
+- {name: GSA Capital, ats: greenhouse, slug: gsacapital}
+- {name: CoLab Software, ats: greenhouse, slug: colabsoftware}
+- {name: Rio Tinto, ats: workday, slug: riotinto/riotinto_careers, workday_host: riotinto.wd3.myworkdayjobs.com, workday_site: riotinto_careers}
+- {name: Unilever, ats: workday, slug: unilever/Unilever_Experienced_Professionals, workday_host: unilever.wd3.myworkdayjobs.com, workday_site: Unilever_Experienced_Professionals}
+- {name: Ericsson, ats: eightfold, slug: ericsson, workday_host: jobs.ericsson.com, workday_site: ericsson.com}
+- {name: Waymo, ats: greenhouse, slug: waymo}
+- {name: Formlabs, ats: greenhouse, slug: formlabs}
+- {name: IXL Learning, ats: greenhouse, slug: ixllearning}
+- {name: SeatGeek, ats: greenhouse, slug: seatgeek}
+- {name: PrizePicks, ats: greenhouse, slug: prizepicks}
+- {name: Stoke Space, ats: greenhouse, slug: stokespacetechnologies}
+- {name: Red Ventures, ats: greenhouse, slug: redventures}
+- {name: Veeam Software, ats: greenhouse, slug: veeamsoftware}
+- {name: ASM, ats: greenhouse, slug: asm}
+- {name: Corning, ats: successfactors, slug: corning, workday_host: corningjobs.corning.com, workday_site: '-'}
+- {name: Paccar, ats: successfactors, slug: paccar, workday_host: jobs.paccar.com, workday_site: '-'}
+- {name: Dominion Energy, ats: successfactors, slug: dominionenergy, workday_host: careers.dominionenergy.com, workday_site: '-'}
+- {name: Entergy, ats: successfactors, slug: entergy, workday_host: jobs.entergy.com, workday_site: '-'}
+- {name: Advanced Energy, ats: successfactors, slug: advancedenergy, workday_host: jobs.advanced-energy.com, workday_site: '-'}
+- {name: ExxonMobil, ats: successfactors, slug: exxonmobil, workday_host: jobs.exxonmobil.com, workday_site: '-'}
+- {name: AGCO, ats: successfactors, slug: agco, workday_host: careers.agcocorp.com, workday_site: '-'}
+- {name: Rogers Communications, ats: successfactors, slug: rogers, workday_host: jobs.rogers.com, workday_site: '-'}
+- {name: Skyworks, ats: successfactors, slug: skyworks, workday_host: careers.skyworksinc.com, workday_site: '-'}
+- {name: EY, ats: successfactors, slug: ey, workday_host: careers.ey.com, workday_site: '-'}
+- {name: Standard Chartered, ats: successfactors, slug: standardchartered, workday_host: jobs.standardchartered.com, workday_site: '-'}
+- {name: Globant, ats: successfactors, slug: globant, workday_host: career.globant.com, workday_site: '-'}
+- {name: Seagate Technology, ats: successfactors, slug: seagate, workday_host: seagatecareers.com, workday_site: '-'}
+- {name: Boston Consulting Group, ats: phenom, slug: bcg, workday_host: careers.bcg.com/global/en, workday_site: '-'}
+- {name: United Airlines, ats: phenom, slug: united, workday_host: careers.united.com/us/en, workday_site: '-'}
+- {name: Trane Technologies, ats: phenom, slug: trane, workday_host: careers.tranetechnologies.com/global/en, workday_site: '-'}
+- {name: Illinois Tool Works, ats: phenom, slug: itw, workday_host: careers.itw.com/us/en, workday_site: '-'}
+- {name: BAE Systems, ats: phenom, slug: baesystems, workday_host: jobs.baesystems.com/global/en, workday_site: '-'}
+- {name: U.S. Bank, ats: phenom, slug: usbank, workday_host: careers.usbank.com/global/en, workday_site: '-'}
+- {name: OpenText, ats: phenom, slug: opentext, workday_host: careers.opentext.com/us/en, workday_site: '-'}
+- {name: Bell Canada, ats: phenom, slug: bell, workday_host: jobs.bell.ca/ca/en, workday_site: '-'}
+- {name: MITRE, ats: phenom, slug: mitre, workday_host: careers.mitre.org/us/en, workday_site: '-'}
+- {name: Battelle, ats: phenom, slug: battelle, workday_host: jobs.battelle.org/us/en, workday_site: '-'}
+- {name: Warner Bros. Discovery, ats: phenom, slug: wbd, workday_host: careers.wbd.com/global/en, workday_site: '-'}
+- {name: NASA Jet Propulsion Laboratory, ats: phenom, slug: jpl, workday_host: www.jpl.jobs, workday_site: '-'}
+- {name: Activision Blizzard, ats: phenom, slug: activision, workday_host: careers.activision.com/global/en, workday_site: '-'}
+- {name: Span, ats: ashby, slug: span}
+- {name: Top Hat, ats: ashby, slug: top-hat}
+- {name: Sentry, ats: ashby, slug: sentry}
+- {name: Collectors, ats: workday, slug: collectorsuniverse/collectors, workday_host: collectorsuniverse.wd1.myworkdayjobs.com, workday_site: collectors}
+- {name: Chatham Financial, ats: workday, slug: chathamfinancial/ChathamFinancial, workday_host: chathamfinancial.wd501.myworkdayjobs.com, workday_site: ChathamFinancial}
+- {name: Workiva, ats: workday, slug: workiva/careers, workday_host: workiva.wd503.myworkdayjobs.com, workday_site: careers}
+- {name: Otis, ats: workday, slug: otis/REC_Ext_Gateway, workday_host: otis.wd504.myworkdayjobs.com, workday_site: REC_Ext_Gateway}
+- {name: FactSet, ats: workday, slug: factset/FactSetCareers, workday_host: factset.wd108.myworkdayjobs.com, workday_site: FactSetCareers}
+- {name: Plusgrade, ats: workday, slug: plusgrade/Plusgrade_External_Site, workday_host: plusgrade.wd10.myworkdayjobs.com, workday_site: Plusgrade_External_Site}
+- {name: Kinaxis, ats: icims, slug: kinaxis, workday_host: careers-kinaxis.icims.com, workday_site: '-'}
+- {name: Jack Henry, ats: avature, slug: jackhenry, workday_host: jackhenry.avature.net/careers, workday_site: '-'}
+- {name: Lockheed Martin, ats: eightfold, slug: lockheedmartin, workday_host: lockheedmartin.eightfold.ai, workday_site: lockheedmartin.com}
+- {name: NXP Semiconductors, ats: workday, slug: nxp/careers, workday_host: nxp.wd3.myworkdayjobs.com, workday_site: careers}
+- {name: HOOPP, ats: workday, slug: hoopp/HOOPP, workday_host: hoopp.wd10.myworkdayjobs.com, workday_site: HOOPP}
+- {name: Ally, ats: workday, slug: ally/Ally, workday_host: ally.wd1.myworkdayjobs.com, workday_site: Ally}
+- {name: MUFG, ats: workday, slug: mufgub/MUFG-Careers, workday_host: mufgub.wd3.myworkdayjobs.com, workday_site: MUFG-Careers}
+- {name: Bruce Power, ats: workday, slug: brucepower/BrucePower, workday_host: brucepower.wd3.myworkdayjobs.com, workday_site: BrucePower}
+- {name: Canada Goose, ats: workday, slug: canadagoose/CanadaGooseCareers, workday_host: canadagoose.wd3.myworkdayjobs.com, workday_site: CanadaGooseCareers}
+- {name: Bentley Systems, ats: workday, slug: bentleysystems/bentley, workday_host: bentleysystems.wd5.myworkdayjobs.com, workday_site: bentley}
+- {name: NetScout, ats: workday, slug: netscout/Careers, workday_host: netscout.wd108.myworkdayjobs.com, workday_site: Careers}
+- {name: UserTesting, ats: workday, slug: usertesting/UserTesting, workday_host: usertesting.wd12.myworkdayjobs.com, workday_site: UserTesting}
+- {name: Moelis, ats: workday, slug: moelis/Experienced-Hires, workday_host: moelis.wd1.myworkdayjobs.com, workday_site: Experienced-Hires}
+- {name: Guggenheim Investments, ats: workday, slug: guggenheiminvestment/External, workday_host: guggenheiminvestment.wd5.myworkdayjobs.com, workday_site: External}
+- {name: iCapital, ats: greenhouse, slug: icapitalnetwork}
+- {name: Public.com, ats: greenhouse, slug: public}
+- {name: Tudor Investment, ats: greenhouse, slug: tudorgroup}
+- {name: SiTime, ats: greenhouse, slug: sitimecorporation}
+- {name: Tenable, ats: greenhouse, slug: tenableinc}
+- {name: Jasper, ats: ashby, slug: Jasper AI}
+- {name: Captions, ats: ashby, slug: mirage}
+- {name: Chainalysis, ats: ashby, slug: chainalysis-careers}
+- {name: Heirloom, ats: ashby, slug: heirloomcarbon}
+- {name: Absorb Software, ats: ashby, slug: absorblms}
+- {name: fal, ats: ashby, slug: fal-ai}
+- {name: Global Trading Systems, ats: icims, slug: gtsx, workday_host: careers-gtsx.icims.com, workday_site: '-'}
+- {name: MSCI, ats: jibe, slug: msci, workday_host: msci.jibeapply.com, workday_site: '-'}
+- {name: Vena Solutions, ats: pinpoint, slug: vena}
+- {name: Absolute Software, ats: jobvite, slug: absolute}
+- {name: Power Integrations, ats: jobvite, slug: power-integrations}
+- {name: Two Sigma, ats: avature, slug: twosigma, workday_host: careers.twosigma.com/careers, workday_site: OpenRoles}
+- {name: Boston Metal, ats: workable, slug: boston-metal}
+- {name: Borrowell, ats: workable, slug: borrowell}
+- {name: Export Development Canada, ats: workable, slug: export-development-canada}
+- {name: Trexquant, ats: workable, slug: trexquant}
+- {name: SciTec, ats: workable, slug: scitec}
+- {name: Genetec, ats: workable, slug: genetec-inc}
+- {name: Innovaccer, ats: workable, slug: innovaccer-analytics}
+- {name: Infleqtion, ats: workable, slug: coldquanta}
+
 # Companies whose postings come from the SimplifyJobs list (their own sites block bots,
 # or use career sites we have no adapter for). slug = the company name as Simplify writes it.
 # Keep these off the hot tier: each poll reads the whole ~13 MB list.
-- {ats: simplify, name: AArete, slug: AArete}
+- {ats: simplify, name: AArete, slug: AArete, disabled: true}
 - {ats: simplify, name: AARP, slug: AARP}
 - {ats: simplify, name: ABEC, slug: ABEC}
 - {ats: simplify, name: Acadian Asset Management, slug: Acadian Asset Management}
-- {ats: simplify, name: Acuity, slug: Acuity}
-- {ats: simplify, name: ADT, slug: ADT}
-- {ats: simplify, name: Advanced Energy, slug: Advanced Energy}
+- {ats: simplify, name: Acuity, slug: Acuity, disabled: true}
+- {ats: simplify, name: ADT, slug: ADT, disabled: true}
+- {ats: simplify, name: Advanced Energy, slug: Advanced Energy, disabled: true}
 - {ats: simplify, name: Aerotech, slug: Aerotech}
-- {ats: simplify, name: AGCO, slug: AGCO}
+- {ats: simplify, name: AGCO, slug: AGCO, disabled: true}
 - {ats: simplify, name: Alliance Laundry Systems, slug: Alliance Laundry Systems}
-- {ats: simplify, name: Altamira Technologies, slug: Altamira Technologies}
-- {ats: simplify, name: AMD, slug: AMD}
+- {ats: simplify, name: Altamira Technologies, slug: Altamira Technologies, disabled: true}
+- {ats: simplify, name: AMD, slug: AMD, disabled: true}
 - {ats: simplify, name: American Enterprise Institute, slug: American Enterprise Institute}
 - {ats: simplify, name: American Equity, slug: American Equity}
-- {ats: simplify, name: American Express, slug: American Express}
+- {ats: simplify, name: American Express, slug: American Express, disabled: true}
 - {ats: simplify, name: American Heart Association, slug: American Heart Association}
 - {ats: simplify, name: AngloGold Ashanti, slug: AngloGold Ashanti}
-- {ats: simplify, name: Aon, slug: Aon}
+- {ats: simplify, name: Aon, slug: Aon, disabled: true}
 - {ats: simplify, name: Apogee Engineering, slug: Apogee Engineering}
 - {ats: simplify, name: Aramco Americas, slug: Aramco Americas}
-- {ats: simplify, name: Arcfield, slug: Arcfield}
-- {ats: simplify, name: Arconic, slug: Arconic}
+- {ats: simplify, name: Arcfield, slug: Arcfield, disabled: true}
+- {ats: simplify, name: Arconic, slug: Arconic, disabled: true}
 - {ats: simplify, name: Armstrong Fluid Technology, slug: Armstrong Fluid Technology}
 - {ats: simplify, name: Arthur J. Gallagher & Co., slug: Arthur J. Gallagher & Co.}
 - {ats: simplify, name: Ascension, slug: Ascension}
 - {ats: simplify, name: Atlassian, slug: Atlassian}
 - {ats: simplify, name: Atomic Semi, slug: Atomic Semi}
-- {ats: simplify, name: AutoZone, slug: AutoZone}
+- {ats: simplify, name: AutoZone, slug: AutoZone, disabled: true}
 - {ats: simplify, name: Awardco, slug: Awardco}
 - {ats: simplify, name: Axiomatic AI, slug: Axiomatic AI}
 - {ats: simplify, name: Bank of China USA, slug: Bank of China USA}
-- {ats: simplify, name: Belden, slug: Belden}
+- {ats: simplify, name: Belden, slug: Belden, disabled: true}
 - {ats: simplify, name: Benjamin Moore, slug: Benjamin Moore}
-- {ats: simplify, name: BGIS, slug: BGIS}
+- {ats: simplify, name: BGIS, slug: BGIS, disabled: true}
 - {ats: simplify, name: Bitmovin, slug: Bitmovin}
 - {ats: simplify, name: Black Cape, slug: Black Cape}
-- {ats: simplify, name: Blackhawk Network Holdings, slug: Blackhawk Network Holdings}
-- {ats: simplify, name: Blue Cross Blue Shield of Michigan, slug: Blue Cross Blue Shield of Michigan}
-- {ats: simplify, name: BNY, slug: BNY}
-- {ats: simplify, name: Boston Consulting Group, slug: Boston Consulting Group}
-- {ats: simplify, name: Boston Scientific, slug: Boston Scientific}
-- {ats: simplify, name: Brevan Howard, slug: Brevan Howard}
-- {ats: simplify, name: C3.ai, slug: C3.ai}
+- {ats: simplify, name: Blackhawk Network Holdings, slug: Blackhawk Network Holdings, disabled: true}
+- {ats: simplify, name: Blue Cross Blue Shield of Michigan, slug: Blue Cross Blue Shield of Michigan, disabled: true}
+- {ats: simplify, name: BNY, slug: BNY, disabled: true}
+- {ats: simplify, name: Boston Consulting Group, slug: Boston Consulting Group, disabled: true}
+- {ats: simplify, name: Boston Scientific, slug: Boston Scientific, disabled: true}
+- {ats: simplify, name: Brevan Howard, slug: Brevan Howard, disabled: true}
+- {ats: simplify, name: C3.ai, slug: C3.ai, disabled: true}
 - {ats: simplify, name: CalAmp, slug: CalAmp}
 - {ats: simplify, name: Calpion/Plutus Health, slug: Calpion/Plutus Health}
 - {ats: simplify, name: CesiumAstro, slug: CesiumAstro}
-- {ats: simplify, name: Charles Schwab, slug: Charles Schwab}
-- {ats: simplify, name: CHS, slug: CHS}
+- {ats: simplify, name: Charles Schwab, slug: Charles Schwab, disabled: true}
+- {ats: simplify, name: CHS, slug: CHS, disabled: true}
 - {ats: simplify, name: Citadel, slug: Citadel}
 - {ats: simplify, name: Citadel Securities, slug: Citadel Securities}
 - {ats: simplify, name: Citizens Financial Group, slug: Citizens Financial Group}
@@ -669,285 +1177,285 @@
 - {ats: simplify, name: Clerkie, slug: Clerkie}
 - {ats: simplify, name: Clyde Companies, slug: Clyde Companies}
 - {ats: simplify, name: Cole Engineering Services, slug: Cole Engineering Services}
-- {ats: simplify, name: Commercial Metals, slug: Commercial Metals}
-- {ats: simplify, name: Constellation Energy, slug: Constellation Energy}
-- {ats: simplify, name: Cook Group, slug: Cook Group}
+- {ats: simplify, name: Commercial Metals, slug: Commercial Metals, disabled: true}
+- {ats: simplify, name: Constellation Energy, slug: Constellation Energy, disabled: true}
+- {ats: simplify, name: Cook Group, slug: Cook Group, disabled: true}
 - {ats: simplify, name: Cooper University Health Care, slug: Cooper University Health Care}
 - {ats: simplify, name: Corgan, slug: Corgan}
-- {ats: simplify, name: Corning, slug: Corning}
-- {ats: simplify, name: Cotiviti, slug: Cotiviti}
-- {ats: simplify, name: CSX, slug: CSX}
-- {ats: simplify, name: Cummins, slug: Cummins}
-- {ats: simplify, name: Cvent, slug: Cvent}
+- {ats: simplify, name: Corning, slug: Corning, disabled: true}
+- {ats: simplify, name: Cotiviti, slug: Cotiviti, disabled: true}
+- {ats: simplify, name: CSX, slug: CSX, disabled: true}
+- {ats: simplify, name: Cummins, slug: Cummins, disabled: true}
+- {ats: simplify, name: Cvent, slug: Cvent, disabled: true}
 - {ats: simplify, name: Dayton Freight Lines, slug: Dayton Freight Lines}
-- {ats: simplify, name: Definity Financial, slug: Definity Financial}
+- {ats: simplify, name: Definity Financial, slug: Definity Financial, disabled: true}
 - {ats: simplify, name: DEKA Research & Development Corp., slug: DEKA Research & Development Corp.}
-- {ats: simplify, name: Deloitte, slug: Deloitte}
+- {ats: simplify, name: Deloitte, slug: Deloitte, disabled: true}
 - {ats: simplify, name: Delta Air Lines, slug: Delta Air Lines}
 - {ats: simplify, name: Delta Dental of Iowa, slug: Delta Dental of Iowa}
 - {ats: simplify, name: Demco Products, slug: Demco Products}
-- {ats: simplify, name: Deutsche Bank, slug: Deutsche Bank}
+- {ats: simplify, name: Deutsche Bank, slug: Deutsche Bank, disabled: true}
 - {ats: simplify, name: DiligenceVault, slug: DiligenceVault}
 - {ats: simplify, name: Diversified Energy, slug: Diversified Energy}
-- {ats: simplify, name: Dominion Energy, slug: Dominion Energy}
+- {ats: simplify, name: Dominion Energy, slug: Dominion Energy, disabled: true}
 - {ats: simplify, name: Domino Data Lab, slug: Domino Data Lab}
-- {ats: simplify, name: DP World, slug: DP World}
+- {ats: simplify, name: DP World, slug: DP World, disabled: true}
 - {ats: simplify, name: DreamWorks Animation, slug: DreamWorks Animation}
-- {ats: simplify, name: DTCC, slug: DTCC}
-- {ats: simplify, name: Eaton, slug: Eaton}
+- {ats: simplify, name: DTCC, slug: DTCC, disabled: true}
+- {ats: simplify, name: Eaton, slug: Eaton, disabled: true}
 - {ats: simplify, name: Echelon Insights, slug: Echelon Insights}
-- {ats: simplify, name: Edison International, slug: Edison International}
-- {ats: simplify, name: Electronic Arts, slug: Electronic Arts}
-- {ats: simplify, name: Emerson Electric, slug: Emerson Electric}
+- {ats: simplify, name: Edison International, slug: Edison International, disabled: true}
+- {ats: simplify, name: Electronic Arts, slug: Electronic Arts, disabled: true}
+- {ats: simplify, name: Emerson Electric, slug: Emerson Electric, disabled: true}
 - {ats: simplify, name: Empirical Foods, slug: Empirical Foods}
 - {ats: simplify, name: Energy Transfer Partners, slug: Energy Transfer Partners}
-- {ats: simplify, name: Enterprise Holdings, slug: Enterprise Holdings}
-- {ats: simplify, name: Epiroc, slug: Epiroc}
+- {ats: simplify, name: Enterprise Holdings, slug: Enterprise Holdings, disabled: true}
+- {ats: simplify, name: Epiroc, slug: Epiroc, disabled: true}
 - {ats: simplify, name: EquipmentShare, slug: EquipmentShare}
-- {ats: simplify, name: Erie Insurance Group, slug: Erie Insurance Group}
+- {ats: simplify, name: Erie Insurance Group, slug: Erie Insurance Group, disabled: true}
 - {ats: simplify, name: Ernst & Young, slug: Ernst & Young}
-- {ats: simplify, name: ExxonMobil, slug: ExxonMobil}
+- {ats: simplify, name: ExxonMobil, slug: ExxonMobil, disabled: true}
 - {ats: simplify, name: Federated Insurance, slug: Federated Insurance}
-- {ats: simplify, name: First Citizens BancShares, slug: First Citizens BancShares}
-- {ats: simplify, name: Formlabs, slug: Formlabs}
+- {ats: simplify, name: First Citizens BancShares, slug: First Citizens BancShares, disabled: true}
+- {ats: simplify, name: Formlabs, slug: Formlabs, disabled: true}
 - {ats: simplify, name: Foundation Finance, slug: Foundation Finance}
-- {ats: simplify, name: Framatome, slug: Framatome}
-- {ats: simplify, name: Franklin Electric, slug: Franklin Electric}
-- {ats: simplify, name: Garmin, slug: Garmin}
+- {ats: simplify, name: Framatome, slug: Framatome, disabled: true}
+- {ats: simplify, name: Franklin Electric, slug: Franklin Electric, disabled: true}
+- {ats: simplify, name: Garmin, slug: Garmin, disabled: true}
 # Gemini now comes from its own Greenhouse board (curated list above).
 - {ats: simplify, name: Gemini, slug: Gemini, disabled: true}
-- {ats: simplify, name: General Dynamics, slug: General Dynamics}
-- {ats: simplify, name: General Dynamics Mission Systems, slug: General Dynamics Mission Systems}
+- {ats: simplify, name: General Dynamics, slug: General Dynamics, disabled: true}
+- {ats: simplify, name: General Dynamics Mission Systems, slug: General Dynamics Mission Systems, disabled: true}
 - {ats: simplify, name: Gensyn, slug: Gensyn}
 - {ats: simplify, name: Geo Owl, slug: Geo Owl}
-- {ats: simplify, name: GM financial, slug: GM financial}
+- {ats: simplify, name: GM financial, slug: GM financial, disabled: true}
 - {ats: simplify, name: Grass Valley, slug: Grass Valley}
 - {ats: simplify, name: Greenwood Village South, slug: Greenwood Village South}
 - {ats: simplify, name: Grow Financial Federal Credit Union, slug: Grow Financial Federal Credit Union}
-- {ats: simplify, name: GuideWell Mutual, slug: GuideWell Mutual}
-- {ats: simplify, name: H&R Block, slug: H&R Block}
-- {ats: simplify, name: HARMAN, slug: HARMAN}
+- {ats: simplify, name: GuideWell Mutual, slug: GuideWell Mutual, disabled: true}
+- {ats: simplify, name: H&R Block, slug: H&R Block, disabled: true}
+- {ats: simplify, name: HARMAN, slug: HARMAN, disabled: true}
 - {ats: simplify, name: Hays Electrical Services, slug: Hays Electrical Services}
-- {ats: simplify, name: Hearst, slug: Hearst}
+- {ats: simplify, name: Hearst, slug: Hearst, disabled: true}
 - {ats: simplify, name: Herzog Railroad Services, slug: Herzog Railroad Services}
-- {ats: simplify, name: Hexagon AB, slug: Hexagon AB}
-- {ats: simplify, name: HEXAWARE, slug: HEXAWARE}
-- {ats: simplify, name: HF Sinclair, slug: HF Sinclair}
+- {ats: simplify, name: Hexagon AB, slug: Hexagon AB, disabled: true}
+- {ats: simplify, name: HEXAWARE, slug: HEXAWARE, disabled: true}
+- {ats: simplify, name: HF Sinclair, slug: HF Sinclair, disabled: true}
 - {ats: simplify, name: Hiebing, slug: Hiebing}
 - {ats: simplify, name: Highgate, slug: Highgate}
-- {ats: simplify, name: Hilton Worldwide, slug: Hilton Worldwide}
+- {ats: simplify, name: Hilton Worldwide, slug: Hilton Worldwide, disabled: true}
 - {ats: simplify, name: Hitachi, slug: Hitachi}
 - {ats: simplify, name: Hoffman Construction, slug: Hoffman Construction}
-- {ats: simplify, name: Honeywell, slug: Honeywell}
+- {ats: simplify, name: Honeywell, slug: Honeywell, disabled: true}
 - {ats: simplify, name: Hormel Foods, slug: Hormel Foods}
 - {ats: simplify, name: Hunt Oil Company, slug: Hunt Oil Company}
-- {ats: simplify, name: Huntington Ingalls Industries, slug: Huntington Ingalls Industries}
-- {ats: simplify, name: IDeaS, slug: IDeaS}
-- {ats: simplify, name: IDEMIA, slug: IDEMIA}
-- {ats: simplify, name: Illinois Tool Works, slug: Illinois Tool Works}
+- {ats: simplify, name: Huntington Ingalls Industries, slug: Huntington Ingalls Industries, disabled: true}
+- {ats: simplify, name: IDeaS, slug: IDeaS, disabled: true}
+- {ats: simplify, name: IDEMIA, slug: IDEMIA, disabled: true}
+- {ats: simplify, name: Illinois Tool Works, slug: Illinois Tool Works, disabled: true}
 - {ats: simplify, name: Impulse Space, slug: Impulse Space, disabled: true}  # now read from Pinpoint
-- {ats: simplify, name: InComm Payments, slug: InComm Payments}
+- {ats: simplify, name: InComm Payments, slug: InComm Payments, disabled: true}
 - {ats: simplify, name: Innovative Systems, slug: Innovative Systems}
 - {ats: simplify, name: IntelliGenesis, slug: IntelliGenesis}
 - {ats: simplify, name: Interplay, slug: Interplay}
-- {ats: simplify, name: Iridium Communications, slug: Iridium Communications}
-- {ats: simplify, name: ITT, slug: ITT}
-- {ats: simplify, name: IXL Learning, slug: IXL Learning}
-- {ats: simplify, name: John Deere, slug: John Deere}
-- {ats: simplify, name: Johns Hopkins Applied Physics Laboratory, slug: Johns Hopkins Applied Physics Laboratory}
-- {ats: simplify, name: JP Morgan Chase, slug: JP Morgan Chase}
+- {ats: simplify, name: Iridium Communications, slug: Iridium Communications, disabled: true}
+- {ats: simplify, name: ITT, slug: ITT, disabled: true}
+- {ats: simplify, name: IXL Learning, slug: IXL Learning, disabled: true}
+- {ats: simplify, name: John Deere, slug: John Deere, disabled: true}
+- {ats: simplify, name: Johns Hopkins Applied Physics Laboratory, slug: Johns Hopkins Applied Physics Laboratory, disabled: true}
+- {ats: simplify, name: JP Morgan Chase, slug: JP Morgan Chase, disabled: true}
 - {ats: simplify, name: K1, slug: K1}
 - {ats: simplify, name: Kaiser Permanente, slug: Kaiser Permanente}
-- {ats: simplify, name: Keysight Technologies, slug: Keysight Technologies}
-- {ats: simplify, name: Kinaxis, slug: Kinaxis}
-- {ats: simplify, name: Kinder Morgan, slug: Kinder Morgan}
+- {ats: simplify, name: Keysight Technologies, slug: Keysight Technologies, disabled: true}
+- {ats: simplify, name: Kinaxis, slug: Kinaxis, disabled: true}
+- {ats: simplify, name: Kinder Morgan, slug: Kinder Morgan, disabled: true}
 - {ats: simplify, name: KKR, slug: KKR}
-- {ats: simplify, name: Koch Industries, slug: Koch Industries}
+- {ats: simplify, name: Koch Industries, slug: Koch Industries, disabled: true}
 - {ats: simplify, name: KQED, slug: KQED}
-- {ats: simplify, name: L3Harris Technologies, slug: L3Harris Technologies}
-- {ats: simplify, name: Lazard, slug: Lazard}
+- {ats: simplify, name: L3Harris Technologies, slug: L3Harris Technologies, disabled: true}
+- {ats: simplify, name: Lazard, slug: Lazard, disabled: true}
 - {ats: simplify, name: Leggett & Platt, slug: Leggett & Platt}
 - {ats: simplify, name: Legrand, slug: Legrand}
-- {ats: simplify, name: Lennox International, slug: Lennox International}
-- {ats: simplify, name: Liberty Mutual, slug: Liberty Mutual}
+- {ats: simplify, name: Lennox International, slug: Lennox International, disabled: true}
+- {ats: simplify, name: Liberty Mutual, slug: Liberty Mutual, disabled: true}
 - {ats: simplify, name: Lunar Outpost, slug: Lunar Outpost}
 - {ats: simplify, name: Machina Labs, slug: Machina Labs}
-- {ats: simplify, name: Mackenzie Investments, slug: Mackenzie Investments}
-- {ats: simplify, name: Macy's, slug: Macy's}
+- {ats: simplify, name: Mackenzie Investments, slug: Mackenzie Investments, disabled: true}
+- {ats: simplify, name: Macy's, slug: Macy's, disabled: true}
 - {ats: simplify, name: Markem-Imaje, slug: Markem-Imaje}
 - {ats: simplify, name: MasterControl, slug: MasterControl}
-- {ats: simplify, name: Mayo Clinic, slug: Mayo Clinic}
+- {ats: simplify, name: Mayo Clinic, slug: Mayo Clinic, disabled: true}
 - {ats: simplify, name: Mechanize, slug: Mechanize}
-- {ats: simplify, name: Medpace, slug: Medpace}
+- {ats: simplify, name: Medpace, slug: Medpace, disabled: true}
 - {ats: simplify, name: 'Medpace, Inc.', slug: 'Medpace, Inc.'}
 - {ats: simplify, name: METECS, slug: METECS}
-- {ats: simplify, name: MetLife, slug: MetLife}
-- {ats: simplify, name: Metropolitan Transportation Authority, slug: Metropolitan Transportation Authority}
+- {ats: simplify, name: MetLife, slug: MetLife, disabled: true}
+- {ats: simplify, name: Metropolitan Transportation Authority, slug: Metropolitan Transportation Authority, disabled: true}
 - {ats: simplify, name: Mindsmith, slug: Mindsmith}
 - {ats: simplify, name: Mohawk, slug: Mohawk}
 - {ats: simplify, name: Montenson, slug: Montenson}
 - {ats: simplify, name: 'Montgomery Investment Technology, Inc.', slug: 'Montgomery Investment Technology, Inc.'}
-- {ats: simplify, name: MSA Safety, slug: MSA Safety}
+- {ats: simplify, name: MSA Safety, slug: MSA Safety, disabled: true}
 - {ats: simplify, name: Muru, slug: Muru}
 - {ats: simplify, name: MyEmployment, slug: MyEmployment}
-- {ats: simplify, name: Navy Federal, slug: Navy Federal}
+- {ats: simplify, name: Navy Federal, slug: Navy Federal, disabled: true}
 - {ats: simplify, name: Nebo, slug: Nebo}
 - {ats: simplify, name: Newham, slug: Newham}
 - {ats: simplify, name: Nexthop.ai, slug: Nexthop.ai}
 - {ats: simplify, name: NJ Department of Environmental Protection, slug: NJ Department of Environmental Protection}
-- {ats: simplify, name: Nokia, slug: Nokia}
+- {ats: simplify, name: Nokia, slug: Nokia, disabled: true}
 - {ats: simplify, name: North Atlantic Industries, slug: North Atlantic Industries}
-- {ats: simplify, name: NOV, slug: NOV}
+- {ats: simplify, name: NOV, slug: NOV, disabled: true}
 - {ats: simplify, name: Nova-Tech, slug: Nova-Tech}
-- {ats: simplify, name: Paccar, slug: Paccar}
-- {ats: simplify, name: Panasonic Holdings, slug: Panasonic Holdings}
+- {ats: simplify, name: Paccar, slug: Paccar, disabled: true}
+- {ats: simplify, name: Panasonic Holdings, slug: Panasonic Holdings, disabled: true}
 - {ats: simplify, name: Peak Energy, slug: Peak Energy}
 - {ats: simplify, name: Pella, slug: Pella}
 - {ats: simplify, name: Pennsylvania State University, slug: Pennsylvania State University}
-- {ats: simplify, name: Peraton, slug: Peraton}
-- {ats: simplify, name: Phillips 66, slug: Phillips 66}
-- {ats: simplify, name: Pomerleau, slug: Pomerleau}
-- {ats: simplify, name: Primetals Technologies, slug: Primetals Technologies}
-- {ats: simplify, name: Principal Financial Group, slug: Principal Financial Group}
-- {ats: simplify, name: PrizePicks, slug: PrizePicks}
+- {ats: simplify, name: Peraton, slug: Peraton, disabled: true}
+- {ats: simplify, name: Phillips 66, slug: Phillips 66, disabled: true}
+- {ats: simplify, name: Pomerleau, slug: Pomerleau, disabled: true}
+- {ats: simplify, name: Primetals Technologies, slug: Primetals Technologies, disabled: true}
+- {ats: simplify, name: Principal Financial Group, slug: Principal Financial Group, disabled: true}
+- {ats: simplify, name: PrizePicks, slug: PrizePicks, disabled: true}
 - {ats: simplify, name: Profound Medical, slug: Profound Medical}
 - {ats: simplify, name: Prospect Equities, slug: Prospect Equities}
-- {ats: simplify, name: Publicis Groupe, slug: Publicis Groupe}
-- {ats: simplify, name: Qorvo, slug: Qorvo}
+- {ats: simplify, name: Publicis Groupe, slug: Publicis Groupe, disabled: true}
+- {ats: simplify, name: Qorvo, slug: Qorvo, disabled: true}
 - {ats: simplify, name: Quantbot Technologies, slug: Quantbot Technologies}
 - {ats: simplify, name: Quantum Signal AI, slug: Quantum Signal AI}
 - {ats: simplify, name: Ragle Inc, slug: Ragle Inc}
-- {ats: simplify, name: Ralliant, slug: Ralliant}
-- {ats: simplify, name: Red Ventures, slug: Red Ventures}
+- {ats: simplify, name: Ralliant, slug: Ralliant, disabled: true}
+- {ats: simplify, name: Red Ventures, slug: Red Ventures, disabled: true}
 - {ats: simplify, name: Resonetics, slug: Resonetics}
-- {ats: simplify, name: Rivian, slug: Rivian}
+- {ats: simplify, name: Rivian, slug: Rivian, disabled: true}
 - {ats: simplify, name: RJ Lee Group, slug: RJ Lee Group}
 - {ats: simplify, name: Robert Bosch Venture Capital, slug: Robert Bosch Venture Capital}
-- {ats: simplify, name: Rockefeller Capital Management, slug: Rockefeller Capital Management}
+- {ats: simplify, name: Rockefeller Capital Management, slug: Rockefeller Capital Management, disabled: true}
 - {ats: simplify, name: Rodan Energy Solutions, slug: Rodan Energy Solutions}
-- {ats: simplify, name: RoviSys, slug: RoviSys}
-- {ats: simplify, name: Royal Caribbean Group, slug: Royal Caribbean Group}
-- {ats: simplify, name: S&C Electric Company, slug: S&C Electric Company}
+- {ats: simplify, name: RoviSys, slug: RoviSys, disabled: true}
+- {ats: simplify, name: Royal Caribbean Group, slug: Royal Caribbean Group, disabled: true}
+- {ats: simplify, name: S&C Electric Company, slug: S&C Electric Company, disabled: true}
 - {ats: simplify, name: SageSure, slug: SageSure}
 - {ats: simplify, name: Sandhills Global, slug: Sandhills Global}
-- {ats: simplify, name: SAS, slug: SAS}
-- {ats: simplify, name: SCOR, slug: SCOR}
+- {ats: simplify, name: SAS, slug: SAS, disabled: true}
+- {ats: simplify, name: SCOR, slug: SCOR, disabled: true}
 - {ats: simplify, name: SDSU Research Foundation, slug: SDSU Research Foundation}
-- {ats: simplify, name: SeatGeek, slug: SeatGeek}
+- {ats: simplify, name: SeatGeek, slug: SeatGeek, disabled: true}
 - {ats: simplify, name: Sentinel Technologies, slug: Sentinel Technologies}
-- {ats: simplify, name: Shure, slug: Shure}
-- {ats: simplify, name: Siemens, slug: Siemens}
+- {ats: simplify, name: Shure, slug: Shure, disabled: true}
+- {ats: simplify, name: Siemens, slug: Siemens, disabled: true}
 - {ats: simplify, name: Sikich, slug: Sikich}
 - {ats: simplify, name: SimIS, slug: SimIS}
 - {ats: simplify, name: SimonComputing, slug: SimonComputing}
 - {ats: simplify, name: SimVentions, slug: SimVentions}
-- {ats: simplify, name: Snap, slug: Snap}
+- {ats: simplify, name: Snap, slug: Snap, disabled: true}
 - {ats: simplify, name: SoundOff Signal, slug: SoundOff Signal}
 - {ats: simplify, name: Southern Star Central Gas Pipeline, slug: Southern Star Central Gas Pipeline}
 - {ats: simplify, name: Space Dynamics Laboratory, slug: Space Dynamics Laboratory}
 - {ats: simplify, name: Specter Aerospace, slug: Specter Aerospace}
 - {ats: simplify, name: Springs Window Fashions, slug: Springs Window Fashions}
-- {ats: simplify, name: Standard Aero, slug: Standard Aero}
-- {ats: simplify, name: Staples, slug: Staples}
+- {ats: simplify, name: Standard Aero, slug: Standard Aero, disabled: true}
+- {ats: simplify, name: Staples, slug: Staples, disabled: true}
 - {ats: simplify, name: Star Dental Partners, slug: Star Dental Partners}
-- {ats: simplify, name: State Farm, slug: State Farm}
+- {ats: simplify, name: State Farm, slug: State Farm, disabled: true}
 - {ats: simplify, name: Steel Dynamics, slug: Steel Dynamics}
 - {ats: simplify, name: Stellar Science, slug: Stellar Science}
 - {ats: simplify, name: StepStone Group, slug: StepStone Group}
-- {ats: simplify, name: Steven's Capital Management, slug: Steven's Capital Management}
-- {ats: simplify, name: Stoke Space, slug: Stoke Space}
+- {ats: simplify, name: Steven's Capital Management, slug: Steven's Capital Management, disabled: true}
+- {ats: simplify, name: Stoke Space, slug: Stoke Space, disabled: true}
 - {ats: simplify, name: Stryten, slug: Stryten}
-- {ats: simplify, name: Symphony, slug: Symphony}
-- {ats: simplify, name: Systems Planning and Analysis, slug: Systems Planning and Analysis}
+- {ats: simplify, name: Symphony, slug: Symphony, disabled: true}
+- {ats: simplify, name: Systems Planning and Analysis, slug: Systems Planning and Analysis, disabled: true}
 - {ats: simplify, name: TechInsights, slug: TechInsights}
 - {ats: simplify, name: Tesla, slug: Tesla}
 - {ats: simplify, name: Textron, slug: Textron}
 - {ats: simplify, name: The Cary Company, slug: The Cary Company}
 - {ats: simplify, name: TIFIN, slug: TIFIN}
-- {ats: simplify, name: TikTok, slug: TikTok}
+- {ats: simplify, name: TikTok, slug: TikTok, disabled: true}
 - {ats: simplify, name: Titan Materials Group, slug: Titan Materials Group}
-- {ats: simplify, name: Tradeweb, slug: Tradeweb}
-- {ats: simplify, name: Trane Technologies, slug: Trane Technologies}
+- {ats: simplify, name: Tradeweb, slug: Tradeweb, disabled: true}
+- {ats: simplify, name: Trane Technologies, slug: Trane Technologies, disabled: true}
 - {ats: simplify, name: Transcard Payments, slug: Transcard Payments}
-- {ats: simplify, name: TRC Companies, slug: TRC Companies}
-- {ats: simplify, name: Two Sigma, slug: Two Sigma}
+- {ats: simplify, name: TRC Companies, slug: TRC Companies, disabled: true}
+- {ats: simplify, name: Two Sigma, slug: Two Sigma, disabled: true}
 - {ats: simplify, name: Udig, slug: Udig}
-- {ats: simplify, name: UL Solutions, slug: UL Solutions}
-- {ats: simplify, name: United Launch Alliance, slug: United Launch Alliance}
+- {ats: simplify, name: UL Solutions, slug: UL Solutions, disabled: true}
+- {ats: simplify, name: United Launch Alliance, slug: United Launch Alliance, disabled: true}
 - {ats: simplify, name: Universal Health Services, slug: Universal Health Services}
 - {ats: simplify, name: University of St. Thomas, slug: University of St. Thomas}
 - {ats: simplify, name: Upstart, slug: Upstart}
 - {ats: simplify, name: URBN, slug: URBN}
-- {ats: simplify, name: V2X, slug: V2X}
+- {ats: simplify, name: V2X, slug: V2X, disabled: true}
 - {ats: simplify, name: VaynerMedia, slug: VaynerMedia}
-- {ats: simplify, name: Veeam Software, slug: Veeam Software}
+- {ats: simplify, name: Veeam Software, slug: Veeam Software, disabled: true}
 - {ats: simplify, name: VersaDesk, slug: VersaDesk}
 - {ats: simplify, name: VetsEZ, slug: VetsEZ}
-- {ats: simplify, name: W.R. Berkley, slug: W.R. Berkley}
-- {ats: simplify, name: W.W. Grainger, slug: W.W. Grainger}
+- {ats: simplify, name: W.R. Berkley, slug: W.R. Berkley, disabled: true}
+- {ats: simplify, name: W.W. Grainger, slug: W.W. Grainger, disabled: true}
 - {ats: simplify, name: Walgreens, slug: Walgreens}
-- {ats: simplify, name: Waymo, slug: Waymo}
-- {ats: simplify, name: WEC Energy Group, slug: WEC Energy Group}
-- {ats: simplify, name: Werfen, slug: Werfen}
+- {ats: simplify, name: Waymo, slug: Waymo, disabled: true}
+- {ats: simplify, name: WEC Energy Group, slug: WEC Energy Group, disabled: true}
+- {ats: simplify, name: Werfen, slug: Werfen, disabled: true}
 - {ats: simplify, name: West Bend Insurance, slug: West Bend Insurance}
 - {ats: simplify, name: West Monroe, slug: West Monroe}
-- {ats: simplify, name: Western & Southern Financial Group, slug: Western & Southern Financial Group}
+- {ats: simplify, name: Western & Southern Financial Group, slug: Western & Southern Financial Group, disabled: true}
 - {ats: simplify, name: Western National Insurance, slug: Western National Insurance}
-- {ats: simplify, name: Westinghouse Electric Company, slug: Westinghouse Electric Company}
+- {ats: simplify, name: Westinghouse Electric Company, slug: Westinghouse Electric Company, disabled: true}
 - {ats: simplify, name: WhatNot, slug: WhatNot}
 - {ats: simplify, name: William Blair, slug: William Blair}
 - {ats: simplify, name: Windstar Cruises, slug: Windstar Cruises}
-- {ats: simplify, name: WTW, slug: WTW}
+- {ats: simplify, name: WTW, slug: WTW, disabled: true}
 - {ats: simplify, name: X Development, slug: X Development}
 - {ats: simplify, name: Zimmer Biomet Holdings, slug: Zimmer Biomet Holdings}
 - {ats: simplify, name: Zions Bank, slug: Zions Bank}
 - {ats: simplify, name: Zipline, slug: Zipline}
-# Career sites we have no adapter for (higher.gs.com, Seagate's newer site, ...). The disabled
-# lines are read from the companies' own sites now.
+# Career sites we have no adapter for (higher.gs.com, ...). The disabled lines are read from
+# the companies' own sites now.
 - {name: Goldman Sachs, ats: simplify, slug: Goldman Sachs}
 - {name: Shopify, ats: simplify, slug: Shopify, disabled: true}
 - {name: National Bank of Canada, ats: simplify, slug: National Bank of Canada, disabled: true}
 - {name: Paramount Global, ats: simplify, slug: Paramount Global, disabled: true}
 - {name: Skyscanner, ats: simplify, slug: Skyscanner}
 - {name: Carbon Robotics, ats: simplify, slug: Carbon Robotics}
-- {name: Seagate Technology, ats: simplify, slug: 'Seagate Technology '}
-- {ats: simplify, name: ZS, slug: ZS}
+- {name: Seagate Technology, ats: simplify, slug: 'Seagate Technology ', disabled: true}
+- {ats: simplify, name: ZS, slug: ZS, disabled: true}
 
 # Backup: companies read from intern-list.com because no other source covers them.
 # slug = the company name as intern-list writes it. Keep off the hot tier (one shared,
 # rate-limited read of the lists per run).
-- {ats: internlist, name: Activision Blizzard, slug: Activision Blizzard}
+- {ats: internlist, name: Activision Blizzard, slug: Activision Blizzard, disabled: true}
 - {ats: internlist, name: ADM, slug: ADM}
-- {ats: internlist, name: AIG, slug: AIG}
-- {ats: internlist, name: Air Products, slug: Air Products}
-- {ats: internlist, name: Arevon, slug: Arevon}
-- {ats: internlist, name: ASM, slug: ASM}
+- {ats: internlist, name: AIG, slug: AIG, disabled: true}
+- {ats: internlist, name: Air Products, slug: Air Products, disabled: true}
+- {ats: internlist, name: Arevon, slug: Arevon, disabled: true}
+- {ats: internlist, name: ASM, slug: ASM, disabled: true}
 - {ats: internlist, name: AUMOVIO, slug: AUMOVIO}
-- {ats: internlist, name: BAE Systems, slug: BAE Systems}
+- {ats: internlist, name: BAE Systems, slug: BAE Systems, disabled: true}
 - {ats: internlist, name: Benchmark, slug: Benchmark}
 - {ats: internlist, name: Builders FirstSource, slug: Builders FirstSource}
 - {ats: internlist, name: BWXT, slug: BWXT}
 - {ats: internlist, name: Canadian Natural Resources Limited (CNRL), slug: Canadian Natural Resources Limited (CNRL)}
 - {ats: internlist, name: Canadian Solar Inc., slug: Canadian Solar Inc.}
-- {ats: internlist, name: Capgemini, slug: Capgemini}
+- {ats: internlist, name: Capgemini, slug: Capgemini, disabled: true}
 - {ats: internlist, name: CBIZ, slug: CBIZ}
 - {ats: internlist, name: CBRE, slug: CBRE}
-- {ats: internlist, name: Chubb, slug: Chubb}
-- {ats: internlist, name: CNH, slug: CNH}
-- {ats: internlist, name: Continental, slug: Continental}
+- {ats: internlist, name: Chubb, slug: Chubb, disabled: true}
+- {ats: internlist, name: CNH, slug: CNH, disabled: true}
+- {ats: internlist, name: Continental, slug: Continental, disabled: true}
 - {ats: internlist, name: Corteva Agriscience, slug: Corteva Agriscience}
 - {ats: internlist, name: Donaldson, slug: Donaldson}
 - {ats: internlist, name: Duquesne Light Company, slug: Duquesne Light Company}
-- {ats: internlist, name: Entergy, slug: Entergy}
-- {ats: internlist, name: Ericsson, slug: Ericsson}
-- {ats: internlist, name: First Solar, slug: First Solar}
+- {ats: internlist, name: Entergy, slug: Entergy, disabled: true}
+- {ats: internlist, name: Ericsson, slug: Ericsson, disabled: true}
+- {ats: internlist, name: First Solar, slug: First Solar, disabled: true}
 - {ats: internlist, name: FIS, slug: FIS}
 - {ats: internlist, name: Fortune Brands Innovations, slug: Fortune Brands Innovations}
 - {ats: internlist, name: Freeport-McMoRan, slug: Freeport-McMoRan}
 - {ats: internlist, name: Genworth, slug: Genworth}
 - {ats: internlist, name: Grainger, slug: Grainger}
 - {ats: internlist, name: Hubbell Incorporated, slug: Hubbell Incorporated}
-- {ats: internlist, name: Iberdrola, slug: Iberdrola}
+- {ats: internlist, name: Iberdrola, slug: Iberdrola, disabled: true}
 - {ats: internlist, name: IBM, slug: IBM}
 - {ats: internlist, name: Infineon Technologies, slug: Infineon Technologies}
 - {ats: internlist, name: Interactive Brokers, slug: Interactive Brokers}
@@ -956,42 +1464,42 @@
 - {ats: internlist, name: Klein Tools, slug: Klein Tools}
 - {ats: internlist, name: Leonardo DRS, slug: Leonardo DRS}
 - {ats: internlist, name: Lincoln Electric, slug: Lincoln Electric}
-- {ats: internlist, name: Littelfuse, slug: Littelfuse}
+- {ats: internlist, name: Littelfuse, slug: Littelfuse, disabled: true}
 - {ats: internlist, name: Loblaw Companies Limited, slug: Loblaw Companies Limited}
-- {ats: internlist, name: Lockheed Martin, slug: Lockheed Martin}
-- {ats: internlist, name: LPL Financial, slug: LPL Financial}
+- {ats: internlist, name: Lockheed Martin, slug: Lockheed Martin, disabled: true}
+- {ats: internlist, name: LPL Financial, slug: LPL Financial, disabled: true}
 - {ats: internlist, name: Mapfre, slug: Mapfre}
 - {ats: internlist, name: MiniMed, slug: MiniMed}
 - {ats: internlist, name: MKS Inc., slug: MKS Inc.}
 - {ats: internlist, name: Mohawk Industries, slug: Mohawk Industries}
 - {ats: internlist, name: Moody's Corporation, slug: Moody's Corporation}
 - {ats: internlist, name: Novo Nordisk, slug: Novo Nordisk}
-- {ats: internlist, name: Nucor Corporation, slug: Nucor Corporation}
+- {ats: internlist, name: Nucor Corporation, slug: Nucor Corporation, disabled: true}
 - {ats: internlist, name: Parkland Corporation, slug: Parkland Corporation}
 - {ats: internlist, name: Prudential Financial, slug: Prudential Financial}
 - {ats: internlist, name: Redwire, slug: Redwire}
-- {ats: internlist, name: Santander, slug: Santander}
+- {ats: internlist, name: Santander, slug: Santander, disabled: true}
 - {ats: internlist, name: SAP, slug: SAP}
 - {ats: internlist, name: Schneider Electric, slug: Schneider Electric}
-- {ats: internlist, name: Schroders, slug: Schroders}
+- {ats: internlist, name: Schroders, slug: Schroders, disabled: true}
 - {ats: internlist, name: Scotiabank, slug: Scotiabank}
 - {ats: internlist, name: Selective Insurance, slug: Selective Insurance}
-- {ats: internlist, name: Sonoco, slug: Sonoco}
+- {ats: internlist, name: Sonoco, slug: Sonoco, disabled: true}
 - {ats: internlist, name: SPX Technologies, slug: SPX Technologies}
 - {ats: internlist, name: Stellantis, slug: Stellantis}
 - {ats: internlist, name: Stifel Financial Corp., slug: Stifel Financial Corp.}
-- {ats: internlist, name: T. Rowe Price, slug: T. Rowe Price}
+- {ats: internlist, name: T. Rowe Price, slug: T. Rowe Price, disabled: true}
 - {ats: internlist, name: TE Connectivity, slug: TE Connectivity}
 - {ats: internlist, name: Teleflex, slug: Teleflex}
-- {ats: internlist, name: The Clorox Company, slug: The Clorox Company}
+- {ats: internlist, name: The Clorox Company, slug: The Clorox Company, disabled: true}
 - {ats: internlist, name: The Hanover Insurance Group, slug: The Hanover Insurance Group}
 - {ats: internlist, name: 'The TJX Companies, Inc.', slug: 'The TJX Companies, Inc.'}
 - {ats: internlist, name: Tokyo Electron US, slug: Tokyo Electron US}
 - {ats: internlist, name: Tractor Supply Company, slug: Tractor Supply Company}
 - {ats: internlist, name: Ulta Beauty, slug: Ulta Beauty}
-- {ats: internlist, name: United Airlines, slug: United Airlines}
+- {ats: internlist, name: United Airlines, slug: United Airlines, disabled: true}
 - {ats: internlist, name: Verizon, slug: Verizon}
 - {ats: internlist, name: Volvo Group, slug: Volvo Group}
 - {ats: internlist, name: Weyerhaeuser, slug: Weyerhaeuser}
-- {ats: internlist, name: Williams, slug: Williams}
+- {ats: internlist, name: Williams, slug: Williams, disabled: true}
 - {ats: internlist, name: Zoetis, slug: Zoetis}

@@ -3,7 +3,16 @@ import json
 import httpx
 import pytest
 
-from scraper.adapters import ADAPTERS, avature, deshaw, pinpoint, shopify, successfactors
+from scraper.adapters import (
+    ADAPTERS,
+    avature,
+    deshaw,
+    phenom,
+    pinpoint,
+    shopify,
+    successfactors,
+    tiktok,
+)
 from scraper.http import Fetcher, FetchError
 from scraper.models import Company
 
@@ -165,6 +174,18 @@ async def test_avature_failed_page_is_pending_and_missing_base_raises():
             await ADAPTERS["avature"](f, co("avature"))
 
 
+async def test_avature_uses_a_renamed_search_page():
+    def handler(request):
+        assert request.url.path == "/careers/OpenRoles/"
+        return httpx.Response(200, text="<html><body>No results found</body></html>")
+
+    company = Company(id=1, name="Ex", ats="avature", slug="ex",
+                      workday_host="e.test/careers", workday_site="OpenRoles")  # fmt: skip
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["avature"](f, company)
+    assert result.jobs == [] and result.confirmed_empty
+
+
 # --- SuccessFactors ---------------------------------------------------------------------------
 
 SITEMAP = """<?xml version="1.0"?><urlset>
@@ -223,6 +244,45 @@ def test_successfactors_reads_a_printed_place_outside_ca_us_as_foreign():
         rmk_page("Intern, Engineering", False, "Colon, QUE, MEX, 76270"), "Colon-Intern-MEX"
     )
     assert page["location"] == "Colon, QUE, MEX, 76270" and page["country"] == "OTHER"
+
+
+RSS = """<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0"><channel>
+<item><title>Co-op Student, Software (Toronto, ON, CA)</title>
+<link>https://jobs.example.com/job/Toronto-Co-op-Student%2C-Software-ON/555/</link>
+<g:location>Toronto, ON, CA</g:location></item>
+<item><title>Sales Associate</title><link>https://jobs.example.com/job/Brampton-Sales-Associate-ON/666/</link></item>
+</channel></rss>"""
+INDEX = """<sitemapindex><sitemap><loc>https://jobs.example.com/en/sitemap.xml</loc></sitemap>
+<sitemap><loc>https://jobs.example.com/fr/jobs/sitemap.xml</loc></sitemap>
+<sitemap><loc>https://jobs.example.com/en/jobs/sitemap.xml</loc></sitemap></sitemapindex>"""
+
+
+async def test_successfactors_reads_an_rss_feed_behind_a_sitemap_index():
+    asked = []
+
+    def handler(request):
+        url = str(request.url)
+        asked.append(url)
+        if url == "https://jobs.example.com/sitemap.xml":
+            return httpx.Response(200, text=INDEX)
+        if url == "https://jobs.example.com/en/sitemap.xml":
+            return httpx.Response(
+                200, text="<urlset><url><loc>https://jobs.example.com/</loc></url></urlset>"
+            )
+        if url == "https://jobs.example.com/en/jobs/sitemap.xml":
+            return httpx.Response(200, text=RSS)
+        return httpx.Response(200, text=rmk_page("Co-op Student, Software", False))
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["successfactors"](f, co("successfactors", host="jobs.example.com"))
+    assert [j.source_job_id for j in result.jobs] == ["jobs.example.com:555"]
+    assert not any("/fr/" in u or "/666/" in u for u in asked)
+
+
+def test_successfactors_slug_title_keeps_co_op():
+    assert successfactors.slug_title("Ottawa-Software-Co-op-%28Winter%29-ON") == (
+        "Ottawa Software Co-op (Winter) ON"
+    )
 
 
 def test_successfactors_bad_sitemap_raises():
@@ -343,3 +403,132 @@ async def test_shopify_lists_postings_and_reads_only_internship_pages():
 def test_shopify_page_without_route_data_raises():
     with pytest.raises(FetchError):
         shopify.parse_search("<html></html>")
+
+
+# --- Phenom -----------------------------------------------------------------------------------
+
+PH_BASE = "careers.example.com/us/en"
+PH_INDEX = """<sitemapindex><sitemap><loc>https://careers.example.com/us/en/sitemap1.xml</loc>
+</sitemap><sitemap><loc>https://careers.example.com/jp/ja/sitemap1.xml</loc></sitemap>
+</sitemapindex>"""
+PH_URLSET = """<urlset>
+<url><loc>https://careers.example.com/us/en/job/R1/Software-Engineering-Intern-Summer-2027</loc></url>
+<url><loc>https://careers.example.com/us/en/job/R2/Senior-Network-Engineer</loc></url>
+<url><loc>https://careers.example.com/us/en/job/R3/Data-Science-Co-op</loc></url>
+<url><loc>https://careers.example.com/us/en/search-results</loc></url>
+</urlset>"""
+
+
+def phenom_page(job):
+    return f"<script>phApp.ddo = {json.dumps({'jobDetail': {'data': {'job': job}}})}; phApp.x = 1;"
+
+
+async def test_phenom_reads_the_sitemap_index_and_opens_only_internship_pages():
+    opened = []
+
+    def handler(request):
+        url = str(request.url)
+        if url == f"https://{PH_BASE}/sitemap.xml":
+            return httpx.Response(200, text=PH_INDEX)
+        if url == f"https://{PH_BASE}/sitemap1.xml":
+            return httpx.Response(200, text=PH_URLSET)
+        assert "/jp/ja/" not in url  # other locales' sitemaps are left alone
+        opened.append(request.url.path)
+        if url.endswith("/R1/Software-Engineering-Intern-Summer-2027"):
+            return httpx.Response(200, text=phenom_page({
+                "title": "Software Engineering Intern (Summer 2027)", "country": "United States",
+                "multi_location": ["McLean, Virginia, United States of America",
+                                   "Bedford, Massachusetts, United States of America"],
+                "description": "<p>Write Go. $30/hour.</p>", "type": "Intern",
+                "postedDate": "2026-09-18T00:00:00.000+0000",
+            }))  # fmt: skip
+        return httpx.Response(200, text=phenom_page({
+            "title": "Data Science Co-op", "country": "Morocco", "location": "Casablanca, Morocco",
+        }))  # fmt: skip
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["phenom"](f, co("phenom", host=PH_BASE))
+    jobs = {j.source_job_id: j for j in result.jobs}
+    assert set(jobs) == {"careers.example.com:R1", "careers.example.com:R3"}
+    assert not any("/R2/" in p for p in opened)
+    job = jobs["careers.example.com:R1"]
+    assert job.title == "Software Engineering Intern (Summer 2027)"
+    assert job.location_raw == (
+        "McLean, Virginia, United States of America | Bedford, Massachusetts, United States of America"
+    )
+    assert "Write Go." in job.description_text and job.employment_type_hint == "Intern"
+    assert job.source_posted_at.date().isoformat() == "2026-09-18" and job.country_hint is None
+    assert jobs["careers.example.com:R3"].country_hint == "OTHER"
+
+
+async def test_phenom_failed_page_is_pending_and_keeps_the_slug_title_otherwise():
+    def handler(request):
+        if request.url.path.endswith("sitemap.xml"):
+            return httpx.Response(200, text=PH_URLSET)
+        if "/R1/" in request.url.path:
+            return httpx.Response(500)
+        return httpx.Response(200, text="<html>no data</html>")
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["phenom"](f, co("phenom", host=PH_BASE))
+        assert result.pending_ids == {"careers.example.com:R1"}
+        assert [j.title for j in result.jobs] == ["Data Science Co-op"]
+        with pytest.raises(FetchError, match="site base"):
+            await ADAPTERS["phenom"](f, co("phenom"))
+
+
+def test_phenom_country_hint_keeps_postings_that_include_ca_or_us():
+    assert phenom.country_hint({"country": "India", "location": "Toronto, Canada"}) is None
+    assert phenom.country_hint({"country": "Canada", "location": "Toronto"}) is None
+    assert phenom.country_hint({"country": "Italy", "location": "Milano, Italy"}) == "OTHER"
+
+
+def test_phenom_bad_sitemap_raises():
+    with pytest.raises(FetchError):
+        phenom.parse_sitemap("<html>blocked</html>")
+
+
+# --- TikTok -----------------------------------------------------------------------------------
+
+
+def tiktok_post(i, title, city, state, country):
+    place = {"en_name": city, "parent": {"en_name": state, "parent": {"en_name": country}}}
+    return {
+        "id": str(i), "title": title, "description": "Build feeds.", "requirement": "Python.",
+        "recruit_type": {"id": "202", "en_name": "Intern"}, "city_info": place,
+    }  # fmt: skip
+
+
+async def test_tiktok_pages_internships_and_keeps_only_ca_us():
+    bodies = []
+
+    def handler(request):
+        body = json.loads(request.content)
+        bodies.append(body)
+        assert request.headers["website-path"] == "tiktok"
+        assert body["recruitment_id_list"] == ["202"]
+        if body["offset"] == 0:
+            posts = [tiktok_post(1, "Software Engineer Intern - 2027 Summer", "San Jose",
+                                 "California", "United States of America")]  # fmt: skip
+            posts += [tiktok_post(i, "Data Intern", "Singapore", "Singapore", "Singapore")
+                      for i in range(2, 101)]  # fmt: skip
+        else:
+            posts = [tiktok_post(101, "ML Intern", "Toronto", "Ontario", "Canada")]
+        return httpx.Response(200, json={"code": 0, "data": {"job_post_list": posts, "count": 101}})
+
+    async with make_fetcher(handler) as f:
+        result = await ADAPTERS["tiktok"](f, co("tiktok", "tiktok"))
+    assert [b["offset"] for b in bodies] == [0, 100]
+    jobs = {j.source_job_id: j for j in result.jobs}
+    assert set(jobs) == {"1", "101"} and not result.truncated
+    job = jobs["1"]
+    assert job.location_raw == "San Jose, California, United States of America"
+    assert job.country_hint == "US" and jobs["101"].country_hint == "CA"
+    assert job.description_text == "Build feeds.\n\nPython."
+    assert job.url == "https://lifeattiktok.com/search/1" and job.employment_type_hint == "Intern"
+
+
+def test_tiktok_places_and_bad_payload():
+    assert tiktok.places({"city_info": None}) == []
+    with pytest.raises(FetchError):
+        tiktok.parse({"code": 1, "message": "blocked"})
