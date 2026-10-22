@@ -1,7 +1,8 @@
 import { Badge } from "@/components/Badge";
+import { CompanyLogo } from "@/components/CompanyLogo";
 import { flagBadges, freshnessBadge, visaBadge } from "@/lib/badges";
 import type { Filters } from "@/lib/filters";
-import { companyInitial, faviconUrl, formatLocation, formatPay, relativeTime, safeUrl } from "@/lib/format";
+import { formatLocation, formatPay, relativeTime, safeUrl } from "@/lib/format";
 import type { JobRow, JobSource } from "@/lib/types";
 
 // Company | Role | Location | Term | Pay | Visa | Flags | Seen
@@ -30,7 +31,6 @@ function evidenceLabel(key: string): string {
 function Row({ job, sources, now }: { job: JobRow; sources: JobSource[]; now: Date }) {
   const url = safeUrl(job.best_url);
   const pay = formatPay(job.pay_hourly_min, job.pay_hourly_max, job.pay_currency);
-  const icon = faviconUrl(job.company_domain);
   const mode = job.work_mode === "remote" || job.work_mode === "hybrid" ? job.work_mode : null;
   const flags = flagBadges(job);
   const evidence = Object.entries(job.evidence);
@@ -39,17 +39,7 @@ function Row({ job, sources, now }: { job: JobRow; sources: JobSource[]; now: Da
       <details className="group">
         <summary className={`cursor-pointer px-4 py-3 hover:bg-canvas/60 md:px-6 ${GRID}`}>
           <div className="flex items-center gap-2 text-sm font-medium text-ink">
-            {icon ? (
-              <img src={icon} alt="" width={16} height={16} className="h-4 w-4 rounded-sm" />
-            ) : (
-              <span
-                data-testid="company-initial"
-                aria-hidden="true"
-                className="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-divider text-[10px] font-semibold leading-none text-graphite"
-              >
-                {companyInitial(job.company_name)}
-              </span>
-            )}
+            <CompanyLogo name={job.company_name} domain={job.company_domain} />
             <span className="truncate">{job.company_name}</span>
           </div>
           <div className="mt-1 text-sm md:mt-0">

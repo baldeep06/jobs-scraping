@@ -23,6 +23,8 @@ def test_migrate_is_idempotent(conn):
         "20261018000000_internlist.sql",
         "20261019000000_alerts.sql",
         "20261021000000_more_career_sites.sql",
+        "20261021120000_company_logos.sql",
+        "20261021130000_logo_host.sql",
     ]
 
 

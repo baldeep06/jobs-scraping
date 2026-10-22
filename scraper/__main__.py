@@ -121,7 +121,7 @@ def cmd_discover(_: argparse.Namespace) -> int:
 def cmd_domains(args: argparse.Namespace) -> int:
     async def go(conn: psycopg.Connection) -> int:
         async with Fetcher() as fetcher:
-            return await resolve_domains(fetcher, conn, limit=args.limit)
+            return await resolve_domains(fetcher, conn, limit=args.limit, recheck=args.recheck)
 
     print(f"found {asyncio.run(go(_connect()))} company websites")
     return 0
@@ -354,6 +354,9 @@ def main(argv: list[str] | None = None) -> int:
         "domains", help="look up websites (for logos) of companies without one"
     )
     domains.add_argument("--limit", type=int, default=2000)
+    domains.add_argument(
+        "--recheck", action="store_true", help="also retry companies an earlier lookup missed"
+    )
 
     groups = sub.add_parser("groups", help="apply data/company_groups.yml to the companies")
     groups.add_argument("--file", type=Path, default=GROUPS_FILE)
