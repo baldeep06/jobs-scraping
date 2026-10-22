@@ -106,6 +106,8 @@ big_tech_adjacent:
   - "Kraken"
   - "Deel"
   - "Mercury"
+  - "Bloomberg"
+  - "Epic Systems"
 
 quant:
   - "Anthelion Capital"
@@ -174,6 +176,8 @@ quant:
   - "Da Vinci"
   - "Bridgewater Associates"
   - "Vatic Labs"
+  - "D. E. Shaw"
+  - "Wolverine Trading"
 
 ai_labs:
   - "Anthropic"
@@ -292,6 +296,8 @@ defense_hardware:
   - "Torc Robotics"
   - "Avride"
   - "Latitude AI"
+  - "Bombardier"
+  - "Impulse Space"
 
 canadian:
   - "1Password"
@@ -333,6 +339,8 @@ canadian:
   - "Wattpad"
   - "Kraken Robotics"
   - "Seaspan"
+  - "Celestica"
+  - "Bombardier"
 
 unicorn:
   - "1Password"

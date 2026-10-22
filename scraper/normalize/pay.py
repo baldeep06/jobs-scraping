@@ -6,7 +6,7 @@ _HOURS = {"hour": 1.0, "week": 40.0, "month": 173.3, "year": 2080.0}
 _PLAUSIBLE = {
     "hour": (10, 500),
     "week": (300, 10_000),
-    "month": (1_000, 20_000),
+    "month": (1_000, 30_000),  # quant internships pay $25k a month
     "year": (10_000, 1_000_000),
 }
 
@@ -21,10 +21,12 @@ _PERIODS = [
     ("hour", re.compile(r"/\s*h(?:ou)?r\b|per\s+hour|hourly|an\s+hour", re.I)),
     (
         "year",
-        re.compile(r"/\s*y(?:ea)?r\b|per\s+(?:year|annum)|annual(?:ly)?|a\s+year|salary", re.I),
+        re.compile(r"/\s*y(?:ea)?r\b|per\s+(?:year|annum)|annual(?:ly)?|a\s+year", re.I),
     ),
     ("month", re.compile(r"/\s*mo(?:nth)?\b|per\s+month|monthly|a\s+month", re.I)),
     ("week", re.compile(r"/\s*w(?:ee)?k\b|per\s+week|weekly|a\s+week", re.I)),
+    # Last: "salary" alone means yearly, but "a monthly base salary of" is monthly.
+    ("year", re.compile(r"salary", re.I)),
 ]
 # Words that make an adjacent amount something other than pay. Checked only up to the
 # neighbouring "$" or line break, so "$40/hr plus a $1,500 housing stipend" keeps $40/hr.

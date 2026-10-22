@@ -93,3 +93,19 @@ def test_pay_next_to_a_stipend_is_still_pay():
 def test_benefits_heading_on_next_line_does_not_hide_pay():
     pay = p("Hourly Range for this internship is:\n$54—$56 USD\nBenefits: Take a peek at our perks")
     assert (pay.min, pay.max, pay.period) == (54, 56, "hour")
+
+
+def test_monthly_salary_is_monthly_not_yearly():
+    # D. E. Shaw: an explicit "monthly" beats the generic word "salary"; quant interns earn
+    # more than $20k a month.
+    pay = p(
+        "The position offers a monthly base salary of $25,000, overtime pay, a sign-on bonus"
+        " of $25,000, travel coverage to and from the internship."
+    )
+    assert (pay.min, pay.period) == (25000, "month")
+    assert pay.hourly_min == 144.26
+
+
+def test_salary_alone_still_means_yearly():
+    pay = p("Base salary: $120,000 - $150,000")
+    assert (pay.min, pay.max, pay.period) == (120000, 150000, "year")

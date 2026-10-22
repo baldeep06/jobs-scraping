@@ -64,6 +64,8 @@
 # request to metacareers.com, add `disabled: true` to this line and run `python -m scraper seed`
 # (it sets the company inactive and closes its open jobs; removing the line alone does nothing).
 - {name: Meta, ats: meta, slug: meta, domain: meta.com, hot: true}
+- {name: D. E. Shaw, ats: deshaw, slug: deshaw, domain: deshaw.com}
+- {name: Shopify, ats: shopify, slug: shopify, domain: shopify.com}
 
 
 # US public tech companies >= $1B market cap (from US_Tech_Companies_by_Market_Cap.xlsx), found by probing public ATS endpoints.
@@ -190,6 +192,18 @@
 - {name: Intuit, ats: talentbrew, slug: intuit, workday_host: jobs.intuit.com, workday_site: "-"}
 - {name: Synopsys, ats: talentbrew, slug: synopsys, workday_host: careers.synopsys.com, workday_site: "-"}
 - {name: Comcast, ats: talentbrew, slug: comcast, workday_host: jobs.comcast.com, workday_site: "-"}
+
+# Avature portals (portal base, host plus path, in workday_host), SuccessFactors sites (host in
+# workday_host) and Pinpoint boards.
+- {name: Bloomberg, ats: avature, slug: bloomberg, workday_host: bloomberg.avature.net/careers, workday_site: "-", domain: bloomberg.com}
+- {name: Epic Systems, ats: avature, slug: epic, workday_host: epic.avature.net/Careers, workday_site: "-", domain: epic.com}
+- {name: National Bank of Canada, ats: avature, slug: bnc, workday_host: emplois.bnc.ca/en_CA/careers, workday_site: "-", domain: nbc.ca}
+- {name: Celestica, ats: successfactors, slug: celestica, workday_host: careers.celestica.com, workday_site: "-", domain: celestica.com}
+- {name: Bombardier, ats: successfactors, slug: bombardier, workday_host: jobs.bombardier.com, workday_site: "-", domain: bombardier.com}
+- {name: Paramount, ats: successfactors, slug: paramount, workday_host: careers.paramount.com, workday_site: "-", domain: paramount.com}
+- {name: Super Micro Computer, ats: successfactors, slug: supermicro, workday_host: jobs.supermicro.com, workday_site: "-", domain: supermicro.com}
+- {name: Wolverine Trading, ats: pinpoint, slug: wolve, domain: wolve.com}
+- {name: Impulse Space, ats: pinpoint, slug: impulsespace, domain: impulsespace.com}
 
 # Jobvite boards and Uber's campus iCIMS portal (no internships posted yet for 2027).
 - {name: Tyler Technologies, ats: jobvite, slug: tylertech}
@@ -731,7 +745,7 @@
 - {ats: simplify, name: IDeaS, slug: IDeaS}
 - {ats: simplify, name: IDEMIA, slug: IDEMIA}
 - {ats: simplify, name: Illinois Tool Works, slug: Illinois Tool Works}
-- {ats: simplify, name: Impulse Space, slug: Impulse Space}
+- {ats: simplify, name: Impulse Space, slug: Impulse Space, disabled: true}  # now read from Pinpoint
 - {ats: simplify, name: InComm Payments, slug: InComm Payments}
 - {ats: simplify, name: Innovative Systems, slug: Innovative Systems}
 - {ats: simplify, name: IntelliGenesis, slug: IntelliGenesis}
@@ -888,11 +902,12 @@
 - {ats: simplify, name: Zimmer Biomet Holdings, slug: Zimmer Biomet Holdings}
 - {ats: simplify, name: Zions Bank, slug: Zions Bank}
 - {ats: simplify, name: Zipline, slug: Zipline}
-# Career sites we have no adapter for (higher.gs.com, Avature, SuccessFactors, ...).
+# Career sites we have no adapter for (higher.gs.com, Seagate's newer site, ...). The disabled
+# lines are read from the companies' own sites now.
 - {name: Goldman Sachs, ats: simplify, slug: Goldman Sachs}
-- {name: Shopify, ats: simplify, slug: Shopify}
-- {name: National Bank of Canada, ats: simplify, slug: National Bank of Canada}
-- {name: Paramount Global, ats: simplify, slug: Paramount Global}
+- {name: Shopify, ats: simplify, slug: Shopify, disabled: true}
+- {name: National Bank of Canada, ats: simplify, slug: National Bank of Canada, disabled: true}
+- {name: Paramount Global, ats: simplify, slug: Paramount Global, disabled: true}
 - {name: Skyscanner, ats: simplify, slug: Skyscanner}
 - {name: Carbon Robotics, ats: simplify, slug: Carbon Robotics}
 - {name: Seagate Technology, ats: simplify, slug: 'Seagate Technology '}

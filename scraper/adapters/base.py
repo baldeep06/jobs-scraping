@@ -21,7 +21,9 @@ STATEFUL_ATS = {"meta", "internlist"}
 AGGREGATOR_ATS = {"simplify", "internlist"}
 BIGTECH_ATS = {"amazon", "apple", "google", "meta", "microsoft"}
 # (Workable is not here: its API answers HTTP 429 to polls every 2 minutes.)
-FAST_ATS = {"greenhouse", "lever", "lever_eu", "ashby", "gem", "rippling", "smartrecruiters"}
+FAST_ATS = {
+    "greenhouse", "lever", "lever_eu", "ashby", "gem", "rippling", "smartrecruiters", "pinpoint",
+}  # fmt: skip
 
 
 def as_id(value: Any) -> str:
