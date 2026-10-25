@@ -1,14 +1,14 @@
 # Intern Radar stats
 
-Updated 2026-10-18 (weekly by the maintenance workflow, which also keeps GitHub from disabling the schedules). Last scrape: scrape-express at 2026-10-18 12:14 UTC
+Updated 2026-10-25 (weekly by the maintenance workflow, which also keeps GitHub from disabling the schedules). Last scrape: scrape-express at 2026-10-25 12:48 UTC
 
 ## Companies by tier
 
 | | Count |
 |---|---|
-| hot | 1330 |
-| inactive | 8 |
-| warm | 457 |
+| hot | 1475 |
+| inactive | 181 |
+| warm | 924 |
 
 ## Companies by ATS
 
@@ -16,33 +16,40 @@ Updated 2026-10-18 (weekly by the maintenance workflow, which also keeps GitHub 
 |---|---|
 | amazon | 1 |
 | apple | 1 |
-| ashby | 271 |
-| eightfold | 6 |
+| ashby | 396 |
+| avature | 11 |
+| deshaw | 1 |
+| eightfold | 12 |
 | eightfold_v2 | 2 |
-| gem | 3 |
+| gem | 6 |
 | google | 1 |
-| greenhouse | 350 |
-| icims | 3 |
+| greenhouse | 549 |
+| icims | 41 |
 | internlist | 79 |
-| jibe | 5 |
-| jobvite | 4 |
-| lever | 77 |
+| jibe | 33 |
+| jobvite | 10 |
+| lever | 121 |
 | lever_eu | 2 |
 | meta | 1 |
 | microsoft | 1 |
-| oraclehcm | 6 |
-| rippling | 17 |
-| simplify | 288 |
-| smartrecruiters | 67 |
+| oraclehcm | 58 |
+| phenom | 13 |
+| pinpoint | 4 |
+| rippling | 21 |
+| shopify | 1 |
+| simplify | 295 |
+| smartrecruiters | 85 |
+| successfactors | 39 |
 | talentbrew | 3 |
-| workable | 35 |
-| workday | 572 |
+| tiktok | 1 |
+| workable | 47 |
+| workday | 745 |
 
 ## Open internships by country
 
 | | Count |
 |---|---|
-| BOTH | 15 |
-| CA | 412 |
-| UNKNOWN | 558 |
-| US | 5517 |
+| BOTH | 26 |
+| CA | 661 |
+| UNKNOWN | 944 |
+| US | 6885 |
