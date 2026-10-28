@@ -163,6 +163,18 @@ describe("GroupToggles", () => {
     expect(html).toContain('href="/us?category=SWE"'); // quant is on: clicking it removes it
     expect(html).toMatch(/<a[^>]*aria-pressed="true"[^>]*>[^<]*Quant/);
   });
+
+  it("shows tech, hardware, finance and industry groups on their own rows", () => {
+    const html = renderToStaticMarkup(<GroupToggles filters={US} counts={counts} />);
+    const at = (s: string) => html.indexOf(s);
+    expect(at(">Tech<")).toBeLessThan(at("Big tech"));
+    expect(at("Big tech")).toBeLessThan(at(">Hardware<"));
+    expect(at(">Hardware<")).toBeLessThan(at("Chips &amp; semiconductors"));
+    expect(at("Robotics &amp; self-driving")).toBeLessThan(at(">Finance<"));
+    expect(at(">Finance<")).toBeLessThan(at("Banks &amp; finance"));
+    expect(at("Banks &amp; finance")).toBeLessThan(at(">Industry<"));
+    expect(at(">Industry<")).toBeLessThan(at("Industrial &amp; manufacturing"));
+  });
 });
 
 describe("FilterBar groups", () => {

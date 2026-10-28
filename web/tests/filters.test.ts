@@ -117,8 +117,8 @@ describe("company group filter", () => {
   });
 
   it("round-trips through the query string", () => {
-    const f = parseFilters("us", { group: "unicorn,quant", page: "2" });
-    expect(toQuery(f)).toBe("?group=quant%2Cunicorn&page=2");
+    const f = parseFilters("us", { group: "energy,quant", page: "2" });
+    expect(toQuery(f)).toBe("?group=quant%2Cenergy&page=2");
   });
 
   it("toggles a group on and off and returns to page 1", () => {

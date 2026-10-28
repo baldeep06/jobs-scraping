@@ -10,17 +10,30 @@ export const CATEGORIES = [
   "IT/Security",
   "Other-tech",
 ] as const;
-/** Company groups, in display order (kept in step with scraper/groups.py). */
+/** Company groups, in display order (kept in step with scraper/groups.py), each in the row
+ * it is shown in: tech companies, hardware, finance, then other industries. */
 export const GROUPS = [
-  ["faang", "FAANG+"],
-  ["big_tech", "Big tech"],
-  ["big_tech_adjacent", "Big-tech adjacent"],
-  ["quant", "Quant / trading"],
-  ["unicorn", "Unicorns"],
-  ["ai_labs", "AI labs"],
-  ["fintech", "Fintech"],
-  ["defense_hardware", "Defense / hardware"],
-  ["canadian", "Canadian"],
+  ["faang", "FAANG+", "tech"],
+  ["big_tech", "Big tech", "tech"],
+  ["big_tech_adjacent", "Established tech", "tech"],
+  ["unicorn", "Unicorns", "tech"],
+  ["startup", "Startups", "tech"],
+  ["ai_labs", "AI labs", "tech"],
+  ["semiconductors", "Chips & semiconductors", "hardware"],
+  ["hardware", "Hardware & devices", "hardware"],
+  ["robotics", "Robotics & self-driving", "hardware"],
+  ["quant", "Quant / trading", "finance"],
+  ["fintech", "Fintech", "finance"],
+  ["finance", "Banks & finance", "finance"],
+  ["consulting", "Consulting", "industry"],
+  ["defense", "Defense & aerospace", "industry"],
+  ["energy", "Energy & utilities", "industry"],
+  ["industrial", "Industrial & manufacturing", "industry"],
+  ["healthcare", "Healthcare & biotech", "industry"],
+  ["consumer", "Consumer & retail", "industry"],
+  ["media", "Media, gaming & telecom", "industry"],
+  ["public_sector", "Government & research", "industry"],
+  ["canadian", "Canadian", "industry"],
 ] as const;
 export type Group = (typeof GROUPS)[number][0];
 export const GROUP_KEYS = GROUPS.map(([key]) => key) as Group[];

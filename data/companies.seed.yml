@@ -356,10 +356,13 @@
 - {name: Improbable, ats: ashby, slug: improbable}
 - {name: Starburst, ats: greenhouse, slug: starburst}
 - {name: Olix, ats: ashby, slug: olix}
-- {name: Sila, ats: lever, slug: sila}
+# lever/sila is Sila Services (plumbing), not Sila Nanotechnologies.
+- {name: Sila, ats: lever, slug: sila, disabled: true}
 - {name: Komodo Health, ats: greenhouse, slug: komodohealth}
 - {name: Cars24, ats: smartrecruiters, slug: cars24}
 - {name: Black Forest Labs, ats: ashby, slug: black-forest-labs}
+# MORSE Corp's co-op board (the Simplify list named it Meridian Partners).
+- {name: MORSE Corp, ats: greenhouse, slug: morsecorpcoop, domain: morsecorp.com}
 - {name: Thumbtack, ats: ashby, slug: thumbtack}
 - {name: Cedar, ats: ashby, slug: cedar}
 - {name: Blockstream, ats: ashby, slug: blockstream}
@@ -1118,6 +1121,58 @@
 - {name: Genetec, ats: workable, slug: genetec-inc}
 - {name: Innovaccer, ats: workable, slug: innovaccer-analytics}
 - {name: Infleqtion, ats: workable, slug: coldquanta}
+
+# Found 2026-10-27 checking a list of companies students apply to (US and Canada only).
+# Boards were read from ATS probes and careers pages.
+- {name: HackerRank, ats: greenhouse, slug: hackerrank, domain: hackerrank.com}
+- {name: Motive, ats: greenhouse, slug: motive, domain: gomotive.com}
+- {name: New Relic, ats: greenhouse, slug: newrelic, domain: newrelic.com}
+- {name: Sumo Logic, ats: greenhouse, slug: sumologic, domain: sumologic.com}
+- {name: Kaseya, ats: greenhouse, slug: kaseya, domain: kaseya.com}
+- {name: Uber Freight, ats: greenhouse, slug: uberfreight, domain: uberfreight.com}
+- {name: SeekOut, ats: greenhouse, slug: seekout, domain: seekout.com}
+- {name: Alpaca, ats: greenhouse, slug: alpaca, domain: alpaca.markets}
+- {name: Amperity, ats: greenhouse, slug: amperity, domain: amperity.com}
+- {name: Cognitiv, ats: greenhouse, slug: cognitiv, domain: cognitiv.ai}
+- {name: Karat, ats: greenhouse, slug: karat, domain: karat.com}
+- {name: Maven Clinic, ats: greenhouse, slug: mavenclinic, domain: mavenclinic.com}
+- {name: Otter.ai, ats: greenhouse, slug: otterai, domain: otter.ai}
+- {name: Observe.AI, ats: greenhouse, slug: observeai, domain: observe.ai}
+- {name: Navan, ats: greenhouse, slug: tripactions, domain: navan.com}
+- {name: Compass, ats: greenhouse, slug: urbancompass, domain: compass.com}
+- {name: Medallion, ats: greenhouse, slug: medallionakafirstlayerai, domain: medallion.co}
+- {name: Toptal, ats: lever, slug: toptal, domain: toptal.com}
+- {name: Coupa, ats: lever, slug: coupa, domain: coupa.com}
+- {name: Scribd, ats: ashby, slug: scribdinc, domain: scribd.com}
+- {name: Airbyte, ats: ashby, slug: airbyte, domain: airbyte.com}
+- {name: Anrok, ats: ashby, slug: anrok, domain: anrok.com}
+- {name: Broccoli AI, ats: ashby, slug: broccoli, domain: broccoli.com}
+- {name: Candid Health, ats: ashby, slug: candidhealth, domain: joincandidhealth.com}
+- {name: Clipboard Health, ats: ashby, slug: clipboard, domain: clipboardhealth.com}
+- {name: DatologyAI, ats: ashby, slug: datologyai, domain: datologyai.com}
+- {name: David AI, ats: ashby, slug: david-ai, domain: withdavid.ai}
+- {name: Distyl AI, ats: ashby, slug: distyl, domain: distyl.ai}
+- {name: FurtherAI, ats: ashby, slug: furtherai, domain: furtherai.com}
+- {name: Headway, ats: ashby, slug: headway, domain: headway.co}
+- {name: Juniper Square, ats: ashby, slug: junipersquare, domain: junipersquare.com}
+- {name: LiveKit, ats: ashby, slug: livekit, domain: livekit.io}
+- {name: PostHog, ats: ashby, slug: posthog, domain: posthog.com}
+- {name: Profound, ats: ashby, slug: profound, domain: tryprofound.com}
+- {name: Reducto, ats: ashby, slug: reducto, domain: reducto.ai}
+- {name: Reevo, ats: ashby, slug: reevo, domain: reevo.ai}
+- {name: Sprinter Health, ats: ashby, slug: sprinter-health, domain: sprinterhealth.com}
+- {name: Tennr, ats: ashby, slug: tennr, domain: tennr.com}
+- {name: Strala, ats: ashby, slug: strala-ai, domain: strala.ai}
+- {name: Giga, ats: ashby, slug: gigaml, domain: giga.ai}
+- {name: OnePay, ats: ashby, slug: oneapp, domain: onepay.com}
+- {name: Latent Health, ats: ashby, slug: latent, domain: latenthealth.com}
+- {name: Sphere, ats: ashby, slug: sphere, domain: getsphere.com}
+- {name: Wonderful, ats: ashby, slug: wonderful, domain: wonderful.ai}
+- {name: Alteryx, ats: workday, slug: alteryx/AlteryxCareers, workday_host: alteryx.wd108.myworkdayjobs.com, workday_site: AlteryxCareers, domain: alteryx.com}
+- {name: Grubhub, ats: workday, slug: wonder/Grubhub_Careers, workday_host: wonder.wd1.myworkdayjobs.com, workday_site: Grubhub_Careers, domain: grubhub.com}
+- {name: BNSF Railway, ats: phenom, slug: bnsf, workday_host: jobs.bnsf.com/us/en, workday_site: '-', domain: bnsf.com}
+- {name: Millennium, ats: eightfold_v2, slug: mlp, workday_host: mlp.eightfold.ai, workday_site: mlp.com, domain: mlp.com}
+- {name: Mercury Insurance, ats: icims, slug: mercuryinsurance, workday_host: careers-mercuryinsurance.icims.com, workday_site: '-', domain: mercuryinsurance.com}
 
 # Companies whose postings come from the SimplifyJobs list (their own sites block bots,
 # or use career sites we have no adapter for). slug = the company name as Simplify writes it.

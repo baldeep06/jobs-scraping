@@ -10,14 +10,30 @@ ROOT = Path(__file__).resolve().parents[1]
 GROUPS_FILE = ROOT / "data" / "company_groups.yml"
 
 GROUPS = (
+    # tech
     "faang",
     "big_tech",
     "big_tech_adjacent",
-    "quant",
     "unicorn",
+    "startup",
     "ai_labs",
+    # hardware
+    "semiconductors",
+    "hardware",
+    "robotics",
+    # finance
+    "quant",
     "fintech",
-    "defense_hardware",
+    "finance",
+    # industry
+    "consulting",
+    "defense",
+    "energy",
+    "industrial",
+    "healthcare",
+    "consumer",
+    "media",
+    "public_sector",
     "canadian",
 )
 

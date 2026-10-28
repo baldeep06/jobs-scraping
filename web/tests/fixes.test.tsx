@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import RegionError from "@/app/[region]/error";
 import { FilterBar } from "@/components/FilterBar";
 import { JobList } from "@/components/JobList";
-import { lastPageRedirect, parseFilters } from "@/lib/filters";
+import { GROUP_KEYS, lastPageRedirect, parseFilters } from "@/lib/filters";
 import { fetchCounts, fetchGroupCounts, fetchJobs } from "@/lib/jobs";
 import { fakeClient } from "./fakeClient";
 import { makeJob } from "./fixtures";
@@ -59,7 +59,7 @@ describe("group counts", () => {
     const counts = await fetchGroupCounts(client, "us");
     expect(counts.quant).toBe(7);
     expect(counts.faang).toBe(0);
-    expect(Object.keys(counts)).toHaveLength(9);
+    expect(Object.keys(counts)).toHaveLength(GROUP_KEYS.length);
     for (const calls of log) {
       expect(calls).toContainEqual(["in", "country", ["US", "BOTH", "UNKNOWN"]]);
       expect(calls).toContainEqual(["in", "visa_status", ["open", "unknown"]]);
